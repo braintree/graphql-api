@@ -7,4 +7,4 @@ You can also use the Github Issues section of this repository to communicate bug
 
 Please visit our GraphQL API [documentation site](https://graphql.braintreepayments.com/) for more information.
 
-Please [contact support](https://help.braintreepayments.com/) for help with using the API. Issues on this repository should be for bug reports and feature requests only.
+Please [contact support](https://help.braintreepayments.com/?issue=GraphQL) for help with using the API. Issues on this repository should be for bug reports and feature requests only.
