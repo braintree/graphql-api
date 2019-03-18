@@ -1,5 +1,5 @@
-# source: https://payments.sandbox.braintree-api.com/graphql
-# timestamp: Thu Feb 28 2019 21:18:00 GMT+0000 (Coordinated Universal Time)
+# source: https://payments.braintree-api.com/graphql
+# timestamp: Mon Mar 18 2019 21:02:44 GMT+0000 (Coordinated Universal Time)
 
 """This directive allows results to be deferred during execution"""
 directive @defer on FIELD
@@ -194,6 +194,22 @@ type AuthorizedEvent implements TransactionStatusEvent {
 }
 
 """
+Top-level input fields for creating a transaction by authorizing a payment method.
+"""
+input AuthorizePaymentMethodInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of a payment method to be authorized."""
+  paymentMethodId: ID!
+
+  """
+  Input fields for the authorization, with details that will define the resulting transaction.
+  """
+  transaction: TransactionInput!
+}
+
+"""
 Response codes from the processing bank's Address Verification System (AVS) and CVV verification.
 """
 enum AvsCvvResponseCode {
@@ -269,6 +285,15 @@ type BraintreeApiConfiguration {
   accessToken: String
 }
 
+"""Top-level input fields for capturing an authorized transaction."""
+input CaptureTransactionInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of a transaction to be captured."""
+  transactionId: ID!
+}
+
 """
 A list of challenges that are required by the current merchant to process a given credit card.
 """
@@ -293,15 +318,6 @@ input ChargePaymentMethodInput {
   Input fields for the charge, with details that will define the resulting transaction.
   """
   transaction: TransactionInput!
-}
-
-"""Top-level output field from charging a payment method."""
-type ChargePaymentMethodPayload {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """The transaction representing the charge on the payment method."""
-  transaction: Transaction
 }
 
 """
@@ -926,9 +942,19 @@ The top-level Mutation type. Mutations are used to make requests that create or 
 """
 type Mutation {
   """
+  Authorize an eligible payment method and return a payload that includes details of the resulting transaction.
+  """
+  authorizePaymentMethod(input: AuthorizePaymentMethodInput!): TransactionPayload
+
+  """
+  Capture an authorized transaction and return a payload that includes details of the transaction.
+  """
+  captureTransaction(input: CaptureTransactionInput!): TransactionPayload
+
+  """
   Charge any payment method and return a payload that includes details of the resulting transaction.
   """
-  chargePaymentMethod(input: ChargePaymentMethodInput!): ChargePaymentMethodPayload
+  chargePaymentMethod(input: ChargePaymentMethodInput!): TransactionPayload
 
   """
   Charge a US bank account and return a payload that includes details of the
@@ -936,12 +962,12 @@ type Mutation {
   https://developers.braintreepayments.com/guides/ach/configuration for
   information on eligibility and setup.
   """
-  chargeUsBankAccount(input: ChargeUsBankAccountInput!): ChargePaymentMethodPayload
+  chargeUsBankAccount(input: ChargeUsBankAccountInput!): TransactionPayload
 
   """
   Charge a PayPal account and return a payload that includes details of the resulting transaction.
   """
-  chargePayPalAccount(input: ChargePayPalAccountInput!): ChargePaymentMethodPayload
+  chargePayPalAccount(input: ChargePayPalAccountInput!): TransactionPayload
 
   """
   Charge a Venmo account and return a payload that includes details of the
@@ -949,7 +975,7 @@ type Mutation {
   https://articles.braintreepayments.com/guides/payment-methods/venmo for
   information on eligibility and setup.
   """
-  chargeVenmoAccount(input: ChargeVenmoAccountInput!): ChargePaymentMethodPayload
+  chargeVenmoAccount(input: ChargeVenmoAccountInput!): TransactionPayload
 
   """
   Vault payment information from a single-use payment method and return a
@@ -1588,6 +1614,15 @@ input SearchTextInput {
   contains: String
 }
 
+"""Input fields for searching for a transaction with a given status."""
+input SearchTransactionStatusInput {
+  """The transaction status is exactly this value."""
+  is: TransactionStatus
+
+  """The transaction status is one of these values."""
+  in: [TransactionStatus!]
+}
+
 """Input fields for searching for specific values."""
 input SearchValueInput {
   """Field is exactly this value."""
@@ -1883,6 +1918,14 @@ type Transaction implements Node {
   chronological order, with the most recent event first in the list.
   """
   statusHistory: [TransactionStatusEvent!]
+
+  """
+  If the transaction request was performed through a shopping cart provider or
+  Braintree partner, this field will have a string identifier for that shopping
+  cart provider or partner. For PayPal transactions, this maps to the PayPal
+  account's bn_code.
+  """
+  channel: String
 }
 
 """Input fields for searching for a transaction amount."""
@@ -1984,12 +2027,28 @@ input TransactionInput {
 
   """The type of recurring payment the transaction represents."""
   recurring: RecurringType
+
+  """
+  For partners and shopping carts only. If you are a shopping cart provider or
+  other Braintree partner, pass a string identifier for your service. For PayPal
+  tranasctions, this maps to paypal.bn_code.
+  """
+  channel: String
 }
 
 """Transaction level fee report."""
 type TransactionLevelFeeReport {
   """The URL where you can access the requested report."""
   url: String
+}
+
+"""Top-level output field from creating a transaction."""
+type TransactionPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The transaction representing the charge on the payment method."""
+  transaction: Transaction
 }
 
 """Detailed response information from the processor."""
@@ -2033,6 +2092,9 @@ input TransactionSearchInput {
 
   """Find transactions with a given orderId."""
   orderId: SearchTextInput
+
+  """Find transactions with a given transaction status."""
+  status: SearchTransactionStatusInput
 }
 
 """The origin of a request that created or changed a transaction."""
