@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Mon Mar 18 2019 21:02:44 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Apr 11 2019 15:15:14 GMT+0000 (Coordinated Universal Time)
 
 """This directive allows results to be deferred during execution"""
 directive @defer on FIELD
@@ -90,15 +90,11 @@ type ApplePayConfiguration {
   """
   merchantIdentifier: String
 
-  """
-  A list of card brands supported for Apple Pay by the current merchant.
-  """
+  """A list of card brands supported for Apple Pay by the current merchant."""
   supportedCardBrands: [CreditCardBrandCode]
 }
 
-"""
-Additional information about the payment method specific to Apple Pay.
-"""
+"""Additional information about the payment method specific to Apple Pay."""
 type ApplePayOriginDetails {
   """
   A human-readable description of the Apple Pay payment method. Usually consists
@@ -138,9 +134,7 @@ type ApplePayWebConfiguration {
   """
   merchantIdentifier: String
 
-  """
-  A list of card brands supported for Apple Pay by the current merchant.
-  """
+  """A list of card brands supported for Apple Pay by the current merchant."""
   supportedCardBrands: [CreditCardBrandCode]
 }
 
@@ -673,6 +667,47 @@ values](https://developers.braintreepayments.com/reference/general/currencies).
 """
 scalar CurrencyCodeAlpha
 
+"""
+Information about a customer and their associated payment methods and transactions.
+"""
+type Customer implements Node {
+  """Unique identifier."""
+  id: ID!
+
+  """The company for this customer."""
+  company: String
+
+  """The date and time at which the customer was created."""
+  createdAt: Timestamp
+
+  """
+  Collection of custom field/value pairs. Custom fields are [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
+  """
+  customFields: [CustomField!]
+
+  """The email address for this customer."""
+  email: String
+
+  """The first name of this customer."""
+  firstName: String
+
+  """The last name of this customer."""
+  lastName: String
+
+  """The phone number for this customer."""
+  phoneNumber: String
+
+  """Payment methods belonging to this customer."""
+  paymentMethods(after: String, first: Int): PaymentMethodConnection
+
+  """
+  Transactions associated with this customer. This includes transactions created
+  by charging a vaulted payment method that belongs or belonged to the customer,
+  or by passing a customer ID when charging an single-use payment method.
+  """
+  transactions(after: String, first: Int): TransactionConnection
+}
+
 """A merchant-defined custom field to store additional information."""
 type CustomField {
   """The name of the custom field."""
@@ -683,8 +718,9 @@ type CustomField {
 }
 
 """
-Custom field name/value pairs. Maximum 255 characters. You must set up each
-custom field in the Control Panel prior to passing it with a request.
+Custom field name/value pairs. Maximum 255 characters. You must [set up each
+custom field in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#creating-a-custom-field)
+prior to passing it with a request.
 """
 input CustomFieldInput {
   """The custom field name."""
@@ -1042,15 +1078,38 @@ type PaymentMethod implements Node {
   """Unique identifier."""
   id: ID!
 
-  """
-  Whether a payment method may be used only once or used multiple times.
-  """
+  """Whether a payment method may be used only once or used multiple times."""
   usage: PaymentMethodUsage
 
   """
   Details about the payment method specific to the type (e.g. credit card, PayPal account).
   """
   details: PaymentMethodDetails
+
+  """
+  A paginated list of verifications that have been run against the payment method.
+  """
+  verifications(after: String, first: Int): VerificationConnection
+}
+
+"""A paginated list of payment methods."""
+type PaymentMethodConnection {
+  """A list of payment methods."""
+  edges: [PaymentMethodConnectionEdge]
+
+  """Information about the page."""
+  pageInfo: PageInfo!
+}
+
+"""A payment method within a PaymentMethodConnection."""
+type PaymentMethodConnectionEdge {
+  """
+  This payment method's location within the PaymentMethodConnection. Used for requesting additional pages.
+  """
+  cursor: String
+
+  """The payment method."""
+  node: PaymentMethod
 }
 
 """
@@ -1089,9 +1148,9 @@ enum PaymentMethodOriginType {
 }
 
 """
-A union of all possible payment method transaction details.
-PaymentMethodSnapshot preserves values used to create a given transaction at
-that moment in time.
+A union of all possible payment method details as they were used in a
+transaction or verification. PaymentMethodSnapshot preserves values used to
+create a given transaction or verify a payment method at that moment in time.
 """
 union PaymentMethodSnapshot = CreditCardDetails | PayPalTransactionDetails | VenmoAccountDetails | UsBankAccountDetails
 
@@ -1326,6 +1385,9 @@ from a previous transaction back to the customer.
 type Refund implements Node {
   """Unique identifier."""
   id: ID!
+
+  """Time at which the refund was created."""
+  createdAt: Timestamp
 
   """
   The amount that will be refunded, which can be less than or equal to the original charge amount.
@@ -1614,6 +1676,19 @@ input SearchTextInput {
   contains: String
 }
 
+"""
+Input fields for searching for a timestamp. These ranges are precise to the
+minute; the results of search for transactions created between 12/17/2015 17:00
+and 12/17/2015 17:00 will include a transaction created at 12/17/2015 17:00:59.
+"""
+input SearchTimestampInput {
+  """Timestamp is greater than or equal to this value."""
+  greaterThanOrEqualTo: Timestamp
+
+  """Timestamp is less than or equal to this value."""
+  lessThanOrEqualTo: Timestamp
+}
+
 """Input fields for searching for a transaction with a given status."""
 input SearchTransactionStatusInput {
   """The transaction status is exactly this value."""
@@ -1872,6 +1947,9 @@ type Transaction implements Node {
   """Unique identifier."""
   id: ID!
 
+  """Time at which the transaction was created."""
+  createdAt: Timestamp
+
   """
   Snapshot of payment method details used to create the transaction, preserved
   at the time the transaction was created. This will always be present.
@@ -1887,7 +1965,9 @@ type Transaction implements Node {
   """The amount charged in this transaction."""
   amount: MonetaryAmount
 
-  """Collection of custom fields specified by the merchant."""
+  """
+  Collection of custom field/value pairs. Custom fields are [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
+  """
   customFields: [CustomField!]
 
   """The ID of the merchant account that processed this transaction."""
@@ -1904,7 +1984,7 @@ type Transaction implements Node {
   """Fields describing the payment processor response."""
   processorResponse: TransactionProcessorResponse @deprecated(reason: "Use relevant events in `statusEvents` instead.")
 
-  """Risk data for this transaction."""
+  """Risk data evaluated for this transaction."""
   riskData: RiskData
 
   """
@@ -1948,7 +2028,9 @@ type TransactionConnection {
 
 """A transaction within a TransactionConnection."""
 type TransactionConnectionEdge {
-  """This transaction's location within the TransactionConnection."""
+  """
+  This transaction's location within the TransactionConnection. Used for requesting additional pages.
+  """
   cursor: String
 
   """The transaction."""
@@ -2013,10 +2095,8 @@ input TransactionInput {
   riskData: RiskDataInput
 
   """
-  Collection of custom field/value pairs. Fields and values must be formatted as
-  strings or integers. Maximum 255 characters. You must set up each custom field
-  in the Control Panel prior to passing it with a request. Querying this value
-  returns a collection of custom field values stored on the transaction object.
+  Collection of custom field/value pairs. You must [set up each custom field in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#creating-a-custom-field)
+  prior to passing it with a request.
   """
   customFields: [CustomFieldInput!]
 
@@ -2054,7 +2134,8 @@ type TransactionPayload {
 """Detailed response information from the processor."""
 type TransactionProcessorResponse {
   """
-  The processor response code indicating the result of attempting to process this transaction.
+  The [processor response code](https://developers.braintreepayments.com/reference/general/processor-responses/authorization-responses)
+  indicating the result of attempting to process this transaction.
   """
   legacyCode: String
 
@@ -2069,9 +2150,7 @@ type TransactionProcessorResponse {
   """
   avsPostalCodeResponse: AvsCvvResponseCode
 
-  """
-  The processing bank's response to the provided billing street address.
-  """
+  """The processing bank's response to the provided billing street address."""
   avsStreetAddressResponse: AvsCvvResponseCode
 }
 
@@ -2095,6 +2174,9 @@ input TransactionSearchInput {
 
   """Find transactions with a given transaction status."""
   status: SearchTransactionStatusInput
+
+  """Find transactions with a given created at time."""
+  createdAt: SearchTimestampInput
 }
 
 """The origin of a request that created or changed a transaction."""
@@ -2246,7 +2328,7 @@ input UsBankAccountInput {
   individualOwner: UsBankAccountIndividualOwnerInput
 
   """The billing address of the account."""
-  billingAddress: UsBankAccountBillingAddressInput!
+  billingAddress: UsBankAccountBillingAddressInput
 
   """
   Language used to prove that you have the customer's explicit permission to
@@ -2376,6 +2458,9 @@ input VaultPaymentMethodInput {
 
   """ID of an existing single-use payment method to be vaulted."""
   paymentMethodId: ID!
+
+  """ID of the merchant account to use when verifying the payment method."""
+  verificationMerchantAccountId: ID
 }
 
 """Top-level output field from vaulting a payment method."""
@@ -2387,6 +2472,9 @@ type VaultPaymentMethodPayload {
   A payment method that has been stored in a merchant's vault and can be reused.
   """
   paymentMethod: PaymentMethod
+
+  """The verification that was run on the payment method prior to vaulting."""
+  verification: Verification
 }
 
 """Details about a Venmo Account."""
@@ -2416,6 +2504,126 @@ enum VenmoEnvironment {
   PRODUCTION
   production
   sandbox
+}
+
+"""
+A verification reporting whether the payment method has passed your fraud rules
+and the issuer has ensured it is associated with a valid account.
+"""
+type Verification implements Node {
+  """Unique identifier."""
+  id: ID!
+
+  """
+  Snapshot of payment method details that were verified. This will always be present.
+  """
+  paymentMethodSnapshot: PaymentMethodSnapshot
+
+  """
+  The multi-use payment method that was verified, if it was vaulted. The details
+  of this PaymentMethod may have changed since it was verified.
+  """
+  paymentMethod: PaymentMethod
+
+  """For a credit card, the amount used when performing the verification."""
+  amount: MonetaryAmount
+
+  """The merchant account used for the verification."""
+  merchantAccountId: ID
+
+  """
+  The current status of this verification, indicating whether the verification
+  was successful. Braintree recommends only vaulting payment methods that are
+  successfully verified.
+  """
+  status: VerificationStatus
+
+  """
+  Detailed response information from the processor. Will not be present if the
+  verification was rejected prior to contacting the processor.
+  """
+  processorResponse: VerificationProcessorResponse
+
+  """The date and time at which the verification was created."""
+  createdAt: Timestamp
+
+  """
+  The reason the verification was rejected. Will only be set if status is GATEWAY_REJECTED.
+  """
+  gatewayRejectionReason: GatewayRejectionReason
+
+  """Risk data evaluated for this verification."""
+  riskData: RiskData
+}
+
+"""A paginated list of verifications."""
+type VerificationConnection {
+  """A list of verifications."""
+  edges: [VerificationConnectionEdge]
+
+  """Information about the page."""
+  pageInfo: PageInfo!
+}
+
+"""A verification within a VerificationConnection."""
+type VerificationConnectionEdge {
+  """
+  This verification's location within the VerificationConnection. Used for requesting additional pages.
+  """
+  cursor: String
+
+  """The verification."""
+  node: Verification
+}
+
+"""Detailed response information from the processor."""
+type VerificationProcessorResponse {
+  """
+  The [processor response code](https://developers.braintreepayments.com/reference/general/processor-responses/authorization-responses)
+  indicating the result of attempting the verification.
+  """
+  legacyCode: String
+
+  """The text explanation of the processor response code."""
+  message: String
+
+  """The processing bank's response to the provided CVV."""
+  cvvResponse: AvsCvvResponseCode
+
+  """
+  The processing bank's response to the provided billing postal or zip code.
+  """
+  avsPostalCodeResponse: AvsCvvResponseCode
+
+  """The processing bank's response to the provided billing street address."""
+  avsStreetAddressResponse: AvsCvvResponseCode
+}
+
+"""
+The status of the verification, indicating whether the payment method was
+successfully verified. Braintree recommends only vaulting payment methods with
+successful verifications.
+"""
+enum VerificationStatus {
+  """
+  Indicates the verification was unsuccessful because of an issue communicating with the processor.
+  """
+  FAILED
+
+  """
+  Indicates that the verification was unsuccessful because the payment method
+  failed one or more fraud checks. In this case, the `gatewayRejectionReason`
+  will indicate which fraud check failed.
+  """
+  GATEWAY_REJECTED
+
+  """
+  Indicates that the verification was unsuccessful based on the response from the processor.
+  """
+  PROCESSOR_DECLINED
+
+  """Indicates that the verification was successful."""
+  VERIFIED
 }
 
 """Configuration for Visa Checkout."""
