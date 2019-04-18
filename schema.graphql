@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Apr 11 2019 15:15:14 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Apr 18 2019 18:31:51 GMT+0000 (UTC)
 
 """This directive allows results to be deferred during execution"""
 directive @defer on FIELD
@@ -437,7 +437,7 @@ type ClientConfiguration {
   googlePay: GooglePayConfiguration
 
   """Configuration for iDEAL."""
-  ideal: IDealConfiguration
+  ideal: IDealConfiguration @deprecated(reason: "This field is included for supporting legacy clients.")
 
   """Configuration for Kount fraud tools."""
   kount: KountConfiguration
@@ -525,6 +525,27 @@ type CreateClientTokenPayload {
 
   """A Base64 encoded string used to initialize client SDKs."""
   clientToken: String
+}
+
+"""Top-level field for creating a customer."""
+input CreateCustomerInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Input fields for creating a customer."""
+  customer: CustomerInput
+}
+
+"""Top-level fields returned when creating a customer."""
+type CreateCustomerPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  Information about the customer that was created. Can be used when vaulting
+  payment methods or creating transactions to associate those objects.
+  """
+  customer: Customer
 }
 
 """A code identifying the card brand."""
@@ -674,10 +695,10 @@ type Customer implements Node {
   """Unique identifier."""
   id: ID!
 
-  """The company for this customer."""
+  """Company or business name associated with this customer."""
   company: String
 
-  """The date and time at which the customer was created."""
+  """Date and time at which the customer was created."""
   createdAt: Timestamp
 
   """
@@ -685,16 +706,16 @@ type Customer implements Node {
   """
   customFields: [CustomField!]
 
-  """The email address for this customer."""
+  """Email address for this customer."""
   email: String
 
-  """The first name of this customer."""
+  """Customer's first name."""
   firstName: String
 
-  """The last name of this customer."""
+  """Customer's last name."""
   lastName: String
 
-  """The phone number for this customer."""
+  """Phone number for this customer."""
   phoneNumber: String
 
   """Payment methods belonging to this customer."""
@@ -706,6 +727,30 @@ type Customer implements Node {
   or by passing a customer ID when charging an single-use payment method.
   """
   transactions(after: String, first: Int): TransactionConnection
+}
+
+"""Input fields for creating a customer."""
+input CustomerInput {
+  """Company or business name associated with the customer."""
+  company: String
+
+  """
+  Collection of custom field/value pairs. You must [set up each custom field in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#creating-a-custom-field)
+  prior to passing it with a request.
+  """
+  customFields: [CustomFieldInput!]
+
+  """Email address for the customer."""
+  email: String
+
+  """Customer's first name."""
+  firstName: String
+
+  """Customer's last name."""
+  lastName: String
+
+  """Phone number for the customer."""
+  phoneNumber: String
 }
 
 """A merchant-defined custom field to store additional information."""
@@ -723,10 +768,10 @@ custom field in the Control Panel](https://articles.braintreepayments.com/contro
 prior to passing it with a request.
 """
 input CustomFieldInput {
-  """The custom field name."""
+  """Name of the custom field as defined in the Control Panel."""
   name: String!
 
-  """The custom field value."""
+  """Value for the named custom field."""
   value: String!
 }
 
@@ -1029,6 +1074,9 @@ type Mutation {
   """
   reverseTransaction(input: ReverseTransactionInput!): ReverseTransactionPayload
 
+  """Run a verification on a multi-use payment method."""
+  verifyPaymentMethod(input: VerifyPaymentMethodInput!): VerifyPaymentMethodPayload
+
   """Delete a multi-use payment method from the vault."""
   deletePaymentMethodFromVault(input: DeletePaymentMethodFromVaultInput!): DeletePaymentMethodFromVaultPayload
 
@@ -1056,6 +1104,11 @@ type Mutation {
   Tokenize U.S. bank account fields and return a payload that includes a single-use payment method.
   """
   tokenizeUsBankAccount(input: TokenizeUsBankAccountInput!): TokenizeUsBankAccountPayload
+
+  """
+  Create a customer for storing individual customer information and/or grouping transactions and multi-use payment methods.
+  """
+  createCustomer(input: CreateCustomerInput): CreateCustomerPayload
 
   """Delete a payment method referenced by a single-use token."""
   deletePaymentMethodFromSingleUseToken(input: DeletePaymentMethodFromSingleUseTokenInput!): DeletePaymentMethodFromSingleUseTokenPayload @deprecated(reason: "Use `deletePaymentMethodFromVault` instead.")
@@ -2624,6 +2677,27 @@ enum VerificationStatus {
 
   """Indicates that the verification was successful."""
   VERIFIED
+}
+
+"""Top-level input field for verifying a multi-use payment method."""
+input VerifyPaymentMethodInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of an existing multi-use payment method to be verified."""
+  paymentMethodId: ID!
+
+  """ID of the merchant account to use when verifying the payment method."""
+  merchantAccountId: ID
+}
+
+"""Top-level output field from verifying a payment method."""
+type VerifyPaymentMethodPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The verification that was run on the payment method."""
+  verification: Verification
 }
 
 """Configuration for Visa Checkout."""

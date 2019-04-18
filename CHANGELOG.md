@@ -1,3 +1,9 @@
+# 2019-04-18
+
+* Add `verifyPaymentMethod` mutation.
+* Add `createCustomer` mutation.
+* Deprecate `ClientConfiguration.ideal`.
+
 # 2019-04-11
 
 * Credit cards are now verified automatically upon vaulting.
