@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Apr 18 2019 18:31:51 GMT+0000 (UTC)
+# timestamp: Mon Apr 22 2019 18:14:36 GMT+0000 (Coordinated Universal Time)
 
 """This directive allows results to be deferred during execution"""
 directive @defer on FIELD
@@ -1143,6 +1143,9 @@ type PaymentMethod implements Node {
   A paginated list of verifications that have been run against the payment method.
   """
   verifications(after: String, first: Int): VerificationConnection
+
+  """The customer that the payment method belongs to."""
+  customer: Customer
 }
 
 """A paginated list of payment methods."""

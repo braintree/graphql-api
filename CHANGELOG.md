@@ -1,3 +1,7 @@
+# 2019-04-22
+
+* `customer` is now a field on `PaymentMethod`.
+
 # 2019-04-18
 
 * Add `verifyPaymentMethod` mutation.
