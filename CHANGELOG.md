@@ -1,6 +1,13 @@
+# 2019-05-03
+
+* Add `updateCustomer` mutation.
+* Add nullable `customerId` field to `VaultPaymentMethodInput`.
+* The `value` field on `CustomFieldInput` type is now nullable.
+* The `achMandate` field on `UsBankAccountInput` type is now non-nullable.
+
 # 2019-04-22
 
-* `customer` is now a field on `PaymentMethod`.
+* Add nullable `customer` field to `PaymentMethod`.
 
 # 2019-04-18
 
@@ -12,9 +19,9 @@
 
 * Credit cards are now verified automatically upon vaulting.
 * `Verification`s will now be returned on `PaymentMethod`s as a connection.
-* `billingAddress` is no longer a required field on `TokenizeUsBankAccountInput`.
-* `TransactionSearchInput` now accepts `createdAt` parameter.
-* `Node` query now can return `Customer`s and `Verification`s.
+* The `billingAddress` field on `TokenizeUsBankAccountInput` is now nullable.
+* Add `createdAt` parameter to `TransactionSearchInput`.
+* The `Node` query now can return `Customer`s and `Verification`s.
 
 # 2019-03-18
 
