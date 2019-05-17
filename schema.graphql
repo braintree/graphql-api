@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Fri May 03 2019 17:43:49 GMT+0000 (Coordinated Universal Time)
+# timestamp: Fri May 17 2019 18:50:15 GMT+0000 (UTC)
 
 """This directive allows results to be deferred during execution"""
 directive @defer on FIELD
@@ -695,6 +695,9 @@ type Customer implements Node {
   """Unique identifier."""
   id: ID!
 
+  """Legacy unique identifier."""
+  legacyId: ID!
+
   """Company or business name associated with this customer."""
   company: String
 
@@ -782,6 +785,21 @@ input CustomFieldInput {
 
 """A date of the form YYYY-MM-DD."""
 scalar Date
+
+"""Top-level input fields for deleting a customer."""
+input DeleteCustomerInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The ID of the customer to be deleted."""
+  customerId: ID!
+}
+
+"""Top-level output field from deleting a customer."""
+type DeleteCustomerPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+}
 
 """
 Top-level input fields for deleting a payment method referenced by a single-use token.
@@ -967,6 +985,17 @@ type KountConfiguration {
   merchantId: String
 }
 
+"""
+The type of object the legacyId represents when converting legacyId to ID.
+"""
+enum LegacyIdType {
+  CUSTOMER
+  PAYMENT_METHOD
+  REFUND
+  TRANSACTION
+  VERIFICATION
+}
+
 """Configuration for Masterpass."""
 type MasterpassConfiguration {
   """
@@ -992,7 +1021,7 @@ type MasterpassOriginDetails {
 }
 
 """Details about a merchant and its current settings."""
-type Merchant implements Node {
+type Merchant {
   """Unique identifier."""
   id: ID!
 
@@ -1118,6 +1147,12 @@ type Mutation {
   """Update a customer's information."""
   updateCustomer(input: UpdateCustomerInput!): UpdateCustomerPayload
 
+  """
+  Delete a customer, breaking association between any of the customer's
+  transactions. Will not delete if the customer has existing payment methods.
+  """
+  deleteCustomer(input: DeleteCustomerInput!): DeleteCustomerPayload
+
   """Delete a payment method referenced by a single-use token."""
   deletePaymentMethodFromSingleUseToken(input: DeletePaymentMethodFromSingleUseTokenInput!): DeletePaymentMethodFromSingleUseTokenPayload @deprecated(reason: "Use `deletePaymentMethodFromVault` instead.")
 }
@@ -1138,6 +1173,11 @@ type PageInfo {
 type PaymentMethod implements Node {
   """Unique identifier."""
   id: ID!
+
+  """
+  Legacy unique identifier. May be the same as id for single-use payment methods.
+  """
+  legacyId: ID!
 
   """Whether a payment method may be used only once or used multiple times."""
   usage: PaymentMethodUsage
@@ -1425,8 +1465,14 @@ type Query {
   """The client-side environment and payment method configuration."""
   clientConfiguration: ClientConfiguration
 
-  """Fetch almost any object using its ID."""
+  """Fetch any object that extends the Node interface using its ID."""
   node(id: ID!): Node
+
+  """
+  Get a GraphQL ID from a legacy ID that was returned from an SDK or a legacyId
+  field. Does not verify existence except for payment methods.
+  """
+  idFromLegacyId(legacyId: ID!, type: LegacyIdType!): ID!
 
   """The available reports."""
   report: Report
@@ -1449,6 +1495,9 @@ from a previous transaction back to the customer.
 type Refund implements Node {
   """Unique identifier."""
   id: ID!
+
+  """Legacy unique identifier."""
+  legacyId: ID!
 
   """Time at which the refund was created."""
   createdAt: Timestamp
@@ -1597,7 +1646,7 @@ enum RiskDecision {
 }
 
 """Groups of rights assigned to a user."""
-type Role implements Node {
+type Role {
   """Unique identifier."""
   id: ID!
 
@@ -2011,6 +2060,9 @@ type Transaction implements Node {
   """Unique identifier."""
   id: ID!
 
+  """Legacy unique identifier."""
+  legacyId: ID!
+
   """Time at which the transaction was created."""
   createdAt: Timestamp
 
@@ -2070,6 +2122,9 @@ type Transaction implements Node {
   account's bn_code.
   """
   channel: String
+
+  """Customer associated with the transaction, if applicable."""
+  customer: Customer
 }
 
 """Input fields for searching for a transaction amount."""
@@ -2178,6 +2233,11 @@ input TransactionInput {
   tranasctions, this maps to paypal.bn_code.
   """
   channel: String
+
+  """
+  If charging a single-use payment method, optional ID of a customer to associate the transaction with.
+  """
+  customerId: ID
 }
 
 """Transaction level fee report."""
@@ -2263,6 +2323,7 @@ enum TransactionStatus {
   GATEWAY_REJECTED
   PROCESSOR_DECLINED
   SETTLED
+  SETTLEMENT_CONFIRMED
   SETTLEMENT_DECLINED
   SETTLEMENT_PENDING
   SETTLING
@@ -2441,7 +2502,7 @@ enum UsBankAccountType {
 scalar UsBankRoutingNumber
 
 """Details about a user and the merchant it is associated with."""
-type User implements Node {
+type User {
   """Unique identifier."""
   id: ID!
 
@@ -2603,6 +2664,9 @@ and the issuer has ensured it is associated with a valid account.
 type Verification implements Node {
   """Unique identifier."""
   id: ID!
+
+  """Legacy unique identifier."""
+  legacyId: ID!
 
   """
   Snapshot of payment method details that were verified. This will always be present.

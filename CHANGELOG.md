@@ -1,3 +1,12 @@
+# 2019-05-17
+
+* Add `deleteCustomer` mutation.
+* Add `idFromLegacyId` query.
+* Add `legacyId` fields to all types that extend the `Node` interface.
+* Add `customerId` to `TransactionInput` to allow associating a transaction with the customer when charging a single-use payment method.
+* Add `customer` field on `Transaction`.
+* Add `SETTLEMENT_CONFIRMED` to `TransactionStatus` enum.
+
 # 2019-05-03
 
 * Add `updateCustomer` mutation.
