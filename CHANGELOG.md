@@ -1,3 +1,7 @@
+# 2019-05-23
+
+* Add `customerId` parameter to `CreateClientTokenInput` to create customer-scoped client tokens.
+
 # 2019-05-17
 
 * Add `deleteCustomer` mutation.
