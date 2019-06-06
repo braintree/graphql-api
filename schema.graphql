@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu May 23 2019 18:02:02 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Jun 06 2019 20:10:03 GMT+0000 (Coordinated Universal Time)
 
 """This directive allows results to be deferred during execution"""
 directive @defer on FIELD
@@ -19,6 +19,38 @@ enum ACHStandardEntryClassCode {
 
   """Internet-initiated/mobile."""
   WEB
+}
+
+"""Representation of an address."""
+type Address {
+  """Company name."""
+  company: String
+
+  """The street address."""
+  streetAddress: String
+
+  """Extended address information, such as apartment or suite number."""
+  extendedAddress: String
+
+  """First name."""
+  firstName: String
+
+  """Last name."""
+  lastName: String
+
+  """Locality/city."""
+  locality: String
+
+  """State or province."""
+  region: String
+
+  """
+  Postal code, otherwise known as CAP, CEP, Eircode, NPA, PIN, PLZ, or ZIP code.
+  """
+  postalCode: String
+
+  """Country code for the address in ISO 3166-1 alpha-3 format."""
+  countryCode: CountryCodeAlpha3
 }
 
 """Input fields for an Address."""
@@ -47,13 +79,17 @@ input AddressInput {
   region: String
 
   """
-  Postal code. Must be a string of 4-9 alphanumeric characters, optionally
-  separated by a dash or a space. Spaces, hyphens, and all other special
-  characters are ignored.
+  Postal code in any country's format, otherwise known as CAP, CEP, Eircode,
+  NPA, PIN, PLZ, or ZIP code. Nine alphanumeric characters maximum, may also
+  contain spaces and hyphens.
+  *Required for Level 3 processing* on TransactionInput.
   """
   postalCode: String
 
-  """Country code for the address in ISO 3166-1 alpha-3 format."""
+  """
+  Country code for the address in ISO 3166-1 alpha-3 format.
+  *Required for Level 3 processing* on TransactionInput.
+  """
   countryCode: CountryCodeAlpha3
 
   """Country code for the address in ISO 3166-1 alpha-3 format."""
@@ -286,6 +322,17 @@ input CaptureTransactionInput {
 
   """ID of a transaction to be captured."""
   transactionId: ID!
+
+  """
+  The amount to capture on the transaction. Must be greater than 0. You can't
+  capture more than the authorized amount unless your industry and processor
+  support settlement adjustment (capturing a certain percentage over the
+  authorized amount); contact [Braintree
+  support](mailto:support@braintreepayments.com) for details. If you capture an
+  amount that is less than what was authorized, the transaction object will
+  return the amount captured.
+  """
+  amount: Amount
 }
 
 """
@@ -1465,7 +1512,7 @@ type Query {
   ping: String!
 
   """The currently authenticated viewer."""
-  viewer: User
+  viewer: Viewer
 
   """The client-side environment and payment method configuration."""
   clientConfiguration: ClientConfiguration
@@ -1662,7 +1709,7 @@ type Role {
   isAccountAdmin: Boolean
 
   """Right names associated with role."""
-  rights: [Right]
+  rights: [Right!]
 }
 
 """Details about a Samsung Pay card."""
@@ -2078,8 +2125,11 @@ type Transaction implements Node {
   paymentMethodSnapshot: PaymentMethodSnapshot
 
   """
-  The multi-use payment method associated with the transaction, if applicable.
-  The details of this PaymentMethod may have changed since the transaction was created.
+  The multi-use payment method associated with the transaction. Only present if
+  a multi-use payment method was used to create the transaction and it has not
+  been deleted. The details of this PaymentMethod may have changed since the
+  transaction was created, details used for the transaction can be found in the
+  `paymentMethodSnapshot` field.
   """
   paymentMethod: PaymentMethod
 
@@ -2098,6 +2148,11 @@ type Transaction implements Node {
   The order ID for this transaction. For PayPal transactions, the PayPal Invoice ID.
   """
   orderId: String
+
+  """
+  A purchase order identification value you associate with this transaction.
+  """
+  purchaseOrderNumber: String
 
   """The current status of this transaction."""
   status: TransactionStatus
@@ -2130,6 +2185,18 @@ type Transaction implements Node {
 
   """Customer associated with the transaction, if applicable."""
   customer: Customer
+
+  """Shipping information."""
+  shipping: TransactionShipping
+
+  """Tax information."""
+  tax: TransactionTaxInformation
+
+  """Discount amount that was included in the total transaction amount."""
+  discountAmount: String
+
+  """Line items for this transaction."""
+  lineItems: [TransactionLineItem!]
 }
 
 """Input fields for searching for a transaction amount."""
@@ -2214,6 +2281,12 @@ input TransactionInput {
   orderId: String
 
   """
+  A purchase order identification value you associate with this transaction.
+  *Required for Level 2 processing*.
+  """
+  purchaseOrderNumber: String
+
+  """
   Customer device information, which is sent directly to supported processors for fraud analysis.
   """
   riskData: RiskDataInput
@@ -2235,7 +2308,7 @@ input TransactionInput {
   """
   For partners and shopping carts only. If you are a shopping cart provider or
   other Braintree partner, pass a string identifier for your service. For PayPal
-  tranasctions, this maps to paypal.bn_code.
+  transactions, this maps to paypal.bn_code.
   """
   channel: String
 
@@ -2243,12 +2316,183 @@ input TransactionInput {
   If charging a single-use payment method, optional ID of a customer to associate the transaction with.
   """
   customerId: ID
+
+  """
+  Shipping information.
+  *Required for Level 3 processing*.
+  """
+  shipping: TransactionShippingInput
+
+  """
+  Tax information about the transaction.
+  *Required for Level 2 processing*.
+  """
+  tax: TransactionTaxInput
+
+  """
+  Discount amount that was included in the total transaction amount. Does not
+  add to the total amount the payment method will be charged. This value can't be negative.
+  *Required for Level 3 processing*.
+  """
+  discountAmount: String
+
+  """
+  Line items for this transaction. Up to 249 line items may be specified.
+  *Required for Level 3 processing*.
+  """
+  lineItems: [TransactionLineItemInput!]
 }
 
-"""Transaction level fee report."""
+"""
+The [transaction-level fee report](https://articles.braintreepayments.com/control-panel/reporting/transaction-level-fee-report)
+provides a breakdown of fees associated with individual transactions.
+"""
 type TransactionLevelFeeReport {
   """The URL where you can access the requested report."""
   url: String
+}
+
+"""Data for individual line items on a transaction."""
+type TransactionLineItem {
+  """Item name."""
+  name: String
+
+  """Indicates whether the line item is a sale or refund."""
+  kind: TransactionLineItemType
+
+  """Number of units of the item purchased."""
+  quantity: String
+
+  """Per-unit price of the item."""
+  unitAmount: String
+
+  """
+  Total price amount for the line item: quantity multiplied by unitAmount.
+  """
+  totalAmount: String
+
+  """Per-unit tax price of the item."""
+  unitTaxAmount: String
+
+  """Tax amount for the line item."""
+  taxAmount: String
+
+  """Amount of discount for the line item."""
+  discountAmount: String
+
+  """The unit of measure or the unit of measure code."""
+  unitOfMeasure: String
+
+  """Product or UPC code for the item."""
+  productCode: String
+
+  """
+  Code used to classify items purchased and track the total amount spent across
+  various categories of products and services. Different corporate purchasing
+  organizations may use different standards, but the [United Nations Standard
+  Products and Services Code (UNSPSC)](https://www.unspsc.org/) is frequently used.
+  """
+  commodityCode: String
+
+  """Item description."""
+  description: String
+
+  """The URL to product information."""
+  url: String
+}
+
+"""Data for individual line items on a transaction."""
+input TransactionLineItemInput {
+  """
+  Item name. Maximum 35 characters, or 127 characters for PayPal transactions.
+  *Required for Level 3 processing*.
+  """
+  name: String!
+
+  """
+  Indicates whether the line item is a sale or refund.
+  *Required for Level 3 processing*.
+  """
+  kind: TransactionLineItemType!
+
+  """
+  Number of units of the item purchased. Can include up to 4 decimal places. This value can't be negative or zero.
+  *Required for Level 3 processing*.
+  """
+  quantity: String!
+
+  """
+  Per-unit price of the item. Maximum 4 decimal places, or 2 decimal places for
+  PayPal transactions. This value can't be negative or zero.
+  *Required for Level 3 processing*.
+  """
+  unitAmount: String!
+
+  """
+  Total price amount for the line item: quantity multiplied by unitAmount. Can include up to 2 decimal places.
+  *Required for Level 3 processing*.
+  """
+  totalAmount: String!
+
+  """
+  Per-unit tax price of the item. Can include up to 2 decimal places. This value can't be negative or zero.
+  *Required for Level 3 processing*.
+  """
+  unitTaxAmount: String
+
+  """
+  Tax amount for the line item. Can include up to 2 decimal places. This value can't be negative.
+  *Required for Level 3 processing*.
+  """
+  taxAmount: String
+
+  """
+  Amount of discount for the line item. Can include up to 2 decimal places. This value can't be negative.
+  *Required for Level 3 processing*.
+  """
+  discountAmount: String
+
+  """
+  The unit of measure or the unit of measure code. Maximum 12 characters.
+  *Required for Level 3 processing*.
+  """
+  unitOfMeasure: String
+
+  """
+  Product or UPC code for the item. Maximum 12 characters, or 127 characters for PayPal transactions.
+  *Required for Level 3 processing*.
+  """
+  productCode: String
+
+  """
+  Code used to classify items purchased and track the total amount spent across
+  various categories of products and services. Different corporate purchasing
+  organizations may use different standards, but the [United Nations Standard
+  Products and Services Code (UNSPSC)](https://www.unspsc.org/) is frequently
+  used. Maximum 12 characters.
+  *Required for Level 3 processing*.
+  """
+  commodityCode: String
+
+  """
+  Item description. Maximum 127 characters.
+  *Required for Level 3 processing*.
+  """
+  description: String
+
+  """
+  A URL to information about the product.
+  *Required for Level 3 processing*.
+  """
+  url: String
+}
+
+"""
+Indicates whether a transaction line item is a debit (sale) or credit (refund).
+"""
+enum TransactionLineItemType {
+  CREDIT
+  DEBIT
 }
 
 """Top-level output field from creating a transaction."""
@@ -2308,6 +2552,39 @@ input TransactionSearchInput {
   createdAt: SearchTimestampInput
 }
 
+"""Information related to shipping a physical product."""
+type TransactionShipping {
+  """Shipping address information."""
+  shippingAddress: Address
+
+  """Shipping cost on the entire transaction."""
+  shippingAmount: Amount
+
+  """The postal code of the source shipping location."""
+  shipsFromPostalCode: String
+}
+
+"""Information related to shipping a physical product."""
+input TransactionShippingInput {
+  """
+  Shipping destination address information.
+  *Required for Level 3 processing*.
+  """
+  shippingAddress: AddressInput
+
+  """
+  Shipping cost on the entire transaction.
+  *Required for Level 3 processing*.
+  """
+  shippingAmount: String
+
+  """
+  The postal code of the source shipping location, in any country's format.
+  *Required for Level 3 processing*.
+  """
+  shipsFromPostalCode: String
+}
+
 """The origin of a request that created or changed a transaction."""
 enum TransactionSource {
   API
@@ -2354,6 +2631,33 @@ interface TransactionStatusEvent {
   Whether this is the final state for the transaction. If false, this transaction will pass into another subsequent state.
   """
   terminal: Boolean
+}
+
+"""Information related to taxes on the transaction."""
+type TransactionTaxInformation {
+  """Amount of tax that was included in the total transaction amount."""
+  taxAmount: Amount
+
+  """
+  Whether the transaction should be considered eligible for tax exemption.
+  """
+  taxExempt: Boolean
+}
+
+"""Information related to taxes on the transaction."""
+input TransactionTaxInput {
+  """
+  Amount of tax that was included in the total transaction amount. Does not add
+  to the total amount the payment method will be charged.
+  *Required for Level 2 processing* unless `taxExempt` is `true`.
+  """
+  taxAmount: Amount
+
+  """
+  Whether the transaction should be considered eligible for tax exemption.
+  *Required for Level 2 processing*.
+  """
+  taxExempt: Boolean
 }
 
 """Configuration for UnionPay cards."""
@@ -2467,14 +2771,12 @@ input UsBankAccountInput {
   accountType: UsBankAccountType!
 
   """
-  Information about the business that owns the account. This should only be
-  specified for business accounts.
+  Information about the business that owns the account. This should only be specified for business accounts.
   """
   businessOwner: UsBankAccountBusinessOwnerInput
 
   """
-  Information about the individual that owns the account. This should only be
-  specified for individual accounts.
+  Information about the individual that owns the account. This should only be specified for individual accounts.
   """
   individualOwner: UsBankAccountIndividualOwnerInput
 
@@ -2482,8 +2784,7 @@ input UsBankAccountInput {
   billingAddress: UsBankAccountBillingAddressInput
 
   """
-  Language used to prove that you have the customer's explicit permission to
-  debit their bank account.
+  Language used to prove that you have the customer's explicit permission to debit their bank account.
   """
   achMandate: String!
 }
@@ -2506,7 +2807,7 @@ enum UsBankAccountType {
 """A routing number containing 8 or 9 digits."""
 scalar UsBankRoutingNumber
 
-"""Details about a user and the merchant it is associated with."""
+"""Details about a user."""
 type User {
   """Unique identifier."""
   id: ID!
@@ -2521,10 +2822,7 @@ type User {
   name: String
 
   """Associated roles."""
-  roles: [Role]
-
-  """Merchant associated with the user."""
-  merchant: Merchant
+  roles: [Role!]
 }
 
 """The status of a User."""
@@ -2804,6 +3102,30 @@ type VerifyPaymentMethodPayload {
 
   """The verification that was run on the payment method."""
   verification: Verification
+}
+
+"""Details about the user and merchant authenticated in this request."""
+type Viewer {
+  """Unique identifier."""
+  id: ID @deprecated(reason: "Use `user` for id instead.")
+
+  """Email address."""
+  email: String @deprecated(reason: "Use `user` for email instead.")
+
+  """Current status."""
+  status: UserStatus @deprecated(reason: "Use `user` for status instead.")
+
+  """Full name."""
+  name: String @deprecated(reason: "Use `user` for name instead.")
+
+  """Associated roles."""
+  roles: [Role!] @deprecated(reason: "Use `user` for roles instead.")
+
+  """Details about the authenticated user."""
+  user: User
+
+  """Details about the authenticated merchant."""
+  merchant: Merchant
 }
 
 """Configuration for Visa Checkout."""

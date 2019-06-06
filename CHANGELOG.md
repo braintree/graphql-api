@@ -1,3 +1,9 @@
+# 2019-06-06
+
+* Add `amount` to `CaptureTransactionInput` to allow you to capture a different amount than the payment method was originally authorized for.
+* Change `viewer` query to return `Viewer` type with `user` and `merchant` fields. All top level fields were deprecated in favor of the `User` and `Merchant` objects.
+* Add additional input fields on `TransactionInput` to specify shipping, tax, and line items for level 2 and level 3 processing.
+
 # 2019-05-23
 
 * Add `customerId` parameter to `CreateClientTokenInput` to create customer-scoped client tokens.
