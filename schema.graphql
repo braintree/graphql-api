@@ -1,8 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Jun 06 2019 20:10:03 GMT+0000 (Coordinated Universal Time)
-
-"""This directive allows results to be deferred during execution"""
-directive @defer on FIELD
+# timestamp: Thu Jul 11 2019 16:10:24 GMT+0000 (Coordinated Universal Time)
 
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
@@ -149,8 +146,8 @@ type ApplePayOriginDetails {
 
 """The environment being used for Apple Pay."""
 enum ApplePayStatus {
-  OFF
   MOCK
+  OFF
   PRODUCTION
   mock
   off
@@ -299,8 +296,8 @@ A boolean-like value that includes `UNKNOWN` in the case where the information i
 """
 enum BinRecordValue {
   NO
-  YES
   UNKNOWN
+  YES
   No
   Unknown
   Yes
@@ -516,11 +513,11 @@ type ClientConfiguration {
 
 """The client configuration environment being used."""
 enum ClientConfigurationEnvironment {
-  QA
-  TEST
   DEVELOPMENT
-  SANDBOX
   PRODUCTION
+  QA
+  SANDBOX
+  TEST
   development
   production
   qa
@@ -602,17 +599,17 @@ type CreateCustomerPayload {
 
 """A code identifying the card brand."""
 enum CreditCardBrandCode {
-  MASTERCARD
-  DISCOVER
-  JCB
-  VISA
-  UNION_PAY
-  SOLO
-  UK_MAESTRO
-  UNKNOWN
-  INTERNATIONAL_MAESTRO
   AMERICAN_EXPRESS
   DINERS
+  DISCOVER
+  INTERNATIONAL_MAESTRO
+  JCB
+  MASTERCARD
+  SOLO
+  UK_MAESTRO
+  UNION_PAY
+  UNKNOWN
+  VISA
   american_express
   diners
   discover
@@ -740,6 +737,49 @@ values](https://developers.braintreepayments.com/reference/general/currencies).
 """
 scalar CurrencyCodeAlpha
 
+"""Details about a custom actions payment method."""
+type CustomActionsPaymentMethodDetails {
+  """The action to be invoked when using the payment method."""
+  actionName: String
+
+  """Fields that your action requires."""
+  fields: [CustomActionsPaymentMethodField!]
+}
+
+"""
+Fields that are provided during tokenization and are presented to the invoked action to be consumed.
+"""
+type CustomActionsPaymentMethodField {
+  """The name of this field. e.g. "accountNumber"."""
+  name: String
+
+  """The value displayed in the Control Panel or API. e.g. "*****6789"."""
+  displayValue: String
+}
+
+"""
+Fields that are provided during tokenization and are presented to the invoked action to be consumed.
+"""
+input CustomActionsPaymentMethodFieldInput {
+  """The name of this field. e.g. "accountNumber"."""
+  name: String!
+
+  """The value of this field. e.g. "123456789"."""
+  value: String!
+
+  """The value displayed in the Control Panel or API. e.g. "*****6789"."""
+  displayValue: String!
+}
+
+"""Input fields for a Custom Actions payment method."""
+input CustomActionsPaymentMethodInput {
+  """The action you wish to invoke when using the tokenized payment method."""
+  actionName: String!
+
+  """Fields that your action requires."""
+  fields: [CustomActionsPaymentMethodFieldInput!]!
+}
+
 """
 Information about a customer and their associated payment methods and transactions.
 """
@@ -761,6 +801,9 @@ type Customer implements Node {
   """
   customFields: [CustomField!]
 
+  """Customer's default payment method."""
+  defaultPaymentMethod: PaymentMethod
+
   """Email address for this customer."""
   email: String
 
@@ -774,14 +817,14 @@ type Customer implements Node {
   phoneNumber: String
 
   """Payment methods belonging to this customer."""
-  paymentMethods(after: String, first: Int): PaymentMethodConnection
+  paymentMethods(first: Int, after: String): PaymentMethodConnection
 
   """
   Transactions associated with this customer. This includes transactions created
   by charging a vaulted payment method that belongs or belonged to the customer,
   or by passing a customer ID when charging an single-use payment method.
   """
-  transactions(after: String, first: Int): TransactionConnection
+  transactions(first: Int, after: String): TransactionConnection
 }
 
 """
@@ -827,13 +870,18 @@ prior to passing it with a request.
 """
 input CustomFieldInput {
   """Name of the custom field as defined in the Control Panel."""
-  name: String!
+  name: CustomFieldName!
 
   """
   Value for the named custom field. A null value will ignore (on create) or remove (on update) the custom field.
   """
   value: String
 }
+
+"""
+A string representing a custom field value. Contains letters, numbers, and underscores.
+"""
+scalar CustomFieldName
 
 """A date of the form YYYY-MM-DD."""
 scalar Date
@@ -1000,8 +1048,8 @@ type GooglePayConfiguration {
 
 """The environment being used for Google Pay."""
 enum GooglePayEnvironment {
-  SANDBOX
   PRODUCTION
+  SANDBOX
   production
   sandbox
 }
@@ -1101,6 +1149,15 @@ type MonetaryAmount {
   currencyIsoCode: CurrencyCodeAlpha
 }
 
+"""Input fields for searching for a transaction or refund amount."""
+input MonetaryAmountSearchInput {
+  """Find transactions for a given amount."""
+  value: SearchRangeInput
+
+  """Find transaction with a given currency."""
+  currencyIsoCode: SearchTextInput
+}
+
 """A two-digit, zero-padded month."""
 scalar Month
 
@@ -1172,6 +1229,11 @@ type Mutation {
   createClientToken(input: CreateClientTokenInput): CreateClientTokenPayload
 
   """
+  Tokenize Custom Actions fields and return a payload that includes a single-use payment method.
+  """
+  tokenizeCustomActionsPaymentMethod(input: TokenizeCustomActionsPaymentMethodInput!): TokenizeCustomActionsPaymentMethodPayload
+
+  """
   Tokenize credit card fields and return a payload that includes a single-use payment method.
   """
   tokenizeCreditCard(input: TokenizeCreditCardInput!): TokenizeCreditCardPayload
@@ -1190,6 +1252,11 @@ type Mutation {
   Tokenize U.S. bank account fields and return a payload that includes a single-use payment method.
   """
   tokenizeUsBankAccount(input: TokenizeUsBankAccountInput!): TokenizeUsBankAccountPayload
+
+  """
+  Tokenize U.S. bank login fields and return a payload that includes a single-use payment method.
+  """
+  tokenizeUsBankLogin(input: TokenizeUsBankLoginInput!): TokenizeUsBankAccountPayload
 
   """
   Create a customer for storing individual customer information and/or grouping transactions and multi-use payment methods.
@@ -1242,7 +1309,7 @@ type PaymentMethod implements Node {
   """
   A paginated list of verifications that have been run against the payment method.
   """
-  verifications(after: String, first: Int): VerificationConnection
+  verifications(first: Int, after: String): VerificationConnection
 
   """The customer that the payment method belongs to."""
   customer: Customer
@@ -1272,7 +1339,7 @@ type PaymentMethodConnectionEdge {
 A union of all possible payment method details. PaymentMethodDetails contain
 information for display purposes, payment method management, and processing.
 """
-union PaymentMethodDetails = CreditCardDetails | PayPalAccountDetails | SamsungPayCardDetails | VenmoAccountDetails | UsBankAccountDetails
+union PaymentMethodDetails = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalAccountDetails | SamsungPayCardDetails | VenmoAccountDetails | UsBankAccountDetails
 
 """
 Information about how the customer provided a payment method, such as via a digital wallet.
@@ -1308,7 +1375,7 @@ A union of all possible payment method details as they were used in a
 transaction or verification. PaymentMethodSnapshot preserves values used to
 create a given transaction or verify a payment method at that moment in time.
 """
-union PaymentMethodSnapshot = CreditCardDetails | PayPalTransactionDetails | VenmoAccountDetails | UsBankAccountDetails
+union PaymentMethodSnapshot = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalTransactionDetails | VenmoAccountDetails | UsBankAccountDetails
 
 """Possible usages for payment methods."""
 enum PaymentMethodUsage {
@@ -1390,8 +1457,8 @@ type PayPalConfiguration {
 """The environment being used for PayPal."""
 enum PayPalEnvironment {
   CUSTOM
-  OFFLINE
   LIVE
+  OFFLINE
   custom
   live
   offline
@@ -1578,6 +1645,26 @@ type Refund implements Node {
   refundedTransaction: Transaction
 }
 
+"""A paginated list of refunds."""
+type RefundConnection {
+  """A list of refunds."""
+  edges: [RefundConnectionEdge]
+
+  """Information about the page."""
+  pageInfo: PageInfo!
+}
+
+"""A transaction within a RecundConnection."""
+type RefundConnectionEdge {
+  """
+  This refund's location within the RefundConnection. Used for requesting additional pages.
+  """
+  cursor: String
+
+  """The refund."""
+  node: Refund
+}
+
 """Specific input fields for describing a refund."""
 input RefundInput {
   """
@@ -1590,6 +1677,24 @@ input RefundInput {
   The refund's order ID. Defaults to the order ID of the original transaction.
   """
   orderId: String
+}
+
+"""Input fields for searching for refunds."""
+input RefundSearchInput {
+  """Find refunds with an id or ids."""
+  id: SearchValueInput
+
+  """Find refund for a given amount or currency."""
+  amount: MonetaryAmountSearchInput
+
+  """Find refunds with a given created at time."""
+  createdAt: SearchTimestampInput
+
+  """Find refunds with a given orderId."""
+  orderId: SearchTextInput
+
+  """Find refunds with a given status."""
+  status: SearchTransactionStatusInput
 }
 
 """Top-level input fields for refunding a transaction."""
@@ -1808,7 +1913,10 @@ type Search {
   """
   A paginated list of transactions that match the TransactionSearchInput.
   """
-  transactions(input: TransactionSearchInput!, after: String, first: Int): TransactionConnection
+  transactions(input: TransactionSearchInput!, first: Int, after: String): TransactionConnection
+
+  """A paginated list of refunds that match the RefundSearchInput."""
+  refunds(input: RefundSearchInput!, first: Int, after: String): RefundConnection
 }
 
 """Input fields for searching for a range."""
@@ -1843,8 +1951,9 @@ input SearchTextInput {
 
 """
 Input fields for searching for a timestamp. These ranges are precise to the
-minute; the results of search for transactions created between 12/17/2015 17:00
-and 12/17/2015 17:00 will include a transaction created at 12/17/2015 17:00:59.
+minute; the results of search for transactions or refunds created between
+12/17/2015 17:00 and 12/17/2015 17:00 will include a transaction created at
+12/17/2015 17:00:59.
 """
 input SearchTimestampInput {
   """Timestamp is greater than or equal to this value."""
@@ -1854,13 +1963,30 @@ input SearchTimestampInput {
   lessThanOrEqualTo: Timestamp
 }
 
-"""Input fields for searching for a transaction with a given status."""
+"""
+Input fields for searching for a transaction or refund with a given status.
+"""
 input SearchTransactionStatusInput {
   """The transaction status is exactly this value."""
   is: TransactionStatus
 
   """The transaction status is one of these values."""
   in: [TransactionStatus!]
+}
+
+"""Transaction status transition times."""
+input SearchTransactionStatusTransitionInput {
+  """Find transactions with a given failed at time."""
+  failedAt: SearchTimestampInput
+
+  """Find transactions with a given settled at time."""
+  settledAt: SearchTimestampInput
+
+  """Find transactions with a given submitted for settlement time."""
+  submittedForSettlementAt: SearchTimestampInput
+
+  """Find transactions with a given voided at time."""
+  voidedAt: SearchTimestampInput
 }
 
 """Input fields for searching for specific values."""
@@ -2047,6 +2173,26 @@ type TokenizeCreditCardPayload {
   paymentMethod: PaymentMethod
 }
 
+"""Top-level input fields for tokenizing Custom Actions."""
+input TokenizeCustomActionsPaymentMethodInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Input fields for a Custom Actions payment method."""
+  customActionsPaymentMethod: CustomActionsPaymentMethodInput!
+}
+
+"""
+Top-level fields returned from tokenizing a CustomActionsPaymentMethod.
+"""
+type TokenizeCustomActionsPaymentMethodPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """A single-use payment method."""
+  paymentMethod: PaymentMethod
+}
+
 """Top-level input fields for tokenizing a CVV."""
 input TokenizeCvvInput {
   """An identifier used to reconcile requests and responses."""
@@ -2105,6 +2251,15 @@ type TokenizeUsBankAccountPayload {
 
   """A single-use payment method."""
   paymentMethod: PaymentMethod
+}
+
+"""Top-level input fields for tokenizing a U.S. bank login."""
+input TokenizeUsBankLoginInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Input fields for a U.S. bank login object."""
+  usBankLogin: UsBankLoginInput!
 }
 
 """A charge on a payment method."""
@@ -2197,15 +2352,6 @@ type Transaction implements Node {
 
   """Line items for this transaction."""
   lineItems: [TransactionLineItem!]
-}
-
-"""Input fields for searching for a transaction amount."""
-input TransactionAmountSearchInput {
-  """Find transactions for a given amount."""
-  value: SearchRangeInput
-
-  """Find transaction with a given currency."""
-  currencyIsoCode: SearchTextInput
 }
 
 """A paginated list of transactions."""
@@ -2540,7 +2686,7 @@ input TransactionSearchInput {
   id: SearchValueInput
 
   """Find transactions for a given amount or currency."""
-  amount: TransactionAmountSearchInput
+  amount: MonetaryAmountSearchInput
 
   """Find transactions with a given orderId."""
   orderId: SearchTextInput
@@ -2550,6 +2696,9 @@ input TransactionSearchInput {
 
   """Find transactions with a given created at time."""
   createdAt: SearchTimestampInput
+
+  """Find transactions based on given transaction status transition times."""
+  statusTransition: SearchTransactionStatusTransitionInput
 }
 
 """Information related to shipping a physical product."""
@@ -2595,21 +2744,91 @@ enum TransactionSource {
 
 """
 The status of the transaction, indicating where it is in the [transaction lifecycle](https://articles.braintreepayments.com/get-started/transaction-lifecycle)
-and its success or failure.
+and its success or failure. For further details on why any given status
+occurred, consult the corresponding `TransactionStatusEvent` in the
+transaction's `statusHistory`.
 """
 enum TransactionStatus {
+  """
+  The transaction spent too much time in the `AUTHORIZED` status and was marked
+  as expired. Expiration [time frames](https://developers.braintreepayments.com/reference/general/statuses#authorization-expired)
+  differ by card type, transaction type, and, in some cases, merchant category.
+  """
   AUTHORIZATION_EXPIRED
+
+  """
+  The processor authorized the transaction, putting your customer's funds on
+  hold. Your customer may see a pending charge on his or her account. However,
+  before the customer is actually charged and before you receive the funds, you
+  must use the `captureTransaction` mutation. If you do not want to capture the
+  transaction, you should use the `reverseTransaction` mutation to avoid a
+  misuse of authorization fee.
+  """
   AUTHORIZED
+
+  """
+  If a transaction remains in a status of `AUTHORIZING`, [contact Braintree
+  Support for assistance](https://help.braintreepayments.com).
+  """
   AUTHORIZING
+
+  """
+  An error occurred when sending the transaction to the downstream processor.
+  See the transaction's `statusHistory` for the exact error.
+  """
   FAILED
+
+  """
+  The transaction was [rejected](https://articles.braintreepayments.com/control-panel/transactions/gateway-rejections)
+  based on one or more settings or rules in your Braintree gateway. See the
+  transaction's `statusHistory` to determine which resulted in the decline.
+  """
   GATEWAY_REJECTED
+
+  """
+  The processor declined the transaction while attempting to authorize it. See
+  the transaction's `statusHistory` to determine what reason the processor gave
+  for the decline.
+  """
   PROCESSOR_DECLINED
+
+  """
+  The transaction has been settled, meaning your customer has been charged and
+  the process of disbursing the funds to your bank account will begin.
+  """
   SETTLED
-  SETTLEMENT_CONFIRMED
+  SETTLEMENT_CONFIRMED @deprecated(reason: "No longer applicable to any supported payment method types.")
+
+  """
+  The processor declined the transaction while attempting to capture it. See the
+  transaction's `statusHistory` to detemine why it was not settled. This status
+  is rare, and only certain types of transactions can be affected.
+  """
   SETTLEMENT_DECLINED
+
+  """
+  The transaction has not yet fully settled. This status is rare, and will
+  generally resolve to a status of `SETTLED`. Only certain types of transactions
+  can be affected.
+  """
   SETTLEMENT_PENDING
+
+  """
+  The transaction is in the process of being settled. This is a transitory state, and will resolve to a status of `SETTLED`.
+  """
   SETTLING
+
+  """
+  The transaction has been successfully captured, and will be included in the
+  next settlement batch, at which time it will become settled.
+  """
   SUBMITTED_FOR_SETTLEMENT
+
+  """
+  The transaction was voided, meaning it is no longer authorized, your
+  customer's funds are no longer on hold, and you cannot use the
+  `captureTransaction` mutation on this transaction.
+  """
   VOIDED
 }
 
@@ -2804,6 +3023,36 @@ enum UsBankAccountType {
   SAVINGS
 }
 
+"""Input fields for a U.S. bank login object."""
+input UsBankLoginInput {
+  """The public token returned from the bank login."""
+  publicToken: String!
+
+  """The login provider account id used for the bank login."""
+  accountId: String!
+
+  """The type of account."""
+  accountType: UsBankAccountType!
+
+  """
+  Information about the business that owns the account. This should only be specified for business accounts.
+  """
+  businessOwner: UsBankAccountBusinessOwnerInput
+
+  """
+  Information about the individual that owns the account. This should only be specified for individual accounts.
+  """
+  individualOwner: UsBankAccountIndividualOwnerInput
+
+  """The billing address of the account."""
+  billingAddress: UsBankAccountBillingAddressInput
+
+  """
+  Language used to prove that you have the customer's explicit permission to debit their bank account.
+  """
+  achMandate: String!
+}
+
 """A routing number containing 8 or 9 digits."""
 scalar UsBankRoutingNumber
 
@@ -2954,8 +3203,8 @@ type VenmoConfiguration {
 
 """The environment being used for Pay with Venmo."""
 enum VenmoEnvironment {
-  SANDBOX
   PRODUCTION
+  SANDBOX
   production
   sandbox
 }

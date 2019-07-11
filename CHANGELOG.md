@@ -1,3 +1,13 @@
+# 2019-07-11
+
+* Add `defaultPaymentMethod` field to `Customer`.
+* Add `tokenizeCustomActionsPaymentMethod` mutation.
+* Add `tokenizeUsBankLogin` mutation.
+* Add `refunds` search field to `Search` query.
+* Add ability to search transactions by status transition time.
+* Change `TransactionAmountSearchInput` input name to `MonetaryAmountSearchInput`.
+* Deprecate `TransactionStatus#SETTLEMENT_CONFIRMED` enum value. It is no longer applicable to any supported payment method types.
+
 # 2019-06-06
 
 * Add `amount` to `CaptureTransactionInput` to allow you to capture a different amount than the payment method was originally authorized for.
