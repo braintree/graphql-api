@@ -1,3 +1,9 @@
+# 2019-07-29
+
+* Add `refunds` field to `Transaction`.
+* Add `customerId` field to `TransactionSearchInput`.
+* Add `duplicateOf` field to `GatewayRejectedEvent`. This facilitates safe retries of failed transaction requests.
+
 # 2019-07-11
 
 * Add `defaultPaymentMethod` field to `Customer`.

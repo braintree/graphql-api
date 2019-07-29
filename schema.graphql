@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Jul 11 2019 16:10:24 GMT+0000 (Coordinated Universal Time)
+# timestamp: Mon Jul 29 2019 19:31:03 GMT+0000 (Coordinated Universal Time)
 
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
@@ -1010,6 +1010,11 @@ type GatewayRejectedEvent implements TransactionStatusEvent {
 
   """Whether this is the final state for the transaction."""
   terminal: Boolean
+
+  """
+  The original transaction if the gateway rejection reason was `DUPLICATE`.
+  """
+  duplicateOf: Transaction
 }
 
 """Possible reasons why a transaction was rejected by the gateway."""
@@ -1919,6 +1924,12 @@ type Search {
   refunds(input: RefundSearchInput!, first: Int, after: String): RefundConnection
 }
 
+"""Input fields for searching transactions by customer."""
+input SearchCustomerInput {
+  """Find transactions with a given customer id."""
+  id: SearchValueInput
+}
+
 """Input fields for searching for a range."""
 input SearchRangeInput {
   """Field is exactly this value."""
@@ -2352,6 +2363,9 @@ type Transaction implements Node {
 
   """Line items for this transaction."""
   lineItems: [TransactionLineItem!]
+
+  """The list of refunds issued against this transaction."""
+  refunds: [Refund!]
 }
 
 """A paginated list of transactions."""
@@ -2699,6 +2713,9 @@ input TransactionSearchInput {
 
   """Find transactions based on given transaction status transition times."""
   statusTransition: SearchTransactionStatusTransitionInput
+
+  """Find transactions with a given customer."""
+  customer: SearchCustomerInput
 }
 
 """Information related to shipping a physical product."""
