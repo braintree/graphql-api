@@ -1,3 +1,9 @@
+# 2019-07-31
+
+* Add `transaction` field to `CaptureTransactionInput`.
+* Add ability to pass `descriptor` and `orderId` when capturing a transaction.
+* Deprecate `amount` field on `CaptureTransactionInput` in favor of `amount` field on `CaptureTransactionOptionsInput`.
+
 # 2019-07-29
 
 * Add `refunds` field to `Transaction`.

@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Mon Jul 29 2019 19:31:03 GMT+0000 (Coordinated Universal Time)
+# timestamp: Wed Jul 31 2019 17:52:14 GMT+0000 (Coordinated Universal Time)
 
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
@@ -330,6 +330,42 @@ input CaptureTransactionInput {
   return the amount captured.
   """
   amount: Amount
+
+  """
+  Input fields for the capture, with details that will define the resulting transaction.
+  """
+  transaction: CaptureTransactionOptionsInput
+}
+
+"""
+Input fields for a capture, with details that will define the resulting transaction.
+"""
+input CaptureTransactionOptionsInput {
+  """
+  The amount to capture on the transaction. Must be greater than 0. You can't
+  capture more than the authorized amount unless your industry and processor
+  support settlement adjustment (capturing a certain percentage over the
+  authorized amount); contact [Braintree
+  support](mailto:support@braintreepayments.com) for details. If you capture an
+  amount that is less than what was authorized, the transaction object will
+  return the amount captured.
+  """
+  amount: Amount
+
+  """
+  Fields used to define what will appear on a customer's bank statement for a
+  specific purchase. If specified, this will update the existing descriptor on
+  the transaction.
+  """
+  descriptor: TransactionDescriptorInput
+
+  """
+  Additional information about the transaction. On PayPal transactions, this
+  field maps to the PayPal invoice number. PayPal invoice numbers must be unique
+  in your PayPal business account. Maximum 255 characters or 127 for PayPal
+  transactions. If specified, this will update the existing order ID on the transaction.
+  """
+  orderId: String
 }
 
 """
