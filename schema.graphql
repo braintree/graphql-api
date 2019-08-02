@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Wed Jul 31 2019 17:52:14 GMT+0000 (Coordinated Universal Time)
+# timestamp: Fri Aug 02 2019 17:39:58 GMT+0000 (Coordinated Universal Time)
 
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
@@ -169,6 +169,31 @@ type ApplePayWebConfiguration {
 
   """A list of card brands supported for Apple Pay by the current merchant."""
   supportedCardBrands: [CreditCardBrandCode]
+}
+
+"""
+Information about the [customer authentication regulation environment](https://developers.braintreepayments.com/guides/3d-secure/migration/javascript/v3#authentication-insight)
+that applies to the payment method when processed with the provided merchant account.
+"""
+type AuthenticationInsight {
+  """The merchant account used to determine authentication insight."""
+  merchantAccountId: String
+
+  """
+  The customer authentication regulation environment that applies when
+  transacting with this payment method and merchant account.
+  """
+  customerAuthenticationRegulationEnvironment: CustomerAuthenticationRegulationEnvironment
+}
+
+"""
+Input fields when requesting authentication insight for a payment method.
+"""
+input AuthenticationInsightInput {
+  """
+  ID of the merchant account that will be used when charging this payment method.
+  """
+  merchantAccountId: ID!
 }
 
 """Accompanying information for an authorization expired transaction."""
@@ -861,6 +886,26 @@ type Customer implements Node {
   or by passing a customer ID when charging an single-use payment method.
   """
   transactions(first: Int, after: String): TransactionConnection
+}
+
+"""
+The customer authentication regulation environment that applies to the
+transaction, such as [PSD2](https://www.braintreepayments.com/blog/understanding-and-preparing-for-psd2-strong-customer-authentication/).
+"""
+enum CustomerAuthenticationRegulationEnvironment {
+  """
+  EU Regulation [PSD2 Strong Customer Authentication](https://www.braintreepayments.com/blog/understanding-and-preparing-for-psd2-strong-customer-authentication/)
+  applies to this transaction.
+  """
+  PSDTWO
+
+  """
+  Customer authentication regulation environment information is unavailable for this transaction at this time.
+  """
+  UNAVAILABLE
+
+  """No customer authentication regulations apply to this transaction."""
+  UNREGULATED
 }
 
 """
@@ -2218,6 +2263,14 @@ type TokenizeCreditCardPayload {
 
   """A single-use payment method."""
   paymentMethod: PaymentMethod
+
+  """
+  Information about the [customer authentication regulation environment](https://developers.braintreepayments.com/guides/3d-secure/migration/javascript/v3#authentication-insight)
+  that applies to the payment method when processed with the provided merchant
+  account. This can be used to determine whether to perform 3D Secure
+  authentication.
+  """
+  authenticationInsight(input: AuthenticationInsightInput!): AuthenticationInsight
 }
 
 """Top-level input fields for tokenizing Custom Actions."""

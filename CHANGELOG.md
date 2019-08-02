@@ -1,3 +1,7 @@
+# 2019-08-02
+
+* Add `AuthenticationInsight` type and corresponding field to `TokenizeCreditCardPayload`.
+
 # 2019-07-31
 
 * Add `transaction` field to `CaptureTransactionInput`.
