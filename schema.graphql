@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Fri Aug 02 2019 17:39:58 GMT+0000 (Coordinated Universal Time)
+# timestamp: Fri Aug 09 2019 17:37:02 GMT+0000 (Coordinated Universal Time)
 
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
@@ -1463,6 +1463,23 @@ create a given transaction or verify a payment method at that moment in time.
 """
 union PaymentMethodSnapshot = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalTransactionDetails | VenmoAccountDetails | UsBankAccountDetails
 
+"""
+A value identifying the type of payment method used for a transaction. For
+certain payment methods such as credit cards, this value also encodes the origin
+from which a customer provided that payment method.
+"""
+enum PaymentMethodSnapshotSearchType {
+  CREDIT_CARD
+  CREDIT_CARD_VIA_APPLE_PAY
+  CREDIT_CARD_VIA_GOOGLE_PAY
+  CREDIT_CARD_VIA_MASTERPASS
+  CREDIT_CARD_VIA_SAMSUNG_PAY
+  CREDIT_CARD_VIA_VISA_CHECKOUT
+  PAYPAL
+  US_BANK_ACCOUNT
+  VENMO_ACCOUNT
+}
+
 """Possible usages for payment methods."""
 enum PaymentMethodUsage {
   MULTI_USE
@@ -2009,6 +2026,25 @@ type Search {
 input SearchCustomerInput {
   """Find transactions with a given customer id."""
   id: SearchValueInput
+}
+
+"""
+Input fields for searching transactions by payment method snapshot type.
+"""
+input SearchPaymentMethodSnapshotTypeInput {
+  """
+  This value represents the payment method used to create a transaction. In the
+  case of credit cards, this value also encode the origin from which a custoemr
+  provided that payment method.
+  """
+  is: PaymentMethodSnapshotSearchType
+
+  """
+  These values represent the payment method used to create a transaction. In the
+  case of credit cards, these values also encode the origin from which a
+  custoemr provided that payment method.
+  """
+  in: [PaymentMethodSnapshotSearchType!]
 }
 
 """Input fields for searching for a range."""
@@ -2805,6 +2841,11 @@ input TransactionSearchInput {
 
   """Find transactions with a given customer."""
   customer: SearchCustomerInput
+
+  """
+  Find transactions created by charging payment methods of the given type.
+  """
+  paymentMethodSnapshotType: SearchPaymentMethodSnapshotTypeInput
 }
 
 """Information related to shipping a physical product."""

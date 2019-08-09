@@ -1,3 +1,7 @@
+# 2019-08-09
+
+* Add `paymentMethodSnapshotType` to `TransactionSearchInput` to support searching for transactions by payment method type.
+
 # 2019-08-02
 
 * Add `AuthenticationInsight` type and corresponding field to `TokenizeCreditCardPayload`.
