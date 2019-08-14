@@ -1,3 +1,7 @@
+# 2019-08-14
+
+* Fix some documentation typos.
+
 # 2019-08-09
 
 * Add `paymentMethodSnapshotType` to `TransactionSearchInput` to support searching for transactions by payment method type.

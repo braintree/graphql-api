@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Fri Aug 09 2019 17:37:02 GMT+0000 (Coordinated Universal Time)
+# timestamp: Wed Aug 14 2019 19:21:53 GMT+0000 (Coordinated Universal Time)
 
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
@@ -2034,7 +2034,7 @@ Input fields for searching transactions by payment method snapshot type.
 input SearchPaymentMethodSnapshotTypeInput {
   """
   This value represents the payment method used to create a transaction. In the
-  case of credit cards, this value also encode the origin from which a custoemr
+  case of credit cards, this value also encode the origin from which a customer
   provided that payment method.
   """
   is: PaymentMethodSnapshotSearchType
@@ -2042,7 +2042,7 @@ input SearchPaymentMethodSnapshotTypeInput {
   """
   These values represent the payment method used to create a transaction. In the
   case of credit cards, these values also encode the origin from which a
-  custoemr provided that payment method.
+  customer provided that payment method.
   """
   in: [PaymentMethodSnapshotSearchType!]
 }
