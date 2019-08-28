@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Wed Aug 14 2019 19:21:53 GMT+0000 (Coordinated Universal Time)
+# timestamp: Wed Aug 28 2019 19:00:40 GMT+0000 (UTC)
 
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
@@ -507,6 +507,14 @@ input ChargeVenmoAccountOptionsInput {
   profileId: String
 }
 
+"""
+A partial capture's relationship to its original authorizating transaction.
+"""
+type ChildCapture {
+  """The original authorization whose funds have been partially captured."""
+  parentAuthorization: Transaction
+}
+
 """Top-level fields returned from the client configuration query."""
 type ClientConfiguration {
   """URL to send analytics."""
@@ -605,6 +613,43 @@ input ClientTokenInput {
   An ID of an existing customer. Including this will allow your customer to vault and manage their payment methods.
   """
   customerId: ID
+}
+
+"""Top-level input field for confirming micro-transfer values."""
+input ConfirmMicroTransferAmountsInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of the verification from vaulting the bank account."""
+  verificationId: ID!
+
+  """
+  The amounts, in cents, of two deposits made into the customer's bank account
+  after initiating a MICRO_TRANSFERS verification. These values should be
+  collected from your customer.
+  """
+  amountsInCents: [Int!]!
+}
+
+"""
+Top-level output field from confirming micro-transfer amounts on bank account.
+"""
+type ConfirmMicroTransferAmountsPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The verification that was run on the payment method prior to vaulting."""
+  verification: Verification
+
+  """The status of the micro-transfer amounts confirmation."""
+  status: ConfirmMicroTransferAmountsStatus
+}
+
+"""The status of a micro-transfer amount confirmation."""
+enum ConfirmMicroTransferAmountsStatus {
+  AMOUNTS_DO_NOT_MATCH
+  CONFIRMED
+  TOO_MANY_ATTEMPTS
 }
 
 """
@@ -790,6 +835,12 @@ scalar CreditCardLast4
 
 """A number that passes Luhn validation."""
 scalar CreditCardNumber
+
+"""Information specific to verifications of credit card payment methods."""
+type CreditCardVerificationDetails {
+  """The amount used when performing the verification. May be 0."""
+  amount: MonetaryAmount
+}
 
 """
 An [ISO 4217 alpha](https://en.wikipedia.org/wiki/ISO_4217) currency code.
@@ -1294,6 +1345,12 @@ type Mutation {
   vaultPaymentMethod(input: VaultPaymentMethodInput!): VaultPaymentMethodPayload
 
   """
+  Vault payment information from a single-use US bank account payment method and
+  return a payload that includes a new multi-use payment method.
+  """
+  vaultUsBankAccount(input: VaultUsBankAccountInput!): VaultPaymentMethodPayload
+
+  """
   Refund a settled transaction and return a payload that includes details of the refund.
   """
   refundTransaction(input: RefundTransactionInput!): RefundTransactionPayload
@@ -1306,6 +1363,16 @@ type Mutation {
   """Run a verification on a multi-use payment method."""
   verifyPaymentMethod(input: VerifyPaymentMethodInput!): VerifyPaymentMethodPayload
 
+  """Run a verification on a multi-use US bank account payment method."""
+  verifyUsBankAccount(input: VerifyUsBankAccountInput!): VerifyPaymentMethodPayload
+
+  """
+  Confirm micro-transfer amounts initiated by vaultUsBankAccount or
+  verifyUsBankAccount, completing the verification process for a US Bank Account
+  via micro-transfer.
+  """
+  confirmMicroTransferAmounts(input: ConfirmMicroTransferAmountsInput!): ConfirmMicroTransferAmountsPayload
+
   """Delete a multi-use payment method from the vault."""
   deletePaymentMethodFromVault(input: DeletePaymentMethodFromVaultInput!): DeletePaymentMethodFromVaultPayload
 
@@ -1313,6 +1380,14 @@ type Mutation {
   Create a client token that can be used to initialize a client in order to tokenize payment information.
   """
   createClientToken(input: CreateClientTokenInput): CreateClientTokenPayload
+
+  """
+  Partially capture funds from a transaction that was successfully authorized
+  and return a payload that includes a new transaction with information about
+  the capture. This is only available for certain use cases. For more
+  information about if this mutation fits your use case [see our docs](https://articles.braintreepayments.com/guides/payment-methods/paypal/processing#multiple-partial-settlements).
+  """
+  partialCaptureTransaction(input: PartialCaptureTransactionInput!): PartialCaptureTransactionPayload
 
   """
   Tokenize Custom Actions fields and return a payload that includes a single-use payment method.
@@ -1372,6 +1447,77 @@ interface Node {
 type PageInfo {
   """Whether there is a next page available."""
   hasNextPage: Boolean!
+}
+
+"""
+An original authorization's relationship to all its partial capture transactions.
+"""
+type ParentAuthorization {
+  """The captures on a partially captured authorization."""
+  childCaptures: [Transaction!]
+
+  """
+  The total amount authorized by this transaction. This amount will not change as this transaction is partially captured.
+  """
+  totalAmountAuthorized: MonetaryAmount
+}
+
+"""
+A union of all possible relationships of transactions involved in partial
+captures. If the transaction has been partially captured, this links to all its
+partial capture children; if the transaction represents a partial capture
+attempt, this links to the original parent authorization.
+"""
+union PartialCaptureDetails = ChildCapture | ParentAuthorization
+
+"""
+Top-level input fields for capturing an outstanding funds authorized by a transaction.
+"""
+input PartialCaptureTransactionInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of the original authorized transaction to be partially captured."""
+  transactionId: ID!
+
+  """
+  Input fields for the capture, with details that will define the resulting capture transaction.
+  """
+  transaction: PartialCaptureTransactionOptionsInput
+}
+
+"""
+Input fields for the capture, with details that will define the resulting capture transaction.
+"""
+input PartialCaptureTransactionOptionsInput {
+  """
+  The amount to capture on the transaction against the parent authorization
+  transaction. Must be greater than 0. You can perform multiple partial capture
+  transactions as long as the cumulative amount of those transactions is less
+  than or equal to the amount authorized by the parent transaction. You can't
+  capture more than the authorized amount unless your industry and processor
+  support settlement adjustment (capturing a certain percentage over the
+  authorized amount); contact [Braintree
+  support](mailto:support@braintreepayments.com) for details.
+  """
+  amount: Amount!
+
+  """
+  Additional information about the transaction. On PayPal transactions, this
+  field maps to the PayPal invoice number. PayPal invoice numbers must be unique
+  in your PayPal business account. Maximum 255 characters or 127 for PayPal
+  transactions. If specified, this will update the existing order ID on the transaction.
+  """
+  orderId: String
+}
+
+"""Top-level output field from partially capturing a transaction."""
+type PartialCaptureTransactionPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The transaction representing the partial capture."""
+  capture: Transaction
 }
 
 """Top-level field representing a payment method."""
@@ -2424,7 +2570,10 @@ type Transaction implements Node {
   """
   paymentMethod: PaymentMethod
 
-  """The amount charged in this transaction."""
+  """
+  The amount charged in this transaction. For transactions that are partially
+  captured, this amount will be the cummulative amount captured on this transaction.
+  """
   amount: MonetaryAmount
 
   """
@@ -2491,6 +2640,13 @@ type Transaction implements Node {
 
   """The list of refunds issued against this transaction."""
   refunds: [Refund!]
+
+  """
+  For transactions created or captured using the `partialCaptureTransaction`
+  mutation. This field links a given transaction to its original authorization
+  or all its partial captures.
+  """
+  partialCaptureDetails: PartialCaptureDetails
 }
 
 """A paginated list of transactions."""
@@ -3170,6 +3326,52 @@ enum UsBankAccountType {
   SAVINGS
 }
 
+"""
+Information specific to verifications of US bank account payment methods.
+"""
+type UsBankAccountVerificationDetails {
+  """Type of US bank account verification performed."""
+  method: UsBankAccountVerificationMethod
+
+  """
+  Time at which the verification was determined to be successful or not. If
+  successful, at this time the payment method will be marked `verified` and you
+  will be able to charge it.
+  """
+  verificationDeterminedAt: Timestamp
+}
+
+"""
+The type of verification on an US bank account payment method. See our [ACH guide](https://articles.braintreepayments.com/guides/payment-methods/ach#verification-methods).
+"""
+enum UsBankAccountVerificationMethod {
+  """
+  Verification conducted independently by the merchant, not through Braintree.
+  """
+  INDEPENDENT_CHECK
+
+  """
+  Verification by micro-deposits transferred to the bank account, which the
+  customer must then confirm. The most reliable method, but takes additional time.
+  """
+  MICRO_TRANSFERS
+
+  """
+  Verification via account information. Will complete the verification process
+  immediately, but is not supported by all banks.
+  """
+  NETWORK_CHECK
+
+  """
+  Verification at the point of tokenization. Requires integration with a
+  third-party provider. Because this requires a different tokenization flow,
+  this method of verification is only supported for vaulting tokenized US bank
+  account logins, and is not supported when re-verifying a US bank account
+  payment method.
+  """
+  TOKENIZED_CHECK
+}
+
 """Input fields for a U.S. bank login object."""
 input UsBankLoginInput {
   """The public token returned from the bank login."""
@@ -3294,6 +3496,55 @@ enum UsStateCode {
 """A US ZIP code. Supports DDDDD and DDDDD-DDDD formats."""
 scalar UsZipCode
 
+"""Top-level input field for vaulting a limited use PayPal account."""
+input VaultLimitedUsePayPalAccountInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  ID of an existing single-use PayPal account generated using the order flow.
+  """
+  paymentMethodId: ID!
+
+  """ID of the customer to associate the resulting payment method with."""
+  customerId: ID
+
+  """
+  Input fields that specify information about the resulting PayPal account.
+  """
+  options: VaultLimitedUsePayPalAccountOptionsInput
+}
+
+"""
+Input fields that specify information about the resulting PayPal account.
+"""
+input VaultLimitedUsePayPalAccountOptionsInput {
+  """
+  The total amount of the order. This will be the limit to how much may be captured on the resulting payment method.
+  """
+  amount: Amount
+
+  """
+  Variable passed directly to PayPal for your own tracking purposes. Customers do not see this value.
+  """
+  customField: String
+
+  """
+  Description of the transaction that is displayed to customers in PayPal email receipts.
+  """
+  description: String
+
+  """
+  The PayPal invoice number. It must be unique in your PayPal business account
+  and can contain a maxiumum of 127 characters. If specified, transactions
+  created from the resulting payment method will have this orderId.
+  """
+  orderId: String
+
+  """Shipping destination address information."""
+  shippingAddress: AddressInput
+}
+
 """
 Top-level input field for vaulting a payment method so it can be used multiple times.
 """
@@ -3325,6 +3576,28 @@ type VaultPaymentMethodPayload {
 
   """The verification that was run on the payment method prior to vaulting."""
   verification: Verification
+}
+
+"""
+Top-level input field for vaulting a bank account so it can be used multiple times.
+"""
+input VaultUsBankAccountInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of an existing single-use payment method to be vaulted."""
+  paymentMethodId: ID!
+
+  """ID of the merchant account to use when verifying the payment method."""
+  verificationMerchantAccountId: ID
+
+  """
+  ID of the customer to associate the resulting multi-use payment method with.
+  """
+  customerId: ID
+
+  """Type of US bank account verification to perform."""
+  verificationMethod: UsBankAccountVerificationMethod!
 }
 
 """Details about a Venmo Account."""
@@ -3379,7 +3652,7 @@ type Verification implements Node {
   paymentMethod: PaymentMethod
 
   """For a credit card, the amount used when performing the verification."""
-  amount: MonetaryAmount
+  amount: MonetaryAmount @deprecated(reason: "Depending on the type of payment method being verified, some verifications do not have an amount. On a credit card verification, use `paymentMethodVerificationDetails.amount` instead.")
 
   """The merchant account used for the verification."""
   merchantAccountId: ID
@@ -3407,6 +3680,11 @@ type Verification implements Node {
 
   """Risk data evaluated for this verification."""
   riskData: RiskData
+
+  """
+  Details unique to the verification based on payment method type being verified.
+  """
+  paymentMethodVerificationDetails: VerificationDetails
 }
 
 """A paginated list of verifications."""
@@ -3428,6 +3706,11 @@ type VerificationConnectionEdge {
   """The verification."""
   node: Verification
 }
+
+"""
+A union of all possible verification details specific to the type of payment method being verified.
+"""
+union VerificationDetails = UsBankAccountVerificationDetails | CreditCardVerificationDetails
 
 """Detailed response information from the processor."""
 type VerificationProcessorResponse {
@@ -3470,6 +3753,9 @@ enum VerificationStatus {
   """
   GATEWAY_REJECTED
 
+  """Indicates that the verification is pending."""
+  PENDING
+
   """
   Indicates that the verification was unsuccessful based on the response from the processor.
   """
@@ -3477,6 +3763,9 @@ enum VerificationStatus {
 
   """Indicates that the verification was successful."""
   VERIFIED
+
+  """Indicates that the verification is in the process of verifying."""
+  VERIFYING
 }
 
 """Top-level input field for verifying a multi-use payment method."""
@@ -3498,6 +3787,21 @@ type VerifyPaymentMethodPayload {
 
   """The verification that was run on the payment method."""
   verification: Verification
+}
+
+"""Top-level input field for retrying a verification on a bank account."""
+input VerifyUsBankAccountInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of an existing multi-use payment method to be vaulted."""
+  paymentMethodId: ID!
+
+  """ID of the merchant account to use when verifying the payment method."""
+  merchantAccountId: ID
+
+  """Type of US bank account verification to perform."""
+  verificationMethod: UsBankAccountVerificationMethod!
 }
 
 """Details about the user and merchant authenticated in this request."""

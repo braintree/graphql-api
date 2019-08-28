@@ -1,3 +1,13 @@
+# 2019-08-28
+
+* Add `vaultUsBankAccount` mutation.
+* Add `verifyUsBankAccount` mutation.
+* Add `confirmMicroTransferAmounts` mutation.
+* Add `partialCaptureTransaction` mutation.
+* Add `partialCaptureDetails` field to `Transaction`.
+* Deprecate `amount` field on `Verification` in favor of `paymentMethodVerificationDetails` which includes payment method specific information.
+* Add `PENDING` and `VERIFYING` to `VerificationStatus`.
+
 # 2019-08-14
 
 * Fix some documentation typos.
