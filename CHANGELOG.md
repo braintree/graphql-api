@@ -1,3 +1,14 @@
+# 2019-09-12
+
+* Add `threeDSecure` field to `CreditCardDetails`.
+* Add `authorizePayPalAccount` mutation.
+* Add `authorizeVenmoAccount` mutation.
+* Add `tokenizeNetworkToken` mutation.
+* Add `performThreeDSecureLookup` mutation.
+* Add `NetworkTokenOriginDetails` to `PaymentMethodOriginDetails` union.
+* Add `NETWORK_TOKEN` to `PaymentMethodOriginType` enum.
+* Add `CREDIT_CARD_VIA_NETWORK_TOKEN` to `PaymentMethodSnapshotSearchType` enum.
+
 # 2019-08-28
 
 * Add `vaultUsBankAccount` mutation.
