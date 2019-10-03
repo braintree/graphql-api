@@ -1,3 +1,13 @@
+# 2019-10-03
+
+* Add `Dispute` type.
+* Add `dispute` field to `Transaction` to retrieve all of a transaction's disputes.
+* Add `threeDSecurePassThrough` to `TransactionInput` (fixes [#3](https://github.com/braintree/graphql-api/issues/3)).
+* Add `verification` field to `VaultPaymentMethodInput`.
+* Add support for opting-out of verifications when vaulting a payment method via the `vaultPaymentMethod` mutation.
+* Deprecate `VaultPaymentMethodInput.verificationMerchantId`, use `VaultPaymentMethodInput.verification.merchantAccountId` instead.
+* Update `PageInfo` to include all [Relay required fields](https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo).
+
 # 2019-09-12
 
 * Add `threeDSecure` field to `CreditCardDetails`.

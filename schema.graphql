@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Sep 12 2019 18:10:57 GMT+0000 (UTC)
+# timestamp: Thu Oct 03 2019 20:30:07 GMT+0000 (UTC)
 
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
@@ -1135,6 +1135,196 @@ type DeletePaymentMethodFromVaultPayload {
 }
 
 """
+[A case raised by a customer to either request information about or to challenge a charge](https://articles.braintreepayments.com/risk-and-security/chargebacks-retrievals/overview).
+These are initiated via a customer's payment provider, such as their bank, and
+require a merchant to provide evidence or further information.
+"""
+type Dispute implements Node {
+  """Unique identifier."""
+  id: ID!
+
+  """Legacy unique identifier."""
+  legacyId: ID!
+
+  """
+  The amount of money from the original charge that the customer is disputing.
+  Can be 0. This amount is debited from a merchant's account and held in a
+  third-party account until the dispute is resolved, at which time it is sent to
+  either the merchant or customer.
+  """
+  amountDisputed: MonetaryAmount
+
+  """
+  If an amount was disputed, the amount of money awarded back to the merchant if the dispute was reversed.
+  """
+  amountWon: MonetaryAmount
+
+  """The case number for the dispute."""
+  caseNumber: String
+
+  """Date and time at which the dispute was created."""
+  createdAt: Timestamp
+
+  """The date the dispute was received by the merchant."""
+  receivedDate: Date
+
+  """The deadline for the merchant to submit a response to the dispute."""
+  responseDeadline: Timestamp
+
+  """The type of Dispute."""
+  type: DisputeType
+
+  """Evidence records submitted by the merchant for the dispute."""
+  evidence: [DisputeEvidence!]
+
+  """
+  If this dispute is a follow-up to a previous chargeback or retrieval, the original dispute.
+  """
+  originalDispute: Dispute
+
+  """Additional information from the payment processor."""
+  processorResponse: DisputeProcessorResponse
+
+  """The status of the dispute."""
+  status: DisputeStatus
+
+  """
+  A log of history events containing status changes by date for this dispute.
+  """
+  statusHistory: [DisputeStatusEvent!]
+
+  """
+  The disputed transaction which the customer is either requesting further information on or challenging.
+  """
+  transaction: Transaction
+}
+
+"""Evidence provided by a merchant to respond to a dispute."""
+interface DisputeEvidence {
+  """Unique identifier."""
+  id: ID!
+
+  """Date and time at which the evidence was created with Braintree."""
+  createdAt: Timestamp
+
+  """Date and time at which the evidence was sent to the processor."""
+  sentToProcessorAt: Timestamp
+
+  """The evidence category."""
+  category: String
+}
+
+"""Images, files, or other evidence supporting a dispute case."""
+type DisputeFileEvidence implements DisputeEvidence {
+  """Unique identifier."""
+  id: ID!
+
+  """Date and time at which the evidence was created with Braintree."""
+  createdAt: Timestamp
+
+  """Date and time at which the evidence was sent to the processor."""
+  sentToProcessorAt: Timestamp
+
+  """A URL where you can retrieve the dispute evidence."""
+  url: String
+
+  """The evidence category."""
+  category: String
+}
+
+"""Information about the dispute provided by the processor."""
+type DisputeProcessorResponse {
+  """Additional comments forwarded by the processor."""
+  processorComments: String
+
+  """The reason the dispute was created."""
+  reason: DisputeReason
+
+  """The reason code provided by the processor."""
+  reasonCode: String
+
+  """The reason code description based on the `reasonCode`."""
+  reasonDescription: String
+
+  """The date the dispute was received by the merchant."""
+  receivedDate: Date
+
+  """
+  The string value representing the reference number provided by the processor (if any).
+  """
+  referenceNumber: String
+}
+
+"""
+The reason a customer opened a chargeback, pre-arbitration, or retrieval.
+"""
+enum DisputeReason {
+  CANCELLED_RECURRING_TRANSACTION
+  CREDIT_NOT_PROCESSED
+  DUPLICATE
+  FRAUD
+  GENERAL
+  INVALID_ACCOUNT
+  NOT_RECOGNIZED
+  PRODUCT_NOT_RECEIVED
+  PRODUCT_UNSATISFACTORY
+  RETRIEVAL
+  TRANSACTION_AMOUNT_DIFFERS
+}
+
+"""The status of the dispute."""
+enum DisputeStatus {
+  ACCEPTED
+  DISPUTED
+  EXPIRED
+  LOST
+  OPEN
+  WON
+}
+
+"""The record of a status that a dispute has passed through."""
+type DisputeStatusEvent {
+  """The date and time this event was disbursed."""
+  disbursementDate: Timestamp
+
+  """The status of the dispute."""
+  status: DisputeStatus
+
+  """The timestamp of the history event."""
+  timestamp: Timestamp
+}
+
+"""Text evidence supporting a dispute case."""
+type DisputeTextEvidence implements DisputeEvidence {
+  """Unique identifier."""
+  id: ID!
+
+  """Date and time at which the evidence was created with Braintree."""
+  createdAt: Timestamp
+
+  """Date and time at which the evidence was sent to the processor."""
+  sentToProcessorAt: Timestamp
+
+  """The body for text evidence."""
+  comment: String
+
+  """The evidence category."""
+  category: String
+}
+
+"""Type of dispute."""
+enum DisputeType {
+  CHARGEBACK
+
+  """
+  A [second challenge to a charge](https://articles.braintreepayments.com/risk-and-security/chargebacks-retrievals/overview#pre-arbitrations),
+  in the case that you have won an initial chargeback.
+  """
+  PRE_ARBITRATION
+  RETRIEVAL
+}
+
+"""
 A card brand-specific two-digit string describing the mode of the transaction.
 """
 scalar ECommerceIndicator
@@ -1415,7 +1605,8 @@ type Mutation {
 
   """
   Vault payment information from a single-use payment method and return a
-  payload that includes a new multi-use payment method.
+  payload that includes a new multi-use payment method. When vaulting a credit
+  card, this mutation will also verify that card by default.
   """
   vaultPaymentMethod(input: VaultPaymentMethodInput!): VaultPaymentMethodPayload
 
@@ -1568,6 +1759,17 @@ interface Node {
 type PageInfo {
   """Whether there is a next page available."""
   hasNextPage: Boolean!
+
+  """
+  Always false; backwards pagination is not supported. Present to comply with Relay specifications.
+  """
+  hasPreviousPage: Boolean!
+
+  """The cursor for the first item in the connection page."""
+  startCursor: String
+
+  """The cursor for the last item in the connection page."""
+  endCursor: String
 }
 
 """
@@ -2553,6 +2755,26 @@ type SettlingEvent implements TransactionStatusEvent {
   terminal: Boolean
 }
 
+"""Input fields for submitting a credit card for account updater."""
+input SubmitCreditCardForAccountUpdaterInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of the credit card to submit for account updater."""
+  paymentMethodId: ID!
+}
+
+"""
+Top-level fields returned when submitting a credit card for account updater.
+"""
+type SubmitCreditCardForAccountUpdaterPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The credit card that was submitted to account updater."""
+  paymentMethod: PaymentMethod
+}
+
 """
 Accompanying information for a transaction that is submitted for settlement.
 This status indicates that the transaction is scheduled to be settled.
@@ -2697,6 +2919,11 @@ enum ThreeDSecureCardEnrolled {
   YES
 }
 
+"""
+A 3D Secure CAVV algorithm. Possible Values: 2 - CVV with ATN, 3 - Mastercard SPA algorithm.
+"""
+scalar ThreeDSecureCavvAlgorithm
+
 """Configuration for 3D Secure."""
 type ThreeDSecureConfiguration {
   """
@@ -2797,7 +3024,7 @@ type ThreeDSecureLookupData {
   pareq: String
 
   """
-  This a the unique 3DS identifier assigned by Braintree to track the 3DS call as it progresses.
+  This a the unique 3D Secure identifier assigned by Braintree to track the 3D Secure call as it progresses.
   """
   md: String
 
@@ -2834,6 +3061,61 @@ input ThreeDSecureLookupTransactionInformationInput {
   """The phone number associated with the transaction."""
   phoneNumber: String
 }
+
+"""Results of a merchant-performed 3D Secure authentication."""
+input ThreeDSecurePassThroughInput {
+  """
+  The value of the electronic commerce indicator (ECI) flag, which indicates the outcome of the 3D Secure authentication.
+  """
+  eciFlag: ECommerceIndicator!
+
+  """
+  Cardholder authentication verification value or CAVV. The main encrypted
+  message issuers and card networks use to verify authentication has occurred.
+  Mastercard uses an AVV (Authentication Verification Value) message and
+  American Express uses an AEVV (American Express Verification Value) message,
+  each of which should also be passed in the cavv parameter.
+  """
+  cavv: String
+
+  """
+  Transaction identifier resulting from 3D Secure authentication. Uniquely
+  identifies the transaction and sometimes required in the authorization
+  message. Must be base64-encoded. This field will no longer be used in 3D
+  Secure 2 authentications.
+  """
+  xId: String
+
+  """
+  Transaction identifier resulting from 3D Secure 2 authentication. This field
+  must be supplied for Mastercard Identity Check.
+  """
+  threeDSecureServerTransactionId: String
+
+  """
+  The version of 3D Secure authentication used for the transaction. Required on Visa and Mastercard authentications.
+  """
+  version: ThreeDSecureVersion
+
+  """The 3D Secure authentication response status code."""
+  authenticationResponse: ThreeDSecureStatusCode
+
+  """The 3D Secure directory server response."""
+  directoryServerResponse: ThreeDSecureStatusCode
+
+  """
+  The algorithm used to generate the CAVV value. This is only returned for MasterCard SecureCode transactions (3DS 1.0).
+  """
+  cavvAlgorithm: ThreeDSecureCavvAlgorithm
+}
+
+"""A raw 3D Secure PARes or VARes response code (e.g. 'Y')."""
+scalar ThreeDSecureStatusCode
+
+"""
+A 3D Secure authentication version. Must be composed of digits separated by periods (e.g. '1.0.2').
+"""
+scalar ThreeDSecureVersion
 
 """
 An [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Times) timestamp with microsecond precision.
@@ -3096,6 +3378,9 @@ type Transaction implements Node {
   or all its partial captures.
   """
   partialCaptureDetails: PartialCaptureDetails
+
+  """A collection of disputes associated with the transaction."""
+  disputes: [Dispute!]
 }
 
 """A paginated list of transactions."""
@@ -3231,6 +3516,14 @@ input TransactionInput {
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
+
+  """
+  Results of a merchant-performed 3D Secure authentication. You will only need
+  to use these fields if you've performed your own integration with a 3D Secure
+  MPI provider (e.g. Cardinal Centinel). Otherwise, Braintree's SDKs handle this
+  for you in our standard 3D Secure integration.
+  """
+  threeDSecurePassThrough: ThreeDSecurePassThroughInput
 }
 
 """
@@ -4004,13 +4297,29 @@ input VaultPaymentMethodInput {
   """ID of an existing single-use payment method to be vaulted."""
   paymentMethodId: ID!
 
-  """ID of the merchant account to use when verifying the payment method."""
+  """
+  ID of the merchant account to use when verifying the payment method.
+  Deprecated: please use `verification.merchantAccountId` instead.
+  """
   verificationMerchantAccountId: ID
+
+  """
+  Input fields that specify options for verifying the vaulted payment method, if it is of a type that supports verification.
+  """
+  verification: VaultPaymentMethodVerificationOptionsInput
 
   """
   ID of the customer to associate the resulting multi-use payment method with.
   """
   customerId: ID
+
+  """
+  Results of a merchant-performed 3D Secure authentication. You will only need
+  to use these fields if you've performed your own integration with a 3D Secure
+  MPI provider (e.g. Cardinal Centinel). Otherwise, Braintree's SDKs handle this
+  for you in our standard 3D Secure integration.
+  """
+  threeDSecurePassThrough: ThreeDSecurePassThroughInput
 }
 
 """Top-level output field from vaulting a payment method."""
@@ -4025,6 +4334,24 @@ type VaultPaymentMethodPayload {
 
   """The verification that was run on the payment method prior to vaulting."""
   verification: Verification
+}
+
+"""
+Input fields that specify options for verifying the vaulted payment method.
+"""
+input VaultPaymentMethodVerificationOptionsInput {
+  """
+  ID of the merchant account to use when verifying the payment method. The
+  verification will use the default merchant account if this field is left blank.
+  """
+  merchantAccountId: ID
+
+  """
+  Whether to opt-out of payment method verification. Payment methods that
+  support verification are verified by default. Clients should only pass `true`
+  in the uncommon scenario that the payment method has been verified externally to Braintree.
+  """
+  skip: Boolean
 }
 
 """
