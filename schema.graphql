@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Oct 03 2019 20:30:07 GMT+0000 (UTC)
+# timestamp: Tue Oct 15 2019 19:37:01 GMT+0000 (Coordinated Universal Time)
 
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
@@ -89,16 +89,28 @@ input AddressInput {
   """
   countryCode: CountryCodeAlpha3
 
-  """Country code for the address in ISO 3166-1 alpha-3 format."""
+  """
+  Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
+  Country code for the address in ISO 3166-1 alpha-3 format.
+  """
   countryCodeAlpha3: String
 
-  """Country code for the address in ISO 3166-1 alpha-2 format."""
+  """
+  Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
+  Country code for the address in ISO 3166-1 alpha-2 format.
+  """
   countryCodeAlpha2: String
 
-  """Country code for the address in ISO 3166-1 numeric format."""
+  """
+  Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
+  Country code for the address in ISO 3166-1 numeric format.
+  """
   countryCodeNumeric: String
 
-  """Country name for the address."""
+  """
+  Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
+  Country name for the address.
+  """
   countryName: String
 }
 
@@ -292,7 +304,7 @@ input AuthorizePayPalAccountOptionsInput {
   """
   description: String
 
-  """Input fields for the PayPal account receiving the transaction funds."""
+  """Deprecated: This field is no longer supported."""
   payee: PayPalPayeeOptionsInput
 }
 
@@ -406,6 +418,7 @@ input CaptureTransactionInput {
   transactionId: ID!
 
   """
+  Deprecated: This field is included for supporting legacy clients. Please use `transaction.amount` instead.
   The amount to capture on the transaction. Must be greater than 0. You can't
   capture more than the authorized amount unless your industry and processor
   support settlement adjustment (capturing a certain percentage over the
@@ -510,7 +523,7 @@ input ChargePayPalAccountOptionsInput {
   """
   description: String
 
-  """Input fields for the PayPal account receiving the transaction funds."""
+  """Deprecated: This field is no longer supported."""
   payee: PayPalPayeeOptionsInput
 }
 
@@ -859,7 +872,9 @@ type CreditCardDetails {
   origin: PaymentMethodOrigin
 
   """
-  Contains relevant data fields if the payment method has been authenticated using 3D Secure.
+  Contains relevant data fields if the payment method has been authenticated
+  using 3D Secure. Only available on 3D Secure authenticated single-use payment
+  methods and 3D Secure paymentMethodSnapshots.
   """
   threeDSecure: ThreeDSecureAuthentication
 }
@@ -1199,6 +1214,26 @@ type Dispute implements Node {
   transaction: Transaction
 }
 
+"""A paginated list of disputes."""
+type DisputeConnection {
+  """A list of disputes."""
+  edges: [DisputeConnectionEdge]
+
+  """Information about the page."""
+  pageInfo: PageInfo!
+}
+
+"""A dispute within a DisputeConnection."""
+type DisputeConnectionEdge {
+  """
+  This dispute's location within the DisputeConnection. Used for requesting additional pages.
+  """
+  cursor: String
+
+  """The dispute."""
+  node: Dispute
+}
+
 """Evidence provided by a merchant to respond to a dispute."""
 interface DisputeEvidence {
   """Unique identifier."""
@@ -1270,6 +1305,15 @@ enum DisputeReason {
   PRODUCT_UNSATISFACTORY
   RETRIEVAL
   TRANSACTION_AMOUNT_DIFFERS
+}
+
+"""Input fields for searching for Disputes."""
+input DisputeSearchInput {
+  """Find disputes with a given status."""
+  status: SearchDisputeStatusInput
+
+  """Find disputes with a given type."""
+  type: SearchDisputeTypeInput
 }
 
 """The status of the dispute."""
@@ -1533,7 +1577,7 @@ type Merchant {
 """A monetary amount with currency."""
 type MonetaryAmount {
   """
-  The amount of money, either a whole number or a number with exactly 2 or 3 decimal places.
+  The amount of money, either a whole number or a number with up to 3 decimal places.
   """
   value: Amount
 
@@ -1625,6 +1669,11 @@ type Mutation {
   Reverse a transaction and return a payload that includes either the voided transaction or a refund.
   """
   reverseTransaction(input: ReverseTransactionInput!): ReverseTransactionPayload
+
+  """
+  Update custom fields on a transaction. Custom fields are [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
+  """
+  updateTransactionCustomFields(input: UpdateTransactionCustomFieldsInput!): UpdateTransactionCustomFieldsPayload
 
   """Run a verification on a multi-use payment method."""
   verifyPaymentMethod(input: VerifyPaymentMethodInput!): VerifyPaymentMethodPayload
@@ -2556,6 +2605,24 @@ type Search {
 input SearchCustomerInput {
   """Find transactions with a given customer id."""
   id: SearchValueInput
+}
+
+"""Input fields for searching for a dispute with a given status."""
+input SearchDisputeStatusInput {
+  """The dispute status is exactly this value."""
+  is: DisputeStatus
+
+  """The dispute status is one of these values."""
+  in: [DisputeStatus!]
+}
+
+"""Input fields for searching for a dispute with a given type."""
+input SearchDisputeTypeInput {
+  """The dispute type is exactly this value."""
+  is: DisputeType
+
+  """The dispute type is one of these values."""
+  in: [DisputeType!]
 }
 
 """
@@ -3951,9 +4018,37 @@ type UpdateCustomerPayload {
   customer: Customer
 }
 
+"""Input for creating or updating custom fields on a transaction."""
+input UpdateTransactionCustomFieldsInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The ID of the transaction to update."""
+  transactionId: ID!
+
+  """
+  The list of custom fields to update. You must [set up each custom field in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#creating-a-custom-field)
+  prior to passing it with a request.
+  """
+  customFields: [CustomFieldInput!]!
+}
+
 """
-A billing address for a U.S. bank account. This is a subset of the fields
-required in `AddressInput`.
+Top-level output field from updating custom fields for a specific transaction.
+"""
+type UpdateTransactionCustomFieldsPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  A list of all custom fields on the updated transaction. Custom fields are
+  [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
+  """
+  customFields: [CustomField!]
+}
+
+"""
+A billing address for a U.S. bank account. This is a subset of the fields required in `AddressInput`.
 """
 input UsBankAccountBillingAddressInput {
   """The street address."""
@@ -3990,8 +4085,8 @@ type UsBankAccountConfiguration {
 """Details about a U.S. bank account."""
 type UsBankAccountDetails {
   """
-  The name of the accountholder. This is either the business name for a
-  business account, or the owner's full name for an individual account.
+  The name of the accountholder. This is either the business name for a business
+  account, or the owner's full name for an individual account.
   """
   accountholderName: String
 
@@ -4298,6 +4393,7 @@ input VaultPaymentMethodInput {
   paymentMethodId: ID!
 
   """
+  Deprecated: This field is included for supporting legacy clients. Please use `verification.merchantAccountId` instead.
   ID of the merchant account to use when verifying the payment method.
   Deprecated: please use `verification.merchantAccountId` instead.
   """

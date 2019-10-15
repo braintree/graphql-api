@@ -1,3 +1,10 @@
+# 2019-10-15
+
+* Deprecate `countryCodeAlpha3`, `countryCodeAlpha2`, `countryCodeNumeric` and `countryName` on `AddressInput`, use `countryCode` instead.
+* Deprecate `payee` on `AuthorizePayPalAccountOptionsInput` and `ChargePayPalAccountOptionsInput`.  
+* Return data in the `threeDSecure` field on `CreditCardDetails` when present and `CreditCardDetails` are returned as part of the `PaymentMethodSnapshot` union.
+* Add `updateTransactionCustomFields` mutation.
+
 # 2019-10-03
 
 * Add `Dispute` type.
