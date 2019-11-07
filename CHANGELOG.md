@@ -1,3 +1,16 @@
+# 2019-11-07
+
+* Add `customers` search field to `Search` query (fixes [#4](https://github.com/braintree/graphql-api/issues/4)).
+* Add `verifications` search field to `Search` query.
+* Add `disputes` search field to `Search` query.
+* Add `acceptDispute` mutation.
+* Add `responseDeadline` and `replyByDate` fields to `Dispute`.
+* Deprecate `transactionFeeAmount` and `transactionFeeCurrencyIsoCode` fields on in favor of in favor of compound `transactionFee` on `PayPalTransactionDetails`.
+* Add `source` and `facilitatorDetails` fields to `Transaction`.
+* Allow searching for transactions by source and facilitator details.
+* Add `AUTHENTICATE_REJECTED`, `AUTHENTICATION_BYPASSED`, and `CHALLENGE_REQUIRED` statuses to `ThreeDSecureAuthenticationStatus` enum.
+* Add `vaultPayPalBillingAgreement` mutation to import and vault an existing PayPal Billing Agreement that was not created through Braintree.
+
 # 2019-10-15
 
 * Deprecate `countryCodeAlpha3`, `countryCodeAlpha2`, `countryCodeNumeric` and `countryName` on `AddressInput`, use `countryCode` instead.

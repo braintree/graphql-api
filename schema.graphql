@@ -1,5 +1,23 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Tue Oct 15 2019 19:37:01 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Nov 07 2019 21:56:03 GMT+0000 (Coordinated Universal Time)
+
+"""Top-level input fields for accepting a dispute."""
+input AcceptDisputeInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The ID of the dispute to be accepted."""
+  disputeId: ID!
+}
+
+"""Top-level field returned when accepting a dispute."""
+type AcceptDisputePayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Information about the dispute that was accepted."""
+  dispute: Dispute
+}
 
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
@@ -26,7 +44,7 @@ type Address {
   """The street address."""
   streetAddress: String
 
-  """Extended address information, such as apartment or suite number."""
+  """Extended address information, such as an apartment or suite number."""
   extendedAddress: String
 
   """First name."""
@@ -59,7 +77,7 @@ input AddressInput {
   streetAddress: String
 
   """
-  Extended address information, such as apartment or suite number. 255 character maximum.
+  Extended address information, such as an apartment or suite number. 255 character maximum.
   """
   extendedAddress: String
 
@@ -79,36 +97,42 @@ input AddressInput {
   Postal code in any country's format, otherwise known as CAP, CEP, Eircode,
   NPA, PIN, PLZ, or ZIP code. Nine alphanumeric characters maximum, may also
   contain spaces and hyphens.
-  *Required for Level 3 processing* on TransactionInput.
+  
+  *Required for Level 3 processing*.
   """
   postalCode: String
 
   """
   Country code for the address in ISO 3166-1 alpha-3 format.
-  *Required for Level 3 processing* on TransactionInput.
+  
+  *Required for Level 3 processing*.
   """
   countryCode: CountryCodeAlpha3
 
   """
   Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
+  
   Country code for the address in ISO 3166-1 alpha-3 format.
   """
   countryCodeAlpha3: String
 
   """
   Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
+  
   Country code for the address in ISO 3166-1 alpha-2 format.
   """
   countryCodeAlpha2: String
 
   """
   Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
+  
   Country code for the address in ISO 3166-1 numeric format.
   """
   countryCodeNumeric: String
 
   """
   Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
+  
   Country name for the address.
   """
   countryName: String
@@ -124,10 +148,10 @@ type ApplePayConfiguration {
   """The environment being used for Apple Pay."""
   status: ApplePayStatus
 
-  """The Apple Pay country code for the current merchant."""
+  """The merchant's Apple Pay country code."""
   countryCode: CountryCodeAlpha2
 
-  """The Apple Pay currency ISO code for the current merchant."""
+  """The merchant's Apple Pay currency ISO code."""
   currencyCode: CurrencyCodeAlpha
 
   """
@@ -135,17 +159,17 @@ type ApplePayConfiguration {
   """
   merchantIdentifier: String
 
-  """A list of card brands supported for Apple Pay by the current merchant."""
+  """A list of card brands supported by the merchant for Apple Pay."""
   supportedCardBrands: [CreditCardBrandCode]
 }
 
 """Additional information about the payment method specific to Apple Pay."""
 type ApplePayOriginDetails {
   """
-  A human-readable description of the Apple Pay payment method. Usually consists
-  of the Apple Pay card type and its last four digits. If there is no underlying
-  credit card, this will describe the customer's payment method and the parent
-  CreditCardDetail's last4 will be null.
+  A human-readable description of the Apple Pay payment method. This usually
+  consists of the Apple Pay card type and its last four digits. If there is no
+  underlying credit card, this will describe the customer's payment method and
+  the parent CreditCardDetail object's last4 field will be null.
   """
   paymentInstrumentName: String
 
@@ -168,10 +192,10 @@ enum ApplePayStatus {
 
 """Configuration for Apple Pay on web."""
 type ApplePayWebConfiguration {
-  """The Apple Pay country code for the current merchant."""
+  """The merchant's Apple Pay country code."""
   countryCode: CountryCodeAlpha2
 
-  """The Apple Pay currency ISO code for the current merchant."""
+  """The merchant's Apple Pay currency ISO code."""
   currencyCode: CurrencyCodeAlpha
 
   """
@@ -179,7 +203,7 @@ type ApplePayWebConfiguration {
   """
   merchantIdentifier: String
 
-  """A list of card brands supported for Apple Pay by the current merchant."""
+  """A list of card brands supported by the merchant for Apple Pay."""
   supportedCardBrands: [CreditCardBrandCode]
 }
 
@@ -224,7 +248,7 @@ type AuthorizationExpiredEvent implements TransactionStatusEvent {
   """The source for the transaction change to the new status."""
   source: TransactionSource
 
-  """Whether this is the final state for the transaction."""
+  """Whether or not this is the final state for the transaction."""
   terminal: Boolean
 }
 
@@ -238,7 +262,7 @@ type AuthorizedEvent implements TransactionStatusEvent {
 
   """
   The amount the transaction was authorized for. This will match the amount on
-  the transaction itself. In most cases, you cannot request to settle more than this amount.
+  the transaction itself. In most cases, you can't request to settle more than this amount.
   """
   amount: MonetaryAmount
 
@@ -253,7 +277,7 @@ type AuthorizedEvent implements TransactionStatusEvent {
   """Risk decision for this transaction."""
   riskDecision: RiskDecision
 
-  """Whether this is the final state for the transaction."""
+  """Whether or not this is the final state for the transaction."""
   terminal: Boolean
 }
 
@@ -349,7 +373,7 @@ enum AvsCvvResponseCode {
 
 """Information about the credit card based on its BIN."""
 type BinRecord {
-  """Whether the card is prepaid, such as a gift card."""
+  """Whether or not the card is prepaid, such as a gift card."""
   prepaid: BinRecordValue
 
   """
@@ -357,7 +381,7 @@ type BinRecord {
   """
   healthcare: BinRecordValue
 
-  """Whether the card is a debit card."""
+  """Whether or not the card is a debit card."""
   debit: BinRecordValue
 
   """
@@ -367,18 +391,18 @@ type BinRecord {
   durbinRegulated: BinRecordValue
 
   """
-  Whether the card is a commercial card and capable of processing Level 2 transactions.
+  Whether or not the card is a commercial card and capable of processing Level 2 transactions.
   """
   commercial: BinRecordValue
 
-  """Whether the card is designated for employee wages."""
+  """Whether or not the card is designated for employee wages."""
   payroll: BinRecordValue
 
   """The name of the bank that issued the card."""
   issuingBank: String
 
   """
-  The country code for the country that issued the card in ISO 3166-1 alpha-3 format.
+  The country code of the country that issued the card in ISO 3166-1 alpha-3 format.
   """
   countryOfIssuance: CountryCodeAlpha3
 
@@ -414,11 +438,12 @@ input CaptureTransactionInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """ID of a transaction to be captured."""
+  """ID of the transaction to be captured."""
   transactionId: ID!
 
   """
   Deprecated: This field is included for supporting legacy clients. Please use `transaction.amount` instead.
+  
   The amount to capture on the transaction. Must be greater than 0. You can't
   capture more than the authorized amount unless your industry and processor
   support settlement adjustment (capturing a certain percentage over the
@@ -581,7 +606,7 @@ input ChargeVenmoAccountOptionsInput {
 }
 
 """
-A partial capture's relationship to its original authorizating transaction.
+A partial capture's relationship to its original authorization transaction.
 """
 type ChildCapture {
   """The original authorization whose funds have been partially captured."""
@@ -607,7 +632,7 @@ type ClientConfiguration {
   """A URL pointing to the base path of Braintree's client API."""
   clientApiUrl: String @deprecated(reason: "This field is included for supporting legacy clients.")
 
-  """A list of ClientFeatures a Merchant supports."""
+  """A list of client features the merchant supports."""
   supportedFeatures: [ClientFeature] @deprecated(reason: "This field is included for supporting legacy clients.")
 
   """Configuration for payment methods in legacy clients."""
@@ -622,7 +647,7 @@ type ClientConfiguration {
   """Configuration for Google Pay on Android and the web."""
   googlePay: GooglePayConfiguration
 
-  """Configuration for iDEAL."""
+  """Deprecated, this field will always be null."""
   ideal: IDealConfiguration @deprecated(reason: "This field is included for supporting legacy clients.")
 
   """Configuration for Kount fraud tools."""
@@ -631,7 +656,7 @@ type ClientConfiguration {
   """Configuration for Masterpass."""
   masterpass: MasterpassConfiguration
 
-  """The current merchant ID based on the authentication used."""
+  """The merchant ID."""
   merchantId: String
 
   """Configuration for PayPal."""
@@ -678,12 +703,12 @@ enum ClientFeature {
 """Input fields for creating a client token."""
 input ClientTokenInput {
   """
-  Merchant account ID used to create the client token. Defaults to your default merchant account ID.
+  The merchant account ID used to create the client token. Defaults to your default merchant account ID.
   """
   merchantAccountId: ID
 
   """
-  An ID of an existing customer. Including this will allow your customer to vault and manage their payment methods.
+  The ID of an existing customer. Including this will allow your customer to vault and manage their payment methods.
   """
   customerId: ID
 }
@@ -693,7 +718,7 @@ input ConfirmMicroTransferAmountsInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """ID of the verification from vaulting the bank account."""
+  """The ID of the verification from vaulting the bank account."""
   verificationId: ID!
 
   """
@@ -805,22 +830,22 @@ enum CreditCardBrandCode {
 """Configuration for credit card tokenization."""
 type CreditCardConfiguration {
   """
-  A list of card brands supported for credit card processing by the current merchant.
+  A list of card brands supported by the merchant for credit card processing.
   """
   supportedCardBrands: [CreditCardBrandCode]
 
   """
-  A list of challenges that are required by the current merchant to process a given credit card.
+  A list of challenges that are required by the merchant to process a given credit card.
   """
   challenges: [Challenge]
 
-  """True if the current merchant supports 3D Secure."""
+  """Whether or not the merchant supports 3D Secure."""
   threeDSecureEnabled: Boolean @deprecated(reason: "Use `threeDSecure` instead.")
 
   """Configuration for 3D Secure."""
   threeDSecure: ThreeDSecureConfiguration
 
-  """True if fraud data collection is enabled for the current merchant."""
+  """Whether or not fraud data collection is enabled for the merchant."""
   fraudDataCollectionEnabled: Boolean
 }
 
@@ -829,10 +854,10 @@ type CreditCardDetails {
   """A static code identifying the card brand."""
   brandCode: CreditCardBrandCode
 
-  """The display name of the card brand, ex: Visa, American Express."""
+  """The display name of the card brand, e.g. "Visa" or "American Express"."""
   brand: String @deprecated(reason: "Use `brandCode` instead.")
 
-  """The last four digits of the credit card number."""
+  """The last four digits of the card number."""
   last4: String
 
   """
@@ -842,7 +867,7 @@ type CreditCardDetails {
   """
   bin: String
 
-  """Information about the credit card based on its BIN."""
+  """Information about the card based on its BIN."""
   binData: BinRecord
 
   """The month of the expiration date, formatted MM."""
@@ -879,7 +904,7 @@ type CreditCardDetails {
   threeDSecure: ThreeDSecureAuthentication
 }
 
-"""Input fields for a credit card object."""
+"""Input fields for a credit card."""
 input CreditCardInput {
   """
   The 12-to-19-digit value that uniquely identifies this credit card, also known as the primary account number or PAN.
@@ -942,10 +967,10 @@ type CustomActionsPaymentMethodDetails {
 Fields that are provided during tokenization and are presented to the invoked action to be consumed.
 """
 type CustomActionsPaymentMethodField {
-  """The name of this field. e.g. "accountNumber"."""
+  """The name of this field, e.g. "accountNumber"."""
   name: String
 
-  """The value displayed in the Control Panel or API. e.g. "*****6789"."""
+  """The value displayed in the Control Panel or API, e.g. "*****6789"."""
   displayValue: String
 }
 
@@ -1005,7 +1030,7 @@ type Customer implements Node {
   """Customer's last name."""
   lastName: String
 
-  """Phone number for this customer."""
+  """The phone number for this customer."""
   phoneNumber: String
 
   """Payment methods belonging to this customer."""
@@ -1039,6 +1064,26 @@ enum CustomerAuthenticationRegulationEnvironment {
   UNREGULATED
 }
 
+"""A paginated list of customers."""
+type CustomerConnection {
+  """A list of customers."""
+  edges: [CustomerConnectionEdge]
+
+  """Information about the page of customers contained in `edges`."""
+  pageInfo: PageInfo!
+}
+
+"""A customer within a CustomerConnection."""
+type CustomerConnectionEdge {
+  """
+  This customer's location within the CustomerConnection. Used for requesting additional pages.
+  """
+  cursor: String
+
+  """The customer."""
+  node: Customer
+}
+
 """
 Input fields for creating or updating a customer. On update, omitted fields will
 not be updated. Passing a null value will assign null to that field.
@@ -1062,8 +1107,32 @@ input CustomerInput {
   """Customer's last name."""
   lastName: String
 
-  """Phone number for the customer."""
+  """The customer's phone number."""
   phoneNumber: String
+}
+
+"""Input fields for searching for customers."""
+input CustomerSearchInput {
+  """Find customers with an id or ids."""
+  id: SearchValueInput
+
+  """Find customers with a given company or business name."""
+  company: SearchTextInput
+
+  """Find customers with a given created at time."""
+  createdAt: SearchTimestampInput
+
+  """Find customers with a given email address."""
+  email: SearchTextInput
+
+  """Find customers with a given first name."""
+  firstName: SearchTextInput
+
+  """Find customers with a given last name."""
+  lastName: SearchTextInput
+
+  """Find customers with a given phone number."""
+  phoneNumber: SearchTextInput
 }
 
 """A merchant-defined custom field to store additional information."""
@@ -1177,14 +1246,22 @@ type Dispute implements Node {
   """The case number for the dispute."""
   caseNumber: String
 
-  """Date and time at which the dispute was created."""
+  """The Date and time at which the dispute was created."""
   createdAt: Timestamp
 
   """The date the dispute was received by the merchant."""
   receivedDate: Date
 
+  """The transaction reference number for the dispute."""
+  referenceNumber: String
+
   """The deadline for the merchant to submit a response to the dispute."""
   responseDeadline: Timestamp
+
+  """
+  The reply by date for the merchant to submit a response to the dispute.
+  """
+  replyByDate: Date
 
   """The type of Dispute."""
   type: DisputeType
@@ -1219,7 +1296,7 @@ type DisputeConnection {
   """A list of disputes."""
   edges: [DisputeConnectionEdge]
 
-  """Information about the page."""
+  """Information about the page of disputes contained in `edges`."""
   pageInfo: PageInfo!
 }
 
@@ -1309,11 +1386,41 @@ enum DisputeReason {
 
 """Input fields for searching for Disputes."""
 input DisputeSearchInput {
+  """Find disputes with an id or ids."""
+  id: SearchValueInput
+
   """Find disputes with a given status."""
   status: SearchDisputeStatusInput
 
   """Find disputes with a given type."""
   type: SearchDisputeTypeInput
+
+  """Find disputes with a given reason description."""
+  reason: SearchDisputeReasonInput
+
+  """Find disputes with a given processor's caseNumber."""
+  caseNumber: SearchTextInput
+
+  """Find disputes with a given transaction referenceNumber."""
+  referenceNumber: SearchTextInput
+
+  """Find disputes for a given amount or currency."""
+  amountDisputed: MonetaryAmountSearchInput
+
+  """Find disputes by the amount won."""
+  amountWon: MonetaryAmountSearchInput
+
+  """Find disputes by the date received."""
+  receivedDate: SearchDateInput
+
+  """Find disputes by the reply by date."""
+  replyByDate: SearchDateInput
+
+  """Find disputes by the date a status change history event took effect."""
+  effectiveDate: SearchDateInput
+
+  """Find disputes based on a set of transaction criteria."""
+  transaction: DisputeTransactionSearchInput
 }
 
 """The status of the dispute."""
@@ -1326,16 +1433,19 @@ enum DisputeStatus {
   WON
 }
 
-"""The record of a status that a dispute has passed through."""
+"""A record of a status the dispute has passed through."""
 type DisputeStatusEvent {
-  """The date and time this event was disbursed."""
-  disbursementDate: Timestamp
+  """The date this event was disbursed."""
+  disbursementDate: Date
 
   """The status of the dispute."""
   status: DisputeStatus
 
   """The timestamp of the history event."""
   timestamp: Timestamp
+
+  """The date the history event took effect."""
+  effectiveDate: Date
 }
 
 """Text evidence supporting a dispute case."""
@@ -1356,6 +1466,31 @@ type DisputeTextEvidence implements DisputeEvidence {
   category: String
 }
 
+"""Transaction input fields for searching for disputes."""
+input DisputeTransactionSearchInput {
+  """Find disputes for a transaction id or ids."""
+  transactionId: SearchValueInput
+
+  """Find disputes for a customer id or ids."""
+  customerId: SearchValueInput
+
+  """Find disputes with a given transaction source."""
+  transactionSource: SearchTransactionSourceInput
+
+  """
+  Find disputes on transactions charging payment methods of the given type.
+  """
+  paymentMethodSnapshotType: SearchPaymentMethodSnapshotTypeInput
+
+  """
+  Find disputes on transactions created by a third party via the Grant API using a given OAuth application client ID.
+  """
+  facilitatorOAuthApplicationClientId: SearchValueInput
+
+  """Find disputes by the transaction's disbursement date."""
+  disbursementDate: SearchDateInput
+}
+
 """Type of dispute."""
 enum DisputeType {
   CHARGEBACK
@@ -1372,6 +1507,17 @@ enum DisputeType {
 A card brand-specific two-digit string describing the mode of the transaction.
 """
 scalar ECommerceIndicator
+
+"""
+Fields capturing information about a third party that provided payment
+information for this transaction via the Grant API, Shared Vault, or Google Pay.
+"""
+type FacilitatorDetails {
+  """
+  The OAuth application that owns the payment information used to create the transaction.
+  """
+  oauthApplication: OAuthApplication
+}
 
 """
 Accompanying information for a transaction that failed because it could not be successfully sent to the processor.
@@ -1397,7 +1543,7 @@ type FailedEvent implements TransactionStatusEvent {
   """Risk decision for this transaction."""
   riskDecision: RiskDecision
 
-  """Whether this is the final state for the transaction."""
+  """Whether or not this is the final state for the transaction."""
   terminal: Boolean
 }
 
@@ -1439,7 +1585,7 @@ type GatewayRejectedEvent implements TransactionStatusEvent {
   """
   riskDecision: RiskDecision
 
-  """Whether this is the final state for the transaction."""
+  """Whether or not this is the final state for the transaction."""
   terminal: Boolean
 
   """
@@ -1476,9 +1622,7 @@ type GooglePayConfiguration {
   """
   paypalClientId: String
 
-  """
-  A list of card brands supported for Google Pay by the current merchant.
-  """
+  """A list of card brands supported by the merchant for Google Pay."""
   supportedCardBrands: [CreditCardBrandCode]
 }
 
@@ -1494,7 +1638,7 @@ enum GooglePayEnvironment {
 Additional information about the payment method specific to Google Pay.
 """
 type GooglePayOriginDetails {
-  """A reference ID to the Google transaction."""
+  """A reference ID for the Google transaction."""
   googleTransactionId: String
 
   """
@@ -1522,13 +1666,15 @@ type KountConfiguration {
 }
 
 """
-The type of object the legacyId represents when converting legacyId to ID.
+The type of object the legacy ID represents when converting it to a global ID.
 """
 enum LegacyIdType {
   CUSTOMER
+  DISPUTE
   PAYMENT_METHOD
   REFUND
   TRANSACTION
+  US_BANK_ACCOUNT_VERIFICATION
   VERIFICATION
 }
 
@@ -1539,9 +1685,7 @@ type MasterpassConfiguration {
   """
   merchantCheckoutId: String
 
-  """
-  A list of card brands supported for Masterpass by the current merchant.
-  """
+  """A list of card brands supported by the merchant for Masterpass."""
   supportedCardBrands: [CreditCardBrandCode]
 }
 
@@ -1590,7 +1734,7 @@ input MonetaryAmountSearchInput {
   """Find transactions for a given amount."""
   value: SearchRangeInput
 
-  """Find transaction with a given currency."""
+  """Find transactions with a given currency."""
   currencyIsoCode: SearchTextInput
 }
 
@@ -1761,9 +1905,22 @@ type Mutation {
   This may consume the payment method and return a new single-use payment method.
   """
   performThreeDSecureLookup(input: PerformThreeDSecureLookupInput!): PerformThreeDSecureLookupPayload
+
+  """
+  Accepts a dispute and returns a payload that includes the dispute that was
+  accepted. Only disputes with a status of OPEN can be accepted.
+  """
+  acceptDispute(input: AcceptDisputeInput!): AcceptDisputePayload
+
+  """
+  Vault an existing PayPal Billing Agreement that was not created through
+  Braintree. Only use this mutation if you need to import PayPal Billing
+  Agreements from an existing PayPal integration into your Braintree account.
+  """
+  vaultPayPalBillingAgreement(input: VaultPayPalBillingAgreementInput!): VaultPayPalBillingAgreementPayload
 }
 
-"""Input fields for a network tokenized card object."""
+"""Input fields for a network tokenized card."""
 input NetworkTokenInput {
   """
   A one-time-use string generated by the token requester to validate the transaction.
@@ -1804,9 +1961,15 @@ interface Node {
   id: ID!
 }
 
+"""Information about an OAuth Application."""
+type OAuthApplication {
+  """The unique identifier of the OAuth application."""
+  clientId: String
+}
+
 """The page information for a connection."""
 type PageInfo {
-  """Whether there is a next page available."""
+  """Whether or not there is a next page available."""
   hasNextPage: Boolean!
 
   """
@@ -1843,7 +2006,7 @@ attempt, this links to the original parent authorization.
 union PartialCaptureDetails = ChildCapture | ParentAuthorization
 
 """
-Top-level input fields for capturing an outstanding funds authorized by a transaction.
+Top-level input fields for capturing outstanding funds authorized by a transaction.
 """
 input PartialCaptureTransactionInput {
   """An identifier used to reconcile requests and responses."""
@@ -1902,7 +2065,7 @@ type PaymentMethod implements Node {
   """
   legacyId: ID!
 
-  """Whether a payment method may be used only once or used multiple times."""
+  """Whether a payment method may be used only once or multiple times."""
   usage: PaymentMethodUsage
 
   """
@@ -1924,7 +2087,7 @@ type PaymentMethodConnection {
   """A list of payment methods."""
   edges: [PaymentMethodConnectionEdge]
 
-  """Information about the page."""
+  """Information about the page of payment methods contained in `edges`."""
   pageInfo: PageInfo!
 }
 
@@ -2026,7 +2189,9 @@ type PayPalAccountDetails {
 
 """Configuration for PayPal."""
 type PayPalConfiguration {
-  """The merchant's company name to display to customers in the PayPal UI."""
+  """
+  The merchant's company name for displaying to customers in the PayPal UI.
+  """
   displayName: String
 
   """The merchant's PayPal client ID."""
@@ -2049,7 +2214,7 @@ type PayPalConfiguration {
   """For internal use only."""
   environmentNoNetwork: Boolean @deprecated(reason: "This field is only included for internal testing purposes.")
 
-  """Whether the merchant has been vetted."""
+  """Whether or not the merchant has been vetted."""
   unvettedMerchant: Boolean
 
   """Braintree's PayPal client ID."""
@@ -2114,7 +2279,7 @@ type PayPalTransactionDetails {
   """Details about the PayPal account that received the funds."""
   payee: PayPalAccountDetails
 
-  """Whether the PayPal account has been verified by PayPal."""
+  """Whether or not the PayPal account has been verified by PayPal."""
   payerStatus: String
 
   """The identification value of the payment within PayPal's API."""
@@ -2123,7 +2288,7 @@ type PayPalTransactionDetails {
   """If the transaction is a refund, the PayPal refund ID."""
   refundId: String
 
-  """Whether the transaction qualifies for PayPal Seller Protection."""
+  """Whether or not the transaction qualifies for PayPal Seller Protection."""
   sellerProtectionStatus: String
 
   """Payer's tax ID. Only returned for payments from Brazilian accounts."""
@@ -2134,11 +2299,14 @@ type PayPalTransactionDetails {
   """
   taxIdType: String
 
-  """The fee for the transaction charged by PayPal."""
-  transactionFeeAmount: String
+  """The fee charged by PayPal for the transaction."""
+  transactionFee: MonetaryAmount
 
-  """The currency code for the currency used for the transaction fee."""
-  transactionFeeCurrencyIsoCode: String
+  """The fee charged by PayPal for the transaction."""
+  transactionFeeAmount: String @deprecated(reason: "Use `transactionFee.value` instead.")
+
+  """The currency code for the currency of the PayPal transaction fee."""
+  transactionFeeCurrencyIsoCode: String @deprecated(reason: "Use `transactionFee.currencyIsoCode` instead.")
 
   """
   Description of the transaction that is displayed to customers in PayPal email receipts.
@@ -2221,7 +2389,7 @@ type ProcessorDeclinedEvent implements TransactionStatusEvent {
   """The source for the transaction change to the new status."""
   source: TransactionSource
 
-  """Whether the decline is the result of a temporary issue."""
+  """Whether or not the decline is the result of a temporary issue."""
   declineType: ProcessorDeclineType
 
   """
@@ -2232,7 +2400,7 @@ type ProcessorDeclinedEvent implements TransactionStatusEvent {
   """Risk decision for this transaction."""
   riskDecision: RiskDecision
 
-  """Whether this is the final state for the transaction."""
+  """Whether or not this is the final state for the transaction."""
   terminal: Boolean
 }
 
@@ -2300,7 +2468,7 @@ type Refund implements Node {
   """Legacy unique identifier."""
   legacyId: ID!
 
-  """Time at which the refund was created."""
+  """The time at which the refund was created."""
   createdAt: Timestamp
 
   """
@@ -2332,7 +2500,7 @@ type RefundConnection {
   """A list of refunds."""
   edges: [RefundConnectionEdge]
 
-  """Information about the page."""
+  """Information about the page of refunds contained in `edges`."""
   pageInfo: PageInfo!
 }
 
@@ -2350,8 +2518,8 @@ type RefundConnectionEdge {
 """Specific input fields for describing a refund."""
 input RefundInput {
   """
-  Amount that should be refunded. Must be less than or equal to the amount of
-  the original transaction. Defaults to the total amount of the original transaction.
+  The amount to refund. Must be less than or equal to the amount of the original
+  transaction. Defaults to the total amount of the original transaction.
   """
   amount: Amount
 
@@ -2363,10 +2531,10 @@ input RefundInput {
 
 """Input fields for searching for refunds."""
 input RefundSearchInput {
-  """Find refunds with an id or ids."""
+  """Find refunds with an ID or IDs."""
   id: SearchValueInput
 
-  """Find refund for a given amount or currency."""
+  """Find refunds with a given amount or currency."""
   amount: MonetaryAmountSearchInput
 
   """Find refunds with a given created at time."""
@@ -2375,7 +2543,7 @@ input RefundSearchInput {
   """Find refunds with a given orderId."""
   orderId: SearchTextInput
 
-  """Find refunds with a given status."""
+  """Find refunds with the given status."""
   status: SearchTransactionStatusInput
 }
 
@@ -2384,7 +2552,7 @@ input RefundTransactionInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """ID of a transaction to be refunded."""
+  """The ID of a transaction to be refunded."""
   transactionId: ID!
 
   """Input fields for the details of the refund."""
@@ -2396,7 +2564,7 @@ type RefundTransactionPayload {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """The information about the refund created."""
+  """The information about the created refund."""
   refund: Refund
 }
 
@@ -2431,7 +2599,7 @@ type ReverseTransactionPayload {
 
 """A right assigned to a user."""
 type Right {
-  """Human readable name."""
+  """A human-readable name."""
   name: String
 }
 
@@ -2484,24 +2652,24 @@ enum RiskDecision {
   REVIEW
 }
 
-"""Groups of rights assigned to a user."""
+"""Groups of rights assigned to the user."""
 type Role {
   """Unique identifier."""
   id: ID!
 
-  """Human readable name."""
+  """A human-readable name."""
   name: String
 
   """Whether the role grants account admin status."""
   isAccountAdmin: Boolean
 
-  """Right names associated with role."""
+  """The rights associated with the role."""
   rights: [Right!]
 }
 
 """Details about a Samsung Pay card."""
 type SamsungPayCardDetails {
-  """The display name of the card brand, ex: Visa, American Express."""
+  """The display name of the card brand, e.g. "Visa" or "American Express"."""
   brand: String
 
   """
@@ -2516,16 +2684,15 @@ type SamsungPayCardDetails {
   bin: String
 
   """
-  Information about the credit card based on its BIN. This BIN will differ from
-  the BIN of the source (customer's actual) card.
+  Information about the card based on its BIN. This BIN will differ from the BIN of the source (customer's actual) card.
   """
   binData: BinRecord
 
-  """Last four digits of the FPAN (the customer's actual backing card)."""
+  """The last four digits of the FPAN (the customer's actual backing card)."""
   sourceCardLast4: CreditCardLast4
 }
 
-"""Input fields for a Samsung Pay Card object."""
+"""Input fields for a Samsung Pay card."""
 input SamsungPayCardInput {
   """
   A one-time-use string generated by the token requester to validate the transaction.
@@ -2567,9 +2734,7 @@ type SamsungPayConfiguration {
   """Authorization to use when tokenizing Samsung Pay."""
   samsungAuthorization: String
 
-  """
-  A list of card brands supported for Samsung Pay by the current merchant.
-  """
+  """A list of card brands supported by the merchant for Samsung Pay."""
   supportedCardBrands: [CreditCardBrandCode]
 }
 
@@ -2599,12 +2764,42 @@ type Search {
 
   """A paginated list of refunds that match the RefundSearchInput."""
   refunds(input: RefundSearchInput!, first: Int, after: String): RefundConnection
+
+  """A paginated list of disputes that match the DisputeSearchInput."""
+  disputes(input: DisputeSearchInput!, first: Int, after: String): DisputeConnection
+
+  """
+  A paginated list of verifications that match the VerificationSearchInput.
+  """
+  verifications(input: VerificationSearchInput!, first: Int, after: String): VerificationConnection
+
+  """A paginated list of customers that match the CustomerSearchInput."""
+  customers(input: CustomerSearchInput!, first: Int, after: String): CustomerConnection
 }
 
 """Input fields for searching transactions by customer."""
 input SearchCustomerInput {
-  """Find transactions with a given customer id."""
+  """Find transactions with a given customer ID."""
   id: SearchValueInput
+}
+
+"""
+Input fields for searching for a date. These ranges are precise to the day.
+"""
+input SearchDateInput {
+  """Date is greater than or equal to this value."""
+  greaterThanOrEqualTo: Date
+
+  """Date is less than or equal to this value."""
+  lessThanOrEqualTo: Date
+}
+
+"""
+Input fields for searching for a dispute with a given reason description.
+"""
+input SearchDisputeReasonInput {
+  """The dispute reason is one of these values."""
+  in: [DisputeReason!]
 }
 
 """Input fields for searching for a dispute with a given status."""
@@ -2630,15 +2825,15 @@ Input fields for searching transactions by payment method snapshot type.
 """
 input SearchPaymentMethodSnapshotTypeInput {
   """
-  This value represents the payment method used to create a transaction. In the
-  case of credit cards, this value also encode the origin from which a customer
-  provided that payment method.
+  This value represents the payment method type used to create a transaction. In
+  the case of credit cards, this value also encode the origin from which a
+  customer provided that payment method.
   """
   is: PaymentMethodSnapshotSearchType
 
   """
-  These values represent the payment method used to create a transaction. In the
-  case of credit cards, these values also encode the origin from which a
+  These values represent the payment method type used to create a transaction.
+  In the case of credit cards, these values also encode the origin from which a
   customer provided that payment method.
   """
   in: [PaymentMethodSnapshotSearchType!]
@@ -2689,6 +2884,14 @@ input SearchTimestampInput {
 }
 
 """
+Input fields for searching for a transaction or refund created with a given source.
+"""
+input SearchTransactionSourceInput {
+  """The transaction source is one of these values."""
+  in: [TransactionSource!]
+}
+
+"""
 Input fields for searching for a transaction or refund with a given status.
 """
 input SearchTransactionStatusInput {
@@ -2723,6 +2926,15 @@ input SearchValueInput {
   in: [String!]
 }
 
+"""Input fields for searching for a verification with a given status."""
+input SearchVerificationStatusInput {
+  """The verification status is exactly this value."""
+  is: VerificationStatus
+
+  """The verification status is one of these values."""
+  in: [VerificationStatus!]
+}
+
 """Accompanying information for a settled transaction."""
 type SettledEvent implements TransactionStatusEvent {
   """The new status of the transaction."""
@@ -2745,7 +2957,7 @@ type SettledEvent implements TransactionStatusEvent {
   """Fields describing the payment processor response."""
   processorResponse: TransactionProcessorResponse
 
-  """Whether this is the final state for the transaction."""
+  """Whether or not this is the final state for the transaction."""
   terminal: Boolean
 }
 
@@ -2770,12 +2982,12 @@ type SettlementDeclinedEvent implements TransactionStatusEvent {
   """
   processorResponse: TransactionProcessorResponse
 
-  """Whether this is the final state for the transaction."""
+  """Whether or not this is the final state for the transaction."""
   terminal: Boolean
 }
 
 """
-Accompanying information for a settlement pending transaction. Typically only occurs for PayPal transactions.
+Accompanying information for a settlement pending transaction. This typically only occurs for PayPal transactions.
 """
 type SettlementPendingEvent implements TransactionStatusEvent {
   """The new status of the transaction."""
@@ -2795,7 +3007,7 @@ type SettlementPendingEvent implements TransactionStatusEvent {
   """
   processorResponse: TransactionProcessorResponse
 
-  """Whether this is the final state for the transaction."""
+  """Whether or not this is the final state for the transaction."""
   terminal: Boolean
 }
 
@@ -2818,16 +3030,16 @@ type SettlingEvent implements TransactionStatusEvent {
   """The source for the transaction change to the new status."""
   source: TransactionSource
 
-  """Whether this is the final state for the transaction."""
+  """Whether or not this is the final state for the transaction."""
   terminal: Boolean
 }
 
-"""Input fields for submitting a credit card for account updater."""
+"""Input fields for submitting a credit card for Account Updater."""
 input SubmitCreditCardForAccountUpdaterInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """ID of the credit card to submit for account updater."""
+  """ID of the credit card to submit for Account Updater."""
   paymentMethodId: ID!
 }
 
@@ -2863,7 +3075,7 @@ type SubmittedForSettlementEvent implements TransactionStatusEvent {
   """The source for the transaction change to the new status."""
   source: TransactionSource
 
-  """Whether this is the final state for the transaction."""
+  """Whether or not this is the final state for the transaction."""
   terminal: Boolean
 }
 
@@ -2908,7 +3120,7 @@ type ThreeDSecureAuthentication {
   xId: String
 
   """
-  A unique identifer for the 3D Secure interaction with the 3D Secure server.
+  A unique identifier for the 3D Secure interaction with the 3D Secure server.
   """
   threeDSecureServerTransactionId: String
 
@@ -2928,7 +3140,7 @@ type ThreeDSecureAuthentication {
   transactionStatus: ThreeDSecureAuthenticationStatusIndicator
 
   """
-  Indicates the reason for the transactionStatus. Will be null if status is `SUCCESSFUL_AUTHENTICATION`.
+  Indicates the reason for the transaction status. This will be null if status is `SUCCESSFUL_AUTHENTICATION`.
   """
   transactionStatusReason: String
 }
@@ -2938,10 +3150,13 @@ enum ThreeDSecureAuthenticationStatus {
   AUTHENTICATE_ATTEMPT_SUCCESSFUL
   AUTHENTICATE_ERROR
   AUTHENTICATE_FAILED
+  AUTHENTICATE_REJECTED
   AUTHENTICATE_SIGNATURE_VERIFICATION_FAILED
   AUTHENTICATE_SUCCESSFUL
   AUTHENTICATE_UNABLE_TO_AUTHENTICATE
+  AUTHENTICATION_BYPASSED
   AUTHENTICATION_UNAVAILABLE
+  CHALLENGE_REQUIRED
   LOOKUP_BYPASSED
   LOOKUP_ENROLLED
   LOOKUP_ERROR
@@ -2970,11 +3185,11 @@ enum ThreeDSecureCardEnrolled {
   BYPASS
 
   """
-  There was an error in determing whether the card is enrolled in a 3D Secure program.
+  There was an error in determining whether the card is enrolled in a 3D Secure program.
   """
   ERROR
 
-  """Card is not enrolled."""
+  """The card is not enrolled."""
   NO
 
   """
@@ -2982,7 +3197,7 @@ enum ThreeDSecureCardEnrolled {
   """
   UNAVAILABLE
 
-  """Card is enrolled."""
+  """The card is enrolled."""
   YES
 }
 
@@ -2999,8 +3214,7 @@ type ThreeDSecureConfiguration {
   cardinalAuthenticationJWT: String
 }
 
-"""
-The billing address of the cardholder sent with 3D Secure Lookup requests.
+""" The billing address of the cardholder sent with 3D Secure Lookup requests.
 """
 input ThreeDSecureLookupBillingAddressInput {
   """
@@ -3091,12 +3305,12 @@ type ThreeDSecureLookupData {
   pareq: String
 
   """
-  This a the unique 3D Secure identifier assigned by Braintree to track the 3D Secure call as it progresses.
+  The unique 3D Secure identifier assigned by Braintree to track the 3D Secure call as it progresses.
   """
   md: String
 
   """
-  The termURL is the fully qualified URL that the customer will be redirected to once the authentication completes.
+  A fully qualified URL that the customer will be redirected to once the authentication completes.
   """
   termUrl: String
 }
@@ -3171,7 +3385,7 @@ input ThreeDSecurePassThroughInput {
   directoryServerResponse: ThreeDSecureStatusCode
 
   """
-  The algorithm used to generate the CAVV value. This is only returned for MasterCard SecureCode transactions (3DS 1.0).
+  The algorithm used to generate the CAVV value. This is only returned for Mastercard SecureCode transactions (3DS 1.0).
   """
   cavvAlgorithm: ThreeDSecureCavvAlgorithm
 }
@@ -3194,7 +3408,7 @@ input TokenizeCreditCardInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """Input fields for a credit card object."""
+  """Input fields for a credit card."""
   creditCard: CreditCardInput!
 
   """Credit card tokenization options."""
@@ -3217,7 +3431,7 @@ type TokenizeCreditCardPayload {
   """A one-time-use reference to tokenized sensitive information."""
   token: String @deprecated(reason: "Use `paymentMethod.id` instead.")
 
-  """Details about the tokenized CreditCard."""
+  """Details about the tokenized card."""
   creditCard: CreditCardDetails @deprecated(reason: "Use `paymentMethod.details` instead.")
 
   """A single-use payment method."""
@@ -3294,12 +3508,12 @@ type TokenizeNetworkTokenPayload {
   paymentMethod: PaymentMethod
 }
 
-"""Top-level input field for tokenizing a Samsung Pay Card."""
+"""Top-level input field for tokenizing a Samsung Pay card."""
 input TokenizeSamsungPayCardInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """Input fields for a Samsung Pay Card object."""
+  """Input fields for a Samsung Pay card."""
   samsungPayCard: SamsungPayCardInput!
 }
 
@@ -3338,7 +3552,7 @@ input TokenizeUsBankLoginInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """Input fields for a U.S. bank login object."""
+  """Input fields for a U.S. bank login."""
   usBankLogin: UsBankLoginInput!
 }
 
@@ -3350,7 +3564,7 @@ type Transaction implements Node {
   """Legacy unique identifier."""
   legacyId: ID!
 
-  """Time at which the transaction was created."""
+  """The time at which the transaction was created."""
   createdAt: Timestamp
 
   """
@@ -3421,6 +3635,9 @@ type Transaction implements Node {
   """
   channel: String
 
+  """How a transaction was created."""
+  source: TransactionSource
+
   """Customer associated with the transaction, if applicable."""
   customer: Customer
 
@@ -3448,6 +3665,14 @@ type Transaction implements Node {
 
   """A collection of disputes associated with the transaction."""
   disputes: [Dispute!]
+
+  """
+  If the transaction request was performed using payment information from a
+  third party via the Grant API, Shared Vault or Google Pay, these fields will
+  capture information about the third party. These fields are primarily useful
+  for the merchant of record.
+  """
+  facilitatorDetails: FacilitatorDetails
 }
 
 """A paginated list of transactions."""
@@ -3455,7 +3680,7 @@ type TransactionConnection {
   """A list of transactions."""
   edges: [TransactionConnectionEdge]
 
-  """Information about the page."""
+  """Information about the page of transactions contained in `edges`."""
   pageInfo: PageInfo!
 }
 
@@ -3502,9 +3727,9 @@ input TransactionDescriptorInput {
 input TransactionInput {
   """
   Billing amount of the request. This value must be greater than 0, and must
-  match the currency format of the merchant account. Can only contain numbers
-  and one decimal point (e.g. x.xx). Can't be greater than the maximum allowed
-  by the processor.
+  match the currency format of the merchant account. This can only contain
+  numbers and one decimal point (e.g. x.xx). Can't be greater than the maximum
+  allowed by the processor.
   """
   amount: Amount!
 
@@ -3524,6 +3749,7 @@ input TransactionInput {
 
   """
   A purchase order identification value you associate with this transaction.
+  
   *Required for Level 2 processing*.
   """
   purchaseOrderNumber: String
@@ -3561,12 +3787,14 @@ input TransactionInput {
 
   """
   Shipping information.
+  
   *Required for Level 3 processing*.
   """
   shipping: TransactionShippingInput
 
   """
   Tax information about the transaction.
+  
   *Required for Level 2 processing*.
   """
   tax: TransactionTaxInput
@@ -3574,12 +3802,14 @@ input TransactionInput {
   """
   Discount amount that was included in the total transaction amount. Does not
   add to the total amount the payment method will be charged. This value can't be negative.
+  
   *Required for Level 3 processing*.
   """
   discountAmount: String
 
   """
   Line items for this transaction. Up to 249 line items may be specified.
+  
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
@@ -3617,7 +3847,7 @@ type TransactionLineItem {
   unitAmount: String
 
   """
-  Total price amount for the line item: quantity multiplied by unitAmount.
+  Total price amount for the line item, i.e. quantity multiplied by unit amount.
   """
   totalAmount: String
 
@@ -3627,7 +3857,7 @@ type TransactionLineItem {
   """Tax amount for the line item."""
   taxAmount: String
 
-  """Amount of discount for the line item."""
+  """The discount amount of the line item."""
   discountAmount: String
 
   """The unit of measure or the unit of measure code."""
@@ -3655,18 +3885,21 @@ type TransactionLineItem {
 input TransactionLineItemInput {
   """
   Item name. Maximum 35 characters, or 127 characters for PayPal transactions.
+  
   *Required for Level 3 processing*.
   """
   name: String!
 
   """
   Indicates whether the line item is a sale or refund.
+  
   *Required for Level 3 processing*.
   """
   kind: TransactionLineItemType!
 
   """
   Number of units of the item purchased. Can include up to 4 decimal places. This value can't be negative or zero.
+  
   *Required for Level 3 processing*.
   """
   quantity: String!
@@ -3674,42 +3907,49 @@ input TransactionLineItemInput {
   """
   Per-unit price of the item. Maximum 4 decimal places, or 2 decimal places for
   PayPal transactions. This value can't be negative or zero.
+  
   *Required for Level 3 processing*.
   """
   unitAmount: String!
 
   """
   Total price amount for the line item: quantity multiplied by unitAmount. Can include up to 2 decimal places.
+  
   *Required for Level 3 processing*.
   """
   totalAmount: String!
 
   """
   Per-unit tax price of the item. Can include up to 2 decimal places. This value can't be negative or zero.
+  
   *Required for Level 3 processing*.
   """
   unitTaxAmount: String
 
   """
   Tax amount for the line item. Can include up to 2 decimal places. This value can't be negative.
+  
   *Required for Level 3 processing*.
   """
   taxAmount: String
 
   """
   Amount of discount for the line item. Can include up to 2 decimal places. This value can't be negative.
+  
   *Required for Level 3 processing*.
   """
   discountAmount: String
 
   """
   The unit of measure or the unit of measure code. Maximum 12 characters.
+  
   *Required for Level 3 processing*.
   """
   unitOfMeasure: String
 
   """
   Product or UPC code for the item. Maximum 12 characters, or 127 characters for PayPal transactions.
+  
   *Required for Level 3 processing*.
   """
   productCode: String
@@ -3720,18 +3960,21 @@ input TransactionLineItemInput {
   organizations may use different standards, but the [United Nations Standard
   Products and Services Code (UNSPSC)](https://www.unspsc.org/) is frequently
   used. Maximum 12 characters.
+  
   *Required for Level 3 processing*.
   """
   commodityCode: String
 
   """
   Item description. Maximum 127 characters.
+  
   *Required for Level 3 processing*.
   """
   description: String
 
   """
   A URL to information about the product.
+  
   *Required for Level 3 processing*.
   """
   url: String
@@ -3778,15 +4021,15 @@ type TransactionProcessorResponse {
 }
 
 """
-A union of all possible results of a transaction reversal. If the transaction
-has been settled, a refund will be issued and a Refund returned. Otherwise, the
-transaction will be voided and a Transaction returned.
+A union of all possible results of a transaction reversal. If the transaction is
+settled, a refund will be issued and a Refund object will be returned.
+Otherwise, the transaction will be voided and a Transaction object will be returned.
 """
 union TransactionReversal = Refund | Transaction
 
 """Input fields for searching for transactions."""
 input TransactionSearchInput {
-  """Find transactions with an id or ids."""
+  """Find transactions with an ID or IDs."""
   id: SearchValueInput
 
   """Find transactions for a given amount or currency."""
@@ -3798,10 +4041,15 @@ input TransactionSearchInput {
   """Find transactions with a given transaction status."""
   status: SearchTransactionStatusInput
 
+  """Find transactions with a given transaction source."""
+  source: SearchTransactionSourceInput
+
   """Find transactions with a given created at time."""
   createdAt: SearchTimestampInput
 
-  """Find transactions based on given transaction status transition times."""
+  """
+  Find transactions based on the given transaction status transition times.
+  """
   statusTransition: SearchTransactionStatusTransitionInput
 
   """Find transactions with a given customer."""
@@ -3811,6 +4059,11 @@ input TransactionSearchInput {
   Find transactions created by charging payment methods of the given type.
   """
   paymentMethodSnapshotType: SearchPaymentMethodSnapshotTypeInput
+
+  """
+  Find transactions created by a third party via the Grant API using a given OAuth application client ID.
+  """
+  facilitatorOAuthApplicationClientId: SearchValueInput
 }
 
 """Information related to shipping a physical product."""
@@ -3818,7 +4071,7 @@ type TransactionShipping {
   """Shipping address information."""
   shippingAddress: Address
 
-  """Shipping cost on the entire transaction."""
+  """The shipping cost of the entire transaction."""
   shippingAmount: Amount
 
   """The postal code of the source shipping location."""
@@ -3829,18 +4082,21 @@ type TransactionShipping {
 input TransactionShippingInput {
   """
   Shipping destination address information.
+  
   *Required for Level 3 processing*.
   """
   shippingAddress: AddressInput
 
   """
   Shipping cost on the entire transaction.
+  
   *Required for Level 3 processing*.
   """
   shippingAmount: String
 
   """
   The postal code of the source shipping location, in any country's format.
+  
   *Required for Level 3 processing*.
   """
   shipsFromPostalCode: String
@@ -3938,7 +4194,7 @@ enum TransactionStatus {
 
   """
   The transaction was voided, meaning it is no longer authorized, your
-  customer's funds are no longer on hold, and you cannot use the
+  customer's funds are no longer on hold, and you can't use the
   `captureTransaction` mutation on this transaction.
   """
   VOIDED
@@ -3952,7 +4208,7 @@ interface TransactionStatusEvent {
   """Date and time at which the status event occurred."""
   timestamp: Timestamp
 
-  """Amount of the transaction applicable to the status."""
+  """The amount of the transaction applicable to the status."""
   amount: MonetaryAmount
 
   """Source that caused the transaction status event to occur."""
@@ -3966,7 +4222,7 @@ interface TransactionStatusEvent {
 
 """Information related to taxes on the transaction."""
 type TransactionTaxInformation {
-  """Amount of tax that was included in the total transaction amount."""
+  """The amount of tax that was included in the total transaction amount."""
   taxAmount: Amount
 
   """
@@ -3980,12 +4236,14 @@ input TransactionTaxInput {
   """
   Amount of tax that was included in the total transaction amount. Does not add
   to the total amount the payment method will be charged.
+  
   *Required for Level 2 processing* unless `taxExempt` is `true`.
   """
   taxAmount: Amount
 
   """
   Whether the transaction should be considered eligible for tax exemption.
+  
   *Required for Level 2 processing*.
   """
   taxExempt: Boolean
@@ -4048,13 +4306,13 @@ type UpdateTransactionCustomFieldsPayload {
 }
 
 """
-A billing address for a U.S. bank account. This is a subset of the fields required in `AddressInput`.
+A billing address for a U.S. bank account. This is a subset of the fields required on `AddressInput`.
 """
 input UsBankAccountBillingAddressInput {
   """The street address."""
   streetAddress: String!
 
-  """The extended address information—such as apartment or suite number."""
+  """The extended address information—such as an apartment or suite number."""
   extendedAddress: String
 
   """The city."""
@@ -4075,7 +4333,7 @@ input UsBankAccountBusinessOwnerInput {
 
 """Configuration for U.S. bank account processing."""
 type UsBankAccountConfiguration {
-  """The route id used to process an U.S. bank account payment."""
+  """The route ID used to process a U.S. bank account payment."""
   routeId: String
 
   """The public key for Plaid to use to log in to a bank account."""
@@ -4105,7 +4363,9 @@ type UsBankAccountDetails {
   """The routing number of the bank."""
   routingNumber: String
 
-  """Whether the bank account has been verified and can be transacted on."""
+  """
+  Whether or not the bank account has been verified and can be transacted on.
+  """
   verified: Boolean
 }
 
@@ -4214,7 +4474,7 @@ input UsBankLoginInput {
   """The public token returned from the bank login."""
   publicToken: String!
 
-  """The login provider account id used for the bank login."""
+  """The login provider account ID used for the bank login."""
   accountId: String!
 
   """The type of account."""
@@ -4242,7 +4502,7 @@ input UsBankLoginInput {
 """A routing number containing 8 or 9 digits."""
 scalar UsBankRoutingNumber
 
-"""Details about a user."""
+"""Details about the user."""
 type User {
   """Unique identifier."""
   id: ID!
@@ -4260,7 +4520,7 @@ type User {
   roles: [Role!]
 }
 
-"""The status of a User."""
+"""The status of the user."""
 enum UserStatus {
   ACTIVE
   DELETED
@@ -4347,13 +4607,13 @@ input VaultLimitedUsePayPalAccountInput {
   customerId: ID
 
   """
-  Input fields that specify information about the resulting PayPal account.
+  Input fields that provide information about the resulting PayPal account.
   """
   options: VaultLimitedUsePayPalAccountOptionsInput
 }
 
 """
-Input fields that specify information about the resulting PayPal account.
+Input fields that provide information about the resulting PayPal account.
 """
 input VaultLimitedUsePayPalAccountOptionsInput {
   """
@@ -4373,7 +4633,7 @@ input VaultLimitedUsePayPalAccountOptionsInput {
 
   """
   The PayPal invoice number. It must be unique in your PayPal business account
-  and can contain a maxiumum of 127 characters. If specified, transactions
+  and can contain a maximum of 127 characters. If specified, transactions
   created from the resulting payment method will have this orderId.
   """
   orderId: String
@@ -4394,8 +4654,8 @@ input VaultPaymentMethodInput {
 
   """
   Deprecated: This field is included for supporting legacy clients. Please use `verification.merchantAccountId` instead.
+  
   ID of the merchant account to use when verifying the payment method.
-  Deprecated: please use `verification.merchantAccountId` instead.
   """
   verificationMerchantAccountId: ID
 
@@ -4448,6 +4708,44 @@ input VaultPaymentMethodVerificationOptionsInput {
   in the uncommon scenario that the payment method has been verified externally to Braintree.
   """
   skip: Boolean
+}
+
+"""
+Top-level input fields for importing and vaulting a PayPal Billing Agreement.
+"""
+input VaultPayPalBillingAgreementInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  ID of a PayPal Billing Agreement, that was not created through Braintree, to import and vault.
+  """
+  billingAgreementId: String!
+
+  """
+  Optional ID of the customer to associate the resulting payment method with.
+  """
+  customerId: ID
+
+  """
+  Optional ID of the merchant account associated with the linked PayPal account
+  to be used to retrieve billing agreement details from PayPal. Only used for
+  merchants with the PayPal multi-account feature enabled in Braintree.
+  """
+  merchantAccountId: ID
+}
+
+"""
+Top-level fields returned when importing and vaulting a PayPal Billing Agreement.
+"""
+type VaultPayPalBillingAgreementPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  The vaulted payment method containing the imported PayPal Billing Agreement.
+  """
+  paymentMethod: PaymentMethod
 }
 
 """
@@ -4546,7 +4844,7 @@ type Verification implements Node {
   createdAt: Timestamp
 
   """
-  The reason the verification was rejected. Will only be set if status is GATEWAY_REJECTED.
+  The reason the verification was rejected. This will only be set if status is GATEWAY_REJECTED.
   """
   gatewayRejectionReason: GatewayRejectionReason
 
@@ -4564,14 +4862,14 @@ type VerificationConnection {
   """A list of verifications."""
   edges: [VerificationConnectionEdge]
 
-  """Information about the page."""
+  """Information about the page of verifications contained in `edges`."""
   pageInfo: PageInfo!
 }
 
 """A verification within a VerificationConnection."""
 type VerificationConnectionEdge {
   """
-  This verification's location within the VerificationConnection. Used for requesting additional pages.
+  The verification's location within the VerificationConnection. Used for requesting additional pages.
   """
   cursor: String
 
@@ -4605,6 +4903,18 @@ type VerificationProcessorResponse {
 
   """The processing bank's response to the provided billing street address."""
   avsStreetAddressResponse: AvsCvvResponseCode
+}
+
+"""Input fields for searching for verifications."""
+input VerificationSearchInput {
+  """Find verifications with an ID or IDs."""
+  id: SearchValueInput
+
+  """Find verifications with a given status."""
+  status: SearchVerificationStatusInput
+
+  """Find verifications with a given created at time."""
+  createdAt: SearchTimestampInput
 }
 
 """
@@ -4708,9 +5018,7 @@ type VisaCheckoutConfiguration {
   """The Visa Checkout external client ID."""
   externalClientId: String
 
-  """
-  A list of card brands supported for Visa Checkout by the current merchant.
-  """
+  """A list of card brands supported by the merchant for Visa Checkout."""
   supportedCardBrands: [CreditCardBrandCode]
 }
 
@@ -4718,7 +5026,7 @@ type VisaCheckoutConfiguration {
 Additional information about the payment method specific to Visa Checkout.
 """
 type VisaCheckoutOriginDetails {
-  """The Visa assigned identifier of the transaction."""
+  """The Visa assigned identifier for the transaction."""
   callId: String
 
   """
@@ -4744,7 +5052,7 @@ type VoidedEvent implements TransactionStatusEvent {
   """The source for the transaction change to the new status."""
   source: TransactionSource
 
-  """Whether this is the final state for the transaction."""
+  """Whether or not this is the final state for the transaction."""
   terminal: Boolean
 }
 
