@@ -4,17 +4,19 @@
 * Add `verifications` search field to `Search` query.
 * Add `disputes` search field to `Search` query.
 * Add `acceptDispute` mutation.
-* Add `responseDeadline` and `replyByDate` fields to `Dispute`.
-* Deprecate `transactionFeeAmount` and `transactionFeeCurrencyIsoCode` fields on in favor of in favor of compound `transactionFee` on `PayPalTransactionDetails`.
+* Add `referenceNumber` and `replyByDate` fields to `Dispute`.
+* Add `effectiveDate` to `DisputeStatusEvent`.
+* Add `AUTHENTICATE_REJECTED`, `AUTHENTICATION_BYPASSED`, and `CHALLENGE_REQUIRED` statuses to `ThreeDSecureAuthenticationStatus` enum.
+* Add `DISPUTE` and `US_BANK_ACCOUNT_VERIFICATION` to `LegacyIdType` enum.
+* Add `vaultPayPalBillingAgreement` mutation to import and vault an existing PayPal Billing Agreement that was not created through Braintree.
 * Add `source` and `facilitatorDetails` fields to `Transaction`.
 * Allow searching for transactions by source and facilitator details.
-* Add `AUTHENTICATE_REJECTED`, `AUTHENTICATION_BYPASSED`, and `CHALLENGE_REQUIRED` statuses to `ThreeDSecureAuthenticationStatus` enum.
-* Add `vaultPayPalBillingAgreement` mutation to import and vault an existing PayPal Billing Agreement that was not created through Braintree.
+* Deprecate `transactionFeeAmount` and `transactionFeeCurrencyIsoCode` fields on `PayPalTransactionDetails` in favor of `transactionFee` on `PayPalTransactionDetails`.
 
 # 2019-10-15
 
 * Deprecate `countryCodeAlpha3`, `countryCodeAlpha2`, `countryCodeNumeric` and `countryName` on `AddressInput`, use `countryCode` instead.
-* Deprecate `payee` on `AuthorizePayPalAccountOptionsInput` and `ChargePayPalAccountOptionsInput`.  
+* Deprecate `payee` on `AuthorizePayPalAccountOptionsInput` and `ChargePayPalAccountOptionsInput`.
 * Return data in the `threeDSecure` field on `CreditCardDetails` when present and `CreditCardDetails` are returned as part of the `PaymentMethodSnapshot` union.
 * Add `updateTransactionCustomFields` mutation.
 
