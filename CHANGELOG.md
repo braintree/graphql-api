@@ -1,3 +1,10 @@
+# 2019-11-19
+
+* Split `TransactionProcessorResponse` into `TransactionAuthorizationProcessorResponse` and `TransactionSettlementProcessorResponse`. Transaction status events related to authorization now reference the former and those related to settlement now reference the latter in their `processorResponse` field.
+* Add `authorizationId` field to `TransactionAuthorizationProcessorResponse`.
+* Add `legacyId` field to `DisputeEvidence` interface and implementations.
+* Add `merchantAccountId` search field to `DisputeTransactionSearchInput`.
+
 # 2019-11-07
 
 * Add `customers` search field to `Search` query (fixes [#4](https://github.com/braintree/graphql-api/issues/4)).

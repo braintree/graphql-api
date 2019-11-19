@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Nov 07 2019 21:56:03 GMT+0000 (Coordinated Universal Time)
+# timestamp: Tue Nov 19 2019 18:58:06 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -272,7 +272,7 @@ type AuthorizedEvent implements TransactionStatusEvent {
   """
   Fields describing the payment processor response to the authorization request.
   """
-  processorResponse: TransactionProcessorResponse
+  processorResponse: TransactionAuthorizationProcessorResponse
 
   """Risk decision for this transaction."""
   riskDecision: RiskDecision
@@ -1316,10 +1316,13 @@ interface DisputeEvidence {
   """Unique identifier."""
   id: ID!
 
-  """Date and time at which the evidence was created with Braintree."""
+  """Legacy unique identifier."""
+  legacyId: ID!
+
+  """Date and time when the evidence was created with Braintree."""
   createdAt: Timestamp
 
-  """Date and time at which the evidence was sent to the processor."""
+  """Date and time when the evidence was sent to the processor."""
   sentToProcessorAt: Timestamp
 
   """The evidence category."""
@@ -1330,6 +1333,9 @@ interface DisputeEvidence {
 type DisputeFileEvidence implements DisputeEvidence {
   """Unique identifier."""
   id: ID!
+
+  """Legacy unique identifier."""
+  legacyId: ID!
 
   """Date and time at which the evidence was created with Braintree."""
   createdAt: Timestamp
@@ -1453,6 +1459,9 @@ type DisputeTextEvidence implements DisputeEvidence {
   """Unique identifier."""
   id: ID!
 
+  """Legacy unique identifier."""
+  legacyId: ID!
+
   """Date and time at which the evidence was created with Braintree."""
   createdAt: Timestamp
 
@@ -1489,6 +1498,11 @@ input DisputeTransactionSearchInput {
 
   """Find disputes by the transaction's disbursement date."""
   disbursementDate: SearchDateInput
+
+  """
+  Find disputes on transactions associated with a merchant account ID or IDs.
+  """
+  merchantAccountId: SearchValueInput
 }
 
 """Type of dispute."""
@@ -1538,7 +1552,7 @@ type FailedEvent implements TransactionStatusEvent {
   """
   Fields describing the payment processor response, or an explanation for the lack thereof.
   """
-  processorResponse: TransactionProcessorResponse
+  processorResponse: TransactionAuthorizationProcessorResponse
 
   """Risk decision for this transaction."""
   riskDecision: RiskDecision
@@ -1578,7 +1592,7 @@ type GatewayRejectedEvent implements TransactionStatusEvent {
   Fields describing the payment processor response. Depending on your gateway
   settings, the AVS and CVV responses may be the reason for the rejection.
   """
-  processorResponse: TransactionProcessorResponse
+  processorResponse: TransactionAuthorizationProcessorResponse
 
   """
   Risk decision for this transaction. If the gatewayRejectionReason is fraud, this may be the reason for the rejection.
@@ -2395,7 +2409,7 @@ type ProcessorDeclinedEvent implements TransactionStatusEvent {
   """
   Fields describing the payment processor response and why they declined the transaction.
   """
-  processorResponse: TransactionProcessorResponse
+  processorResponse: TransactionAuthorizationProcessorResponse
 
   """Risk decision for this transaction."""
   riskDecision: RiskDecision
@@ -2955,7 +2969,7 @@ type SettledEvent implements TransactionStatusEvent {
   source: TransactionSource
 
   """Fields describing the payment processor response."""
-  processorResponse: TransactionProcessorResponse
+  processorResponse: TransactionSettlementProcessorResponse
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
@@ -2980,7 +2994,7 @@ type SettlementDeclinedEvent implements TransactionStatusEvent {
   """
   Fields describing the payment processor response to the settlement request.
   """
-  processorResponse: TransactionProcessorResponse
+  processorResponse: TransactionSettlementProcessorResponse
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
@@ -3005,7 +3019,7 @@ type SettlementPendingEvent implements TransactionStatusEvent {
   """
   Fields describing the payment processor response to the settlement request.
   """
-  processorResponse: TransactionProcessorResponse
+  processorResponse: TransactionSettlementProcessorResponse
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
@@ -3610,7 +3624,7 @@ type Transaction implements Node {
   status: TransactionStatus
 
   """Fields describing the payment processor response."""
-  processorResponse: TransactionProcessorResponse @deprecated(reason: "Use relevant events in `statusEvents` instead.")
+  processorResponse: TransactionAuthorizationProcessorResponse @deprecated(reason: "Use relevant events in `statusEvents` instead.")
 
   """Risk data evaluated for this transaction."""
   riskData: RiskData
@@ -3673,6 +3687,35 @@ type Transaction implements Node {
   for the merchant of record.
   """
   facilitatorDetails: FacilitatorDetails
+}
+
+"""
+Detailed response information from the processor when attempting to authorize a transaction.
+"""
+type TransactionAuthorizationProcessorResponse {
+  """
+  A code based on the response from the processor, indicating the result of
+  attempting to authorize this transaction. See the [list of possible processor
+  response codes for authorization](https://developers.braintreepayments.com/reference/general/processor-responses/settlement-responses).
+  """
+  legacyCode: String
+
+  """The text explanation of the processor response legacyCode."""
+  message: String
+
+  """The processing bank's response to the provided CVV."""
+  cvvResponse: AvsCvvResponseCode
+
+  """
+  The processing bank's response to the provided billing postal or zip code.
+  """
+  avsPostalCodeResponse: AvsCvvResponseCode
+
+  """The processing bank's response to the provided billing street address."""
+  avsStreetAddressResponse: AvsCvvResponseCode
+
+  """The processor's unique ID or "code" for the authorization."""
+  authorizationId: String
 }
 
 """A paginated list of transactions."""
@@ -3997,29 +4040,6 @@ type TransactionPayload {
   transaction: Transaction
 }
 
-"""Detailed response information from the processor."""
-type TransactionProcessorResponse {
-  """
-  The [processor response code](https://developers.braintreepayments.com/reference/general/processor-responses/authorization-responses)
-  indicating the result of attempting to process this transaction.
-  """
-  legacyCode: String
-
-  """The text explanation of the processor response code."""
-  message: String
-
-  """The processing bank's response to the provided CVV."""
-  cvvResponse: AvsCvvResponseCode
-
-  """
-  The processing bank's response to the provided billing postal or zip code.
-  """
-  avsPostalCodeResponse: AvsCvvResponseCode
-
-  """The processing bank's response to the provided billing street address."""
-  avsStreetAddressResponse: AvsCvvResponseCode
-}
-
 """
 A union of all possible results of a transaction reversal. If the transaction is
 settled, a refund will be issued and a Refund object will be returned.
@@ -4064,6 +4084,32 @@ input TransactionSearchInput {
   Find transactions created by a third party via the Grant API using a given OAuth application client ID.
   """
   facilitatorOAuthApplicationClientId: SearchValueInput
+}
+
+"""
+Detailed response information from the processor when attempting to settle a transaction.
+"""
+type TransactionSettlementProcessorResponse {
+  """
+  A code based on the response from the processor, indicating the result of
+  attempting to settle this transaction. See the [list of possible processor
+  response codes for settlement](https://developers.braintreepayments.com/reference/general/processor-responses/settlement-responses).
+  """
+  legacyCode: String
+
+  """The text explanation of the processor response legacyCode."""
+  message: String
+
+  """The processing bank's response to the provided CVV."""
+  cvvResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `TransactionStatusEvent` instead.")
+
+  """
+  The processing bank's response to the provided billing postal or zip code.
+  """
+  avsPostalCodeResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `TransactionStatusEvent` instead.")
+
+  """The processing bank's response to the provided billing street address."""
+  avsStreetAddressResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `TransactionStatusEvent` instead.")
 }
 
 """Information related to shipping a physical product."""
