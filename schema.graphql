@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Tue Nov 19 2019 18:58:06 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Dec 05 2019 20:12:14 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -238,7 +238,7 @@ type AuthorizationExpiredEvent implements TransactionStatusEvent {
   status: TransactionStatus
 
   """
-  The date and time at which the authorization for this transaction was marked expired.
+  Date and time when the authorization for this transaction was marked expired.
   """
   timestamp: Timestamp
 
@@ -257,7 +257,7 @@ type AuthorizedEvent implements TransactionStatusEvent {
   """The new status of the transaction."""
   status: TransactionStatus
 
-  """The date and time at which the transaction was authorized."""
+  """Date and time when the transaction was authorized."""
   timestamp: Timestamp
 
   """
@@ -447,10 +447,9 @@ input CaptureTransactionInput {
   The amount to capture on the transaction. Must be greater than 0. You can't
   capture more than the authorized amount unless your industry and processor
   support settlement adjustment (capturing a certain percentage over the
-  authorized amount); contact [Braintree
-  support](mailto:support@braintreepayments.com) for details. If you capture an
-  amount that is less than what was authorized, the transaction object will
-  return the amount captured.
+  authorized amount); [contact us for assistance](https://help.braintreepayments.com?issue=TransactionProcessingQuestion).
+  If you capture an amount that is less than what was authorized, the
+  transaction object will return the amount captured.
   """
   amount: Amount
 
@@ -468,10 +467,9 @@ input CaptureTransactionOptionsInput {
   The amount to capture on the transaction. Must be greater than 0. You can't
   capture more than the authorized amount unless your industry and processor
   support settlement adjustment (capturing a certain percentage over the
-  authorized amount); contact [Braintree
-  support](mailto:support@braintreepayments.com) for details. If you capture an
-  amount that is less than what was authorized, the transaction object will
-  return the amount captured.
+  authorized amount); [contact us for assistance](https://help.braintreepayments.com?issue=TransactionProcessingQuestion).
+  If you capture an amount that is less than what was authorized, the
+  transaction object will return the amount captured.
   """
   amount: Amount
 
@@ -668,7 +666,7 @@ type ClientConfiguration {
   """Configuration for UnionPay cards."""
   unionPay: UnionPayConfiguration
 
-  """Configuration for U.S. bank account processing."""
+  """Configuration for US bank account processing."""
   usBankAccount: UsBankAccountConfiguration
 
   """Configuration for Pay with Venmo."""
@@ -1164,7 +1162,7 @@ A string representing a custom field value. Contains letters, numbers, and under
 """
 scalar CustomFieldName
 
-"""A date of the form YYYY-MM-DD."""
+"""A date in the format YYYY-MM-DD."""
 scalar Date
 
 """Top-level input fields for deleting a customer."""
@@ -1246,10 +1244,10 @@ type Dispute implements Node {
   """The case number for the dispute."""
   caseNumber: String
 
-  """The Date and time at which the dispute was created."""
+  """Date and time at which the dispute was created."""
   createdAt: Timestamp
 
-  """The date the dispute was received by the merchant."""
+  """Date the dispute was received by the merchant."""
   receivedDate: Date
 
   """The transaction reference number for the dispute."""
@@ -1263,7 +1261,7 @@ type Dispute implements Node {
   """
   replyByDate: Date
 
-  """The type of Dispute."""
+  """The type of dispute."""
   type: DisputeType
 
   """Evidence records submitted by the merchant for the dispute."""
@@ -1364,7 +1362,7 @@ type DisputeProcessorResponse {
   """The reason code description based on the `reasonCode`."""
   reasonDescription: String
 
-  """The date the dispute was received by the merchant."""
+  """Date the dispute was received by the merchant."""
   receivedDate: Date
 
   """
@@ -1441,16 +1439,16 @@ enum DisputeStatus {
 
 """A record of a status the dispute has passed through."""
 type DisputeStatusEvent {
-  """The date this event was disbursed."""
+  """The date any funds associated with this event were disbursed."""
   disbursementDate: Date
 
   """The status of the dispute."""
   status: DisputeStatus
 
-  """The timestamp of the history event."""
+  """Date and time when the status event occurred."""
   timestamp: Timestamp
 
-  """The date the history event took effect."""
+  """The date the status event took effect."""
   effectiveDate: Date
 }
 
@@ -1540,7 +1538,7 @@ type FailedEvent implements TransactionStatusEvent {
   """The new status of the transaction."""
   status: TransactionStatus
 
-  """The date and time at which the transaction failed."""
+  """Date and time when the transaction failed."""
   timestamp: Timestamp
 
   """The amount of the transaction for this status event."""
@@ -1572,9 +1570,7 @@ type GatewayRejectedEvent implements TransactionStatusEvent {
   """The new status of the transaction."""
   status: TransactionStatus
 
-  """
-  The date and time at which the transaction was rejected by the gateway.
-  """
+  """Date and time when the transaction was rejected by the gateway."""
   timestamp: Timestamp
 
   """The amount of the transaction for this status event."""
@@ -1888,12 +1884,12 @@ type Mutation {
   tokenizeSamsungPayCard(input: TokenizeSamsungPayCardInput!): TokenizeSamsungPayCardPayload
 
   """
-  Tokenize U.S. bank account fields and return a payload that includes a single-use payment method.
+  Tokenize US bank account fields and return a payload that includes a single-use payment method.
   """
   tokenizeUsBankAccount(input: TokenizeUsBankAccountInput!): TokenizeUsBankAccountPayload
 
   """
-  Tokenize U.S. bank login fields and return a payload that includes a single-use payment method.
+  Tokenize US bank login fields and return a payload that includes a single-use payment method.
   """
   tokenizeUsBankLogin(input: TokenizeUsBankLoginInput!): TokenizeUsBankAccountPayload
 
@@ -1932,6 +1928,11 @@ type Mutation {
   Agreements from an existing PayPal integration into your Braintree account.
   """
   vaultPayPalBillingAgreement(input: VaultPayPalBillingAgreementInput!): VaultPayPalBillingAgreementPayload
+
+  """
+  Force a transaction to settle in the sandbox environment. Generates an error elsewhere.
+  """
+  sandboxSettleTransaction(input: SandboxSettleTransactionInput!): TransactionPayload
 }
 
 """Input fields for a network tokenized card."""
@@ -2046,8 +2047,7 @@ input PartialCaptureTransactionOptionsInput {
   than or equal to the amount authorized by the parent transaction. You can't
   capture more than the authorized amount unless your industry and processor
   support settlement adjustment (capturing a certain percentage over the
-  authorized amount); contact [Braintree
-  support](mailto:support@braintreepayments.com) for details.
+  authorized amount); [contact us for assistance](https://help.braintreepayments.com?issue=TransactionProcessingQuestion).
   """
   amount: Amount!
 
@@ -2081,6 +2081,9 @@ type PaymentMethod implements Node {
 
   """Whether a payment method may be used only once or multiple times."""
   usage: PaymentMethodUsage
+
+  """Date and time when the payment method was vaulted."""
+  createdAt: Timestamp
 
   """
   Details about the payment method specific to the type (e.g. credit card, PayPal account).
@@ -2392,9 +2395,7 @@ type ProcessorDeclinedEvent implements TransactionStatusEvent {
   """The new status of the transaction."""
   status: TransactionStatus
 
-  """
-  The date and time at which the transaction was declined by the processor.
-  """
+  """Date and time when the transaction was declined by the processor."""
   timestamp: Timestamp
 
   """The amount of the transaction for this status event."""
@@ -2482,7 +2483,7 @@ type Refund implements Node {
   """Legacy unique identifier."""
   legacyId: ID!
 
-  """The time at which the refund was created."""
+  """Date and time when the refund was created."""
   createdAt: Timestamp
 
   """
@@ -2769,6 +2770,19 @@ type SamsungPayOriginDetails {
   bin: String
 }
 
+"""
+Top-level input fields for settling a transaction in the sandbox environment.
+"""
+input SandboxSettleTransactionInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  Id of the transaction to force settlement in the sandbox environment.
+  """
+  transactionId: ID!
+}
+
 """Top-level fields returned for a search query."""
 type Search {
   """
@@ -2884,10 +2898,10 @@ input SearchTextInput {
 }
 
 """
-Input fields for searching for a timestamp. These ranges are precise to the
-minute; the results of search for transactions or refunds created between
-12/17/2015 17:00 and 12/17/2015 17:00 will include a transaction created at
-12/17/2015 17:00:59.
+Input fields for searching by timestamp. These ranges are precise to the minute;
+the results of searching for an object created between 12/17/2015 17:00 and
+12/17/2015 17:00 (i.e., the same minute) will include objects created at
+12/17/2015 17:00:59. If no timezone is provided, it will be assumed to be UTC.
 """
 input SearchTimestampInput {
   """Timestamp is greater than or equal to this value."""
@@ -2954,7 +2968,7 @@ type SettledEvent implements TransactionStatusEvent {
   """The new status of the transaction."""
   status: TransactionStatus
 
-  """The date and time at which the transaction was settled."""
+  """Date and time when the transaction was settled."""
   timestamp: Timestamp
 
   """
@@ -2980,9 +2994,7 @@ type SettlementDeclinedEvent implements TransactionStatusEvent {
   """The new status of the transaction."""
   status: TransactionStatus
 
-  """
-  The date and time at which the processor declined to settle this transaction.
-  """
+  """Date and time when the processor declined to settle this transaction."""
   timestamp: Timestamp
 
   """The amount of the transaction for this status event."""
@@ -3007,7 +3019,7 @@ type SettlementPendingEvent implements TransactionStatusEvent {
   """The new status of the transaction."""
   status: TransactionStatus
 
-  """The date and time at which the transaction became settlement pending."""
+  """Date and time when the transaction became settlement pending."""
   timestamp: Timestamp
 
   """The amount of the transaction for this status event."""
@@ -3033,7 +3045,7 @@ type SettlingEvent implements TransactionStatusEvent {
   """The new status of the transaction."""
   status: TransactionStatus
 
-  """The date and time at which the transaction began settling."""
+  """Date and time when the transaction began settling."""
   timestamp: Timestamp
 
   """
@@ -3076,9 +3088,7 @@ type SubmittedForSettlementEvent implements TransactionStatusEvent {
   """The new status of the transaction."""
   status: TransactionStatus
 
-  """
-  The date and time at which the transaction was submitted for settlement.
-  """
+  """Date and time when the transaction was submitted for settlement."""
   timestamp: Timestamp
 
   """
@@ -3413,7 +3423,7 @@ A 3D Secure authentication version. Must be composed of digits separated by peri
 scalar ThreeDSecureVersion
 
 """
-An [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Times) timestamp with microsecond precision.
+An [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Times) timestamp with microsecond precision, in UTC.
 """
 scalar Timestamp
 
@@ -3543,16 +3553,16 @@ type TokenizeSamsungPayCardPayload {
   paymentMethod: PaymentMethod
 }
 
-"""Top-level input fields for tokenizing a U.S. bank account."""
+"""Top-level input fields for tokenizing a US bank account."""
 input TokenizeUsBankAccountInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """Input fields for a U.S. bank account object."""
+  """Input fields for a US bank account object."""
   usBankAccount: UsBankAccountInput!
 }
 
-"""Top-level fields returned from a tokenized U.S. bank account."""
+"""Top-level fields returned from a tokenized US bank account."""
 type TokenizeUsBankAccountPayload {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
@@ -3561,12 +3571,12 @@ type TokenizeUsBankAccountPayload {
   paymentMethod: PaymentMethod
 }
 
-"""Top-level input fields for tokenizing a U.S. bank login."""
+"""Top-level input fields for tokenizing a US bank login."""
 input TokenizeUsBankLoginInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """Input fields for a U.S. bank login."""
+  """Input fields for a US bank login."""
   usBankLogin: UsBankLoginInput!
 }
 
@@ -3578,7 +3588,7 @@ type Transaction implements Node {
   """Legacy unique identifier."""
   legacyId: ID!
 
-  """The time at which the transaction was created."""
+  """Date and time when the transaction was created."""
   createdAt: Timestamp
 
   """
@@ -4181,8 +4191,7 @@ enum TransactionStatus {
   AUTHORIZED
 
   """
-  If a transaction remains in a status of `AUTHORIZING`, [contact Braintree
-  Support for assistance](https://help.braintreepayments.com).
+  If a transaction remains in a status of `AUTHORIZING`, [contact us for assistance](https://help.braintreepayments.com?issue=TransactionProcessingQuestion).
   """
   AUTHORIZING
 
@@ -4251,7 +4260,7 @@ interface TransactionStatusEvent {
   """New status of the transaction."""
   status: TransactionStatus
 
-  """Date and time at which the status event occurred."""
+  """Date and time when the status event occurred."""
   timestamp: Timestamp
 
   """The amount of the transaction applicable to the status."""
@@ -4351,8 +4360,17 @@ type UpdateTransactionCustomFieldsPayload {
   customFields: [CustomField!]
 }
 
+"""Details about the customer's acceptance of ACH terms."""
+type UsBankAccountAchMandate {
+  """The text the customer agreed to when setting up ACH."""
+  acceptanceText: String
+
+  """Date and time when the text terms were accepted."""
+  acceptedAt: Timestamp
+}
+
 """
-A billing address for a U.S. bank account. This is a subset of the fields required on `AddressInput`.
+A billing address for a US bank account. This is a subset of the fields required on `AddressInput`.
 """
 input UsBankAccountBillingAddressInput {
   """The street address."""
@@ -4371,22 +4389,22 @@ input UsBankAccountBillingAddressInput {
   zipCode: UsZipCode!
 }
 
-"""The name of the owner of a business U.S. bank account."""
+"""The name of the owner of a business US bank account."""
 input UsBankAccountBusinessOwnerInput {
   """The name of the business that owns the account."""
   businessName: String!
 }
 
-"""Configuration for U.S. bank account processing."""
+"""Configuration for US bank account processing."""
 type UsBankAccountConfiguration {
-  """The route ID used to process a U.S. bank account payment."""
+  """The route ID used to process a US bank account payment."""
   routeId: String
 
   """The public key for Plaid to use to log in to a bank account."""
   plaidPublicKey: String
 }
 
-"""Details about a U.S. bank account."""
+"""Details about a US bank account."""
 type UsBankAccountDetails {
   """
   The name of the accountholder. This is either the business name for a business
@@ -4413,9 +4431,12 @@ type UsBankAccountDetails {
   Whether or not the bank account has been verified and can be transacted on.
   """
   verified: Boolean
+
+  """NACHA-mandated proof of acceptance of ACH terms."""
+  achMandate: UsBankAccountAchMandate
 }
 
-"""The name of the owner of a personal U.S. bank account."""
+"""The name of the owner of a personal US bank account."""
 input UsBankAccountIndividualOwnerInput {
   """The first name of the accountholder."""
   firstName: String!
@@ -4424,7 +4445,7 @@ input UsBankAccountIndividualOwnerInput {
   lastName: String!
 }
 
-"""Input fields for a U.S. bank account object."""
+"""Input fields for a US bank account object."""
 input UsBankAccountInput {
   """The account number of the bank account."""
   accountNumber: UsBankAccountNumber!
@@ -4457,13 +4478,13 @@ input UsBankAccountInput {
 """An account number containing 4-17 digits."""
 scalar UsBankAccountNumber
 
-"""The ownership type of U.S. Bank Account."""
+"""The ownership type of US Bank Account."""
 enum UsBankAccountOwnershipType {
   BUSINESS
   PERSONAL
 }
 
-"""The type of U.S. Bank Account."""
+"""The type of US Bank Account."""
 enum UsBankAccountType {
   CHECKING
   SAVINGS
@@ -4515,7 +4536,7 @@ enum UsBankAccountVerificationMethod {
   TOKENIZED_CHECK
 }
 
-"""Input fields for a U.S. bank login object."""
+"""Input fields for a US bank login object."""
 input UsBankLoginInput {
   """The public token returned from the bank login."""
   publicToken: String!
@@ -4575,7 +4596,7 @@ enum UserStatus {
   SUSPENDED
 }
 
-"""A two-letter code representing a U.S. state or territory."""
+"""A two-letter code representing a US state or territory."""
 enum UsStateCode {
   AK
   AL
@@ -4886,7 +4907,7 @@ type Verification implements Node {
   """
   processorResponse: VerificationProcessorResponse
 
-  """The date and time at which the verification was created."""
+  """Date and time at which the verification was created."""
   createdAt: Timestamp
 
   """
@@ -5087,7 +5108,7 @@ type VoidedEvent implements TransactionStatusEvent {
   """The new status of the transaction."""
   status: TransactionStatus
 
-  """The date and time at which the transaction was voided."""
+  """Date and time when the transaction was voided."""
   timestamp: Timestamp
 
   """

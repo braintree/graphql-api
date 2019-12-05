@@ -1,3 +1,9 @@
+# 2019-12-05
+
+* Add `sandboxSettleTransaction` mutation.
+* Add `createdAt` field to `PaymentMethod`.
+* Add `achMandate` field to `UsBankAccountDetails`.
+
 # 2019-11-19
 
 * Split `TransactionProcessorResponse` into `TransactionAuthorizationProcessorResponse` and `TransactionSettlementProcessorResponse`. Transaction status events related to authorization now reference the former and those related to settlement now reference the latter in their `processorResponse` field.
