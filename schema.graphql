@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Dec 05 2019 20:12:14 GMT+0000 (Coordinated Universal Time)
+# timestamp: Wed Dec 18 2019 18:43:46 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -1217,6 +1217,36 @@ type DeletePaymentMethodFromVaultPayload {
 }
 
 """
+Disbursement details contain information about how and when the transaction was
+disbursed, including timing and currency information. This field is only
+available if you have an eligible merchant account.
+"""
+type DisbursementDetails {
+  """
+  The date that the funds associated with this transaction were disbursed.
+  """
+  date: Date
+
+  """
+  Amount of money disbursed in the settlement currency, which may be different
+  than the transaction's [presentment
+  currency](https://articles.braintreepayments.com/get-started/currencies).
+  """
+  amount: MonetaryAmount
+
+  """
+  The exchange rate from the presentment currency to the settlement currency. If
+  the currencies are the same, this will be 1.
+  """
+  exchangeRate: String
+
+  """
+  Indicates whether funds have been withheld from a disbursement to the merchant's account.
+  """
+  fundsHeld: Boolean
+}
+
+"""
 [A case raised by a customer to either request information about or to challenge a charge](https://articles.braintreepayments.com/risk-and-security/chargebacks-retrievals/overview).
 These are initiated via a customer's payment provider, such as their bank, and
 require a merchant to provide evidence or further information.
@@ -1824,6 +1854,9 @@ type Mutation {
   """
   reverseTransaction(input: ReverseTransactionInput!): ReverseTransactionPayload
 
+  """Reverse a refund and return a payload that includes voided refund."""
+  reverseRefund(input: ReverseRefundInput!): RefundTransactionPayload
+
   """
   Update custom fields on a transaction. Custom fields are [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
   """
@@ -2275,6 +2308,15 @@ input PayPalPayeeOptionsInput {
   email: String
 }
 
+"""PayPal-specific refund details."""
+type PayPalRefundDetails {
+  """The PayPal refund ID."""
+  refundId: String
+
+  """Refunded transaction fee charged by PayPal."""
+  refundedFee: MonetaryAmount
+}
+
 """PayPal-specific details on a transaction."""
 type PayPalTransactionDetails {
   """
@@ -2303,7 +2345,7 @@ type PayPalTransactionDetails {
   paymentId: String
 
   """If the transaction is a refund, the PayPal refund ID."""
-  refundId: String
+  refundId: String @deprecated(reason: "This field will never be populated as it only appears on refunds. Use `details.paypalId` on a refund instead.")
 
   """Whether or not the transaction qualifies for PayPal Seller Protection."""
   sellerProtectionStatus: String
@@ -2506,6 +2548,9 @@ type Refund implements Node {
   """
   statusHistory: [TransactionStatusEvent!]
 
+  """Payment method specific details about the refund."""
+  details: RefundPaymentMethodDetails
+
   """The original transaction that this refunds."""
   refundedTransaction: Transaction
 }
@@ -2543,6 +2588,9 @@ input RefundInput {
   """
   orderId: String
 }
+
+"""A union of all possible payment method refund details."""
+union RefundPaymentMethodDetails = PayPalRefundDetails
 
 """Input fields for searching for refunds."""
 input RefundSearchInput {
@@ -2587,6 +2635,15 @@ type RefundTransactionPayload {
 type Report {
   """Top-level fields returned in the transaction level fee report query."""
   transactionLevelFees(date: Date!, merchantAccountId: ID): TransactionLevelFeeReport
+}
+
+"""Input fields for reversing a refund."""
+input ReverseRefundInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The ID of the refund to reverse."""
+  refundId: ID!
 }
 
 """Input fields for reversing a transaction."""
@@ -2777,9 +2834,7 @@ input SandboxSettleTransactionInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """
-  Id of the transaction to force settlement in the sandbox environment.
-  """
+  """Id of the transaction to force settlement in the sandbox environment."""
   transactionId: ID!
 }
 
@@ -3697,6 +3752,12 @@ type Transaction implements Node {
   for the merchant of record.
   """
   facilitatorDetails: FacilitatorDetails
+
+  """
+  The disbursement details associated with this transaction. This field is only
+  available after the transaction is SETTLED and you have an eligible merchant account.
+  """
+  disbursementDetails: DisbursementDetails
 }
 
 """
@@ -4094,6 +4155,9 @@ input TransactionSearchInput {
   Find transactions created by a third party via the Grant API using a given OAuth application client ID.
   """
   facilitatorOAuthApplicationClientId: SearchValueInput
+
+  """Find transactions by their disbursement date."""
+  disbursementDate: SearchDateInput
 }
 
 """

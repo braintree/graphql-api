@@ -1,3 +1,11 @@
+# 2019-12-18
+
+* Add `reverseRefund` mutation.
+* Add `details` field to `Refund`.
+* Deprecate `PayPalTransactionDetails.refundId`. Use `Refund.details.refundId` instead.
+* Add `disbursementDetails` field to `Transaction`.
+* Add `disbursementDate` field to `TransactionSearchInput`.
+
 # 2019-12-05
 
 * Add `sandboxSettleTransaction` mutation.
