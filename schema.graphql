@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Wed Dec 18 2019 18:43:46 GMT+0000 (Coordinated Universal Time)
+# timestamp: Fri Jan 03 2020 17:17:40 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -3767,7 +3767,7 @@ type TransactionAuthorizationProcessorResponse {
   """
   A code based on the response from the processor, indicating the result of
   attempting to authorize this transaction. See the [list of possible processor
-  response codes for authorization](https://developers.braintreepayments.com/reference/general/processor-responses/settlement-responses).
+  response codes for authorization](https://developers.braintreepayments.com/reference/general/processor-responses/authorization-responses).
   """
   legacyCode: String
 
