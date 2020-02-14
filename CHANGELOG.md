@@ -1,3 +1,21 @@
+# 2020-02-14
+
+* Add `LocalPaymentDetails` to `PaymentMethodSnapshot` union to support transactions with local payments.
+* Add `PayPalLocalPaymentOriginDetails` to `PaymentMethodOriginDetails` union.
+* Add `PayPalLocalPaymentRefundDetails` to `RefundPaymentMethodDetails` union.
+* Add `PAYPAL` to `PaymentMethodOriginType` enum.
+* Add `AUTHENTICATE_SUCCESSFUL_ISSUER_NOT_PARTICIPATING` to `ThreeDSecureAuthenticationStatus`.
+* Add additional input fields to `ThreeDSecureLookupTransactionInformationInput`.
+* Add `Payment` interface to represent the movement of money by `Transaction` or `Refund`.
+* Rename `TransactionSource` enum to `PaymentSource`.
+* Rename `TransactionStatus` enum to `PaymentStatus`.
+* Rename `TransactionStatusEvent` interface to `PaymentStatusEvent`.
+* Add `paymentLevelFees` field to `Report` type as an alias of `transactionLevelFees`, `transactionLevelFees` already returned a report that included transactions and refunds.
+* Add `payments` field to `Search` type to allow searching for all types implementing `Payment`.
+* Make `supportedCardBrands` list entries non-nullable.
+* Make `supportedFeatures` list entries non-nullable.
+* Make `challenges` list entries non-nullable.
+
 # 2019-12-18
 
 * Add `reverseRefund` mutation.

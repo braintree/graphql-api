@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Fri Jan 03 2020 17:17:40 GMT+0000 (Coordinated Universal Time)
+# timestamp: Fri Feb 14 2020 16:27:46 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -160,7 +160,7 @@ type ApplePayConfiguration {
   merchantIdentifier: String
 
   """A list of card brands supported by the merchant for Apple Pay."""
-  supportedCardBrands: [CreditCardBrandCode]
+  supportedCardBrands: [CreditCardBrandCode!]
 }
 
 """Additional information about the payment method specific to Apple Pay."""
@@ -204,7 +204,7 @@ type ApplePayWebConfiguration {
   merchantIdentifier: String
 
   """A list of card brands supported by the merchant for Apple Pay."""
-  supportedCardBrands: [CreditCardBrandCode]
+  supportedCardBrands: [CreditCardBrandCode!]
 }
 
 """
@@ -233,9 +233,9 @@ input AuthenticationInsightInput {
 }
 
 """Accompanying information for an authorization expired transaction."""
-type AuthorizationExpiredEvent implements TransactionStatusEvent {
+type AuthorizationExpiredEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """
   Date and time when the authorization for this transaction was marked expired.
@@ -246,16 +246,16 @@ type AuthorizationExpiredEvent implements TransactionStatusEvent {
   amount: MonetaryAmount
 
   """The source for the transaction change to the new status."""
-  source: TransactionSource
+  source: PaymentSource
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
 }
 
 """Accompanying information for an authorized transaction."""
-type AuthorizedEvent implements TransactionStatusEvent {
+type AuthorizedEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """Date and time when the transaction was authorized."""
   timestamp: Timestamp
@@ -267,7 +267,7 @@ type AuthorizedEvent implements TransactionStatusEvent {
   amount: MonetaryAmount
 
   """The source for the transaction change to the new status."""
-  source: TransactionSource
+  source: PaymentSource
 
   """
   Fields describing the payment processor response to the authorization request.
@@ -631,7 +631,7 @@ type ClientConfiguration {
   clientApiUrl: String @deprecated(reason: "This field is included for supporting legacy clients.")
 
   """A list of client features the merchant supports."""
-  supportedFeatures: [ClientFeature] @deprecated(reason: "This field is included for supporting legacy clients.")
+  supportedFeatures: [ClientFeature!] @deprecated(reason: "This field is included for supporting legacy clients.")
 
   """Configuration for payment methods in legacy clients."""
   braintreeApi: BraintreeApiConfiguration @deprecated(reason: "This field is included for supporting legacy clients.")
@@ -674,6 +674,11 @@ type ClientConfiguration {
 
   """Configuration for Visa Checkout."""
   visaCheckout: VisaCheckoutConfiguration
+
+  """
+  A list of challenges that are required by the current merchant to process a given credit card.
+  """
+  challenges: [Challenge!]
 }
 
 """The client configuration environment being used."""
@@ -830,12 +835,12 @@ type CreditCardConfiguration {
   """
   A list of card brands supported by the merchant for credit card processing.
   """
-  supportedCardBrands: [CreditCardBrandCode]
+  supportedCardBrands: [CreditCardBrandCode!]
 
   """
   A list of challenges that are required by the merchant to process a given credit card.
   """
-  challenges: [Challenge]
+  challenges: [Challenge!]
 
   """Whether or not the merchant supports 3D Secure."""
   threeDSecureEnabled: Boolean @deprecated(reason: "Use `threeDSecure` instead.")
@@ -925,7 +930,7 @@ input CreditCardInput {
   cvv: String
 
   """
-  When supplied, the cardholder name to be tokenized with the contents of the fields.
+  When supplied, the cardholder name that will be tokenized with the contents of the fields.
   """
   cardholderName: String
 
@@ -1037,7 +1042,7 @@ type Customer implements Node {
   """
   Transactions associated with this customer. This includes transactions created
   by charging a vaulted payment method that belongs or belonged to the customer,
-  or by passing a customer ID when charging an single-use payment method.
+  or by passing a customer ID when charging a single-use payment method.
   """
   transactions(first: Int, after: String): TransactionConnection
 }
@@ -1564,9 +1569,9 @@ type FacilitatorDetails {
 """
 Accompanying information for a transaction that failed because it could not be successfully sent to the processor.
 """
-type FailedEvent implements TransactionStatusEvent {
+type FailedEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """Date and time when the transaction failed."""
   timestamp: Timestamp
@@ -1575,7 +1580,7 @@ type FailedEvent implements TransactionStatusEvent {
   amount: MonetaryAmount
 
   """The source for the transaction change to the new status."""
-  source: TransactionSource
+  source: PaymentSource
 
   """
   Fields describing the payment processor response, or an explanation for the lack thereof.
@@ -1596,9 +1601,9 @@ enum FraudServiceProvider {
 }
 
 """Accompanying information for a gateway rejected transaction."""
-type GatewayRejectedEvent implements TransactionStatusEvent {
+type GatewayRejectedEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """Date and time when the transaction was rejected by the gateway."""
   timestamp: Timestamp
@@ -1607,7 +1612,7 @@ type GatewayRejectedEvent implements TransactionStatusEvent {
   amount: MonetaryAmount
 
   """The source for the transaction change to the new status."""
-  source: TransactionSource
+  source: PaymentSource
 
   """
   The reason the transaction was rejected, based on your gateway settings.
@@ -1663,7 +1668,7 @@ type GooglePayConfiguration {
   paypalClientId: String
 
   """A list of card brands supported by the merchant for Google Pay."""
-  supportedCardBrands: [CreditCardBrandCode]
+  supportedCardBrands: [CreditCardBrandCode!]
 }
 
 """The environment being used for Google Pay."""
@@ -1718,6 +1723,41 @@ enum LegacyIdType {
   VERIFICATION
 }
 
+"""Local payment specific details on a transaction."""
+type LocalPaymentDetails {
+  """
+  Additional information about the local payment method provided from a
+  third-party origin, such as PayPal or another regional payment method provider.
+  """
+  origin: PaymentMethodOrigin
+
+  """Regional payment method selected by the customer."""
+  type: LocalPaymentMethodType
+
+  """Description of the payment method that can be displayed to customers."""
+  displayName: String
+}
+
+"""A value identifying the type of regional payment method."""
+enum LocalPaymentMethodType {
+  ALIPAY
+  BANCONTACT
+  BLIK
+  EPS
+  GIROPAY
+  IDEAL
+  MYBANK
+  P24
+  PAYU
+  SEPA
+  SOFORT
+  SWISH
+  TRUSTLY
+  VERKKOPANKKI
+  VIPPS
+  WECHAT_PAY
+}
+
 """Configuration for Masterpass."""
 type MasterpassConfiguration {
   """
@@ -1726,7 +1766,7 @@ type MasterpassConfiguration {
   merchantCheckoutId: String
 
   """A list of card brands supported by the merchant for Masterpass."""
-  supportedCardBrands: [CreditCardBrandCode]
+  supportedCardBrands: [CreditCardBrandCode!]
 }
 
 """
@@ -1912,7 +1952,7 @@ type Mutation {
   tokenizeNetworkToken(input: TokenizeNetworkTokenInput!): TokenizeNetworkTokenPayload
 
   """
-  Tokenize Samsung Pay Card fields and return a payload that includes a single-use payment method.
+  Tokenize Samsung Pay card fields and return a payload that includes a single-use payment method.
   """
   tokenizeSamsungPayCard(input: TokenizeSamsungPayCardInput!): TokenizeSamsungPayCardPayload
 
@@ -2102,13 +2142,88 @@ type PartialCaptureTransactionPayload {
   capture: Transaction
 }
 
+"""
+A merchant-initiated movement of money between the merchant and a customer, by
+way of a payment method. Payments can represent money moving either from a
+customer to the merchant by charging a payment method (a Transaction), or from
+the merchant back to a customer by refunding a previous transaction (a Refund).
+"""
+interface Payment {
+  """Unique identifier."""
+  id: ID!
+
+  """Legacy unique identifier."""
+  legacyId: ID!
+
+  """Date and time when the payment was created."""
+  createdAt: Timestamp
+
+  """
+  The amount charged or credited to the payment method. Note that in the case of
+  a Transaction, this amount will represent the amount moving from the customer
+  to the merchant, and in the case of a Refund, will represent the amount moving
+  from the merchant back to the customer.
+  """
+  amount: MonetaryAmount
+
+  """The order ID."""
+  orderId: String
+
+  """The current status of this payment."""
+  status: PaymentStatus
+
+  """
+  The records of all statuses this payment has passed through, with additional
+  information on why each status occurred. Returned in reverse chronological
+  order, with the most recent event first in the list.
+  """
+  statusHistory: [PaymentStatusEvent!]
+
+  """The ID of the merchant account that processed this payment."""
+  merchantAccountId: ID
+
+  """How the payment was created."""
+  source: PaymentSource
+}
+
+"""A paginated list of transactions and refunds."""
+type PaymentConnection {
+  """A list of transactions and refunds."""
+  edges: [PaymentConnectionEdge]
+
+  """
+  Information about the page of transactions and refunds contained in `edges`.
+  """
+  pageInfo: PageInfo!
+}
+
+"""A transaction or refund within a PaymentConnection."""
+type PaymentConnectionEdge {
+  """
+  This transaction or refund's location within the PaymentConnection. Used for requesting additional pages.
+  """
+  cursor: String
+
+  """The transaction or refund."""
+  node: Payment
+}
+
+"""
+The [payment-level fee report (formerly known as the transaction-level fee report)](https://articles.braintreepayments.com/control-panel/reporting/transaction-level-fee-report)
+provides a breakdown of fees per individual payments (encompassing transactions and refunds).
+"""
+type PaymentLevelFeeReport {
+  """The URL where you can access the requested report."""
+  url: String
+}
+
 """Top-level field representing a payment method."""
 type PaymentMethod implements Node {
   """Unique identifier."""
   id: ID!
 
   """
-  Legacy unique identifier. May be the same as id for single-use payment methods.
+  Legacy unique identifier. May be the same as ID for single-use payment methods.
   """
   legacyId: ID!
 
@@ -2174,7 +2289,7 @@ A union of all possible payment method origin details.
 PaymentMethodOriginDetails contain additional information specific to the third
 party the payment method was provided by.
 """
-union PaymentMethodOriginDetails = ApplePayOriginDetails | GooglePayOriginDetails | MasterpassOriginDetails | NetworkTokenOriginDetails | SamsungPayOriginDetails | VisaCheckoutOriginDetails
+union PaymentMethodOriginDetails = ApplePayOriginDetails | GooglePayOriginDetails | MasterpassOriginDetails | NetworkTokenOriginDetails | SamsungPayOriginDetails | VisaCheckoutOriginDetails | PayPalLocalPaymentOriginDetails
 
 """
 A value identifying the third-party origin from which a customer provided their payment method.
@@ -2184,6 +2299,7 @@ enum PaymentMethodOriginType {
   GOOGLE_PAY
   MASTERPASS
   NETWORK_TOKEN
+  PAYPAL
   SAMSUNG_PAY
   VISA_CHECKOUT
 }
@@ -2193,7 +2309,7 @@ A union of all possible payment method details as they were used in a
 transaction or verification. PaymentMethodSnapshot preserves values used to
 create a given transaction or verify a payment method at that moment in time.
 """
-union PaymentMethodSnapshot = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalTransactionDetails | VenmoAccountDetails | UsBankAccountDetails
+union PaymentMethodSnapshot = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalTransactionDetails | VenmoAccountDetails | UsBankAccountDetails | LocalPaymentDetails
 
 """
 A value identifying the type of payment method used for a transaction. For
@@ -2217,6 +2333,162 @@ enum PaymentMethodSnapshotSearchType {
 enum PaymentMethodUsage {
   MULTI_USE
   SINGLE_USE
+}
+
+"""Input fields for searching for any type of Payment."""
+input PaymentSearchInput {
+  """Find payments with an ID or IDs."""
+  id: SearchValueInput
+
+  """Find payments with a given status."""
+  status: SearchPaymentStatusInput
+
+  """
+  Find payments based on the time at which they transitioned to a given status.
+  """
+  statusTransition: SearchPaymentStatusTransitionInput
+
+  """Find payments with a given source."""
+  source: SearchPaymentSourceInput
+
+  """Find payments for a given amount or currency."""
+  amount: MonetaryAmountSearchInput
+
+  """Find payments with a given orderId."""
+  orderId: SearchTextInput
+
+  """Find payments with a given created at time."""
+  createdAt: SearchTimestampInput
+
+  """Find payments processed through a merchant account ID or IDs."""
+  merchantAccountId: SearchValueInput
+}
+
+"""
+The origin of a request that created or changed a transaction or refund.
+"""
+enum PaymentSource {
+  API
+  CONTROL_PANEL
+  RECURRING
+  UNKNOWN
+}
+
+"""
+The status of the payment, indicating its success or failure, and where it is in its [lifecycle](https://articles.braintreepayments.com/get-started/transaction-lifecycle).
+For further details on why any given status occurred, consult the corresponding
+`PaymentStatusEvent` in the payment's `statusHistory`.
+"""
+enum PaymentStatus {
+  """
+  The transaction spent too much time in the `AUTHORIZED` status and was marked
+  as expired. Expiration [time frames](https://developers.braintreepayments.com/reference/general/statuses#authorization-expired)
+  differ by card type, transaction type, and, in some cases, merchant category.
+  """
+  AUTHORIZATION_EXPIRED
+
+  """
+  The processor authorized the transaction, putting your customer's funds on
+  hold. Your customer may see a pending charge on his or her account. However,
+  before the customer is actually charged and before you receive the funds, you
+  must use the `captureTransaction` mutation. If you do not want to capture the
+  transaction, you should use the `reverseTransaction` mutation to avoid a
+  misuse of authorization fee.
+  """
+  AUTHORIZED
+
+  """
+  If a payment remains in a status of `AUTHORIZING`, [contact us for assistance](https://help.braintreepayments.com?issue=TransactionProcessingQuestion).
+  """
+  AUTHORIZING
+
+  """
+  An error occurred when sending the payment to the downstream processor. See
+  the payment's `statusHistory` for the exact error.
+  """
+  FAILED
+
+  """
+  The transaction was [rejected](https://articles.braintreepayments.com/control-panel/transactions/gateway-rejections)
+  based on one or more settings or rules in your Braintree gateway. See the
+  transaction's `statusHistory` to determine which resulted in the decline.
+  """
+  GATEWAY_REJECTED
+
+  """
+  The processor declined the transaction while attempting to authorize it. See
+  the transaction's `statusHistory` to determine what reason the processor gave
+  for the decline.
+  """
+  PROCESSOR_DECLINED
+
+  """
+  The payment has been settled. For transactions, this means your customer has
+  been charged and the process of disbursing the funds to your bank account has
+  begun. For refunds, it means that the process of disbursing funds back to the
+  customer has begun.
+  """
+  SETTLED
+  SETTLEMENT_CONFIRMED @deprecated(reason: "No longer applicable to any supported payment method types.")
+
+  """
+  The processor declined the payment while attempting to capture it. See the
+  payment's `statusHistory` to detemine why it was not settled. This status is
+  rare, and only certain types of transactions can be affected.
+  """
+  SETTLEMENT_DECLINED
+
+  """
+  The transaction has not yet fully settled. This status is rare, and will
+  generally resolve to a status of `SETTLED`. Only certain types of transactions
+  can be affected.
+  """
+  SETTLEMENT_PENDING
+
+  """
+  The payment is in the process of being settled. This is a transitory state, and will resolve to a status of `SETTLED`.
+  """
+  SETTLING
+
+  """
+  The payment has been successfully captured, and will be included in the next
+  settlement batch, at which time it will become settled.
+  """
+  SUBMITTED_FOR_SETTLEMENT
+
+  """
+  The payment has been voided or canceled. For transactions, this means it is no
+  longer authorized, your customer's funds are no longer on hold, and you can't
+  use the `captureTransaction` mutation on this transaction. For refunds, it
+  means the customer will not receive the funds from the refund.
+  """
+  VOIDED
+}
+
+"""
+Status event in the [lifecycle of a payment](https://articles.braintreepayments.com/get-started/transaction-lifecycle).
+"""
+interface PaymentStatusEvent {
+  """New status of the payment."""
+  status: PaymentStatus
+
+  """Date and time when the status event occurred."""
+  timestamp: Timestamp
+
+  """
+  The payment amount applicable to the status. For instance, the amount when a
+  transaction is `SUBMITTED_FOR_SETTLEMENT` might be less than the amount for
+  which it was `AUTHORIZED`.
+  """
+  amount: MonetaryAmount
+
+  """Source that caused the status event to occur."""
+  source: PaymentSource
+
+  """
+  Whether this is the final state for the payment. If false, this transaction will pass into another subsequent state.
+  """
+  terminal: Boolean
 }
 
 """Details about a PayPal account."""
@@ -2300,6 +2572,34 @@ enum PayPalEnvironment {
   custom
   live
   offline
+}
+
+"""
+Additional information about the local payment method specific to PayPal.
+"""
+type PayPalLocalPaymentOriginDetails {
+  """
+  If funds for the transaction have settled, the PayPal ID for the capture of funds.
+  """
+  captureId: String
+
+  """A string of field/value pairs passed directly to PayPal."""
+  customField: String
+
+  """The identification value of the payment within PayPal's API."""
+  paymentId: String
+
+  """The fee charged by PayPal for the transaction."""
+  transactionFee: MonetaryAmount
+}
+
+"""PayPal local payment specific refund details."""
+type PayPalLocalPaymentRefundDetails {
+  """The PayPal refund ID."""
+  refundId: String
+
+  """Refunded transaction fee charged by PayPal."""
+  refundedFee: MonetaryAmount
 }
 
 """Input fields for a PayPal account receiving transaction funds."""
@@ -2433,9 +2733,9 @@ type PerformThreeDSecureLookupPayload {
 }
 
 """Accompanying information for a processor declined transaction."""
-type ProcessorDeclinedEvent implements TransactionStatusEvent {
+type ProcessorDeclinedEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """Date and time when the transaction was declined by the processor."""
   timestamp: Timestamp
@@ -2444,7 +2744,7 @@ type ProcessorDeclinedEvent implements TransactionStatusEvent {
   amount: MonetaryAmount
 
   """The source for the transaction change to the new status."""
-  source: TransactionSource
+  source: PaymentSource
 
   """Whether or not the decline is the result of a temporary issue."""
   declineType: ProcessorDeclineType
@@ -2518,7 +2818,7 @@ enum RecurringType {
 A refund of a charge on a payment method, representing an attempt to send money
 from a previous transaction back to the customer.
 """
-type Refund implements Node {
+type Refund implements Node & Payment {
   """Unique identifier."""
   id: ID!
 
@@ -2539,17 +2839,23 @@ type Refund implements Node {
   orderId: String
 
   """The current status of this refund."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """
-  The records of all statuses this transaction has passed through, with
-  additional information on why each status occurred. Returned in reverse
-  chronological order, with the most recent event first in the list.
+  The records of all statuses this refund has passed through, with additional
+  information on why each status occurred. Returned in reverse chronological
+  order, with the most recent event first in the list.
   """
-  statusHistory: [TransactionStatusEvent!]
+  statusHistory: [PaymentStatusEvent!]
 
   """Payment method specific details about the refund."""
   details: RefundPaymentMethodDetails
+
+  """The ID of the merchant account that processed this refund."""
+  merchantAccountId: ID
+
+  """How the refund was created."""
+  source: PaymentSource
 
   """The original transaction that this refunds."""
   refundedTransaction: Transaction
@@ -2564,7 +2870,7 @@ type RefundConnection {
   pageInfo: PageInfo!
 }
 
-"""A transaction within a RecundConnection."""
+"""A transaction within a RefundConnection."""
 type RefundConnectionEdge {
   """
   This refund's location within the RefundConnection. Used for requesting additional pages.
@@ -2590,7 +2896,7 @@ input RefundInput {
 }
 
 """A union of all possible payment method refund details."""
-union RefundPaymentMethodDetails = PayPalRefundDetails
+union RefundPaymentMethodDetails = PayPalRefundDetails | PayPalLocalPaymentRefundDetails
 
 """Input fields for searching for refunds."""
 input RefundSearchInput {
@@ -2633,8 +2939,11 @@ type RefundTransactionPayload {
 
 """Top-level fields returned for a report query."""
 type Report {
-  """Top-level fields returned in the transaction level fee report query."""
-  transactionLevelFees(date: Date!, merchantAccountId: ID): TransactionLevelFeeReport
+  """Top-level fields returned in the transaction-level fee report query."""
+  transactionLevelFees(date: Date!, merchantAccountId: ID): TransactionLevelFeeReport @deprecated(reason: "This report has been renamed `paymentLevelFees`, since it applies to all types in the Payment interface, including transactions and refunds. Use the `paymentLevelFees` field instead, which returns the same report.")
+
+  """Top-level fields returned in the payment-level fee report query."""
+  paymentLevelFees(date: Date!, merchantAccountId: ID): PaymentLevelFeeReport
 }
 
 """Input fields for reversing a refund."""
@@ -2807,7 +3116,7 @@ type SamsungPayConfiguration {
   samsungAuthorization: String
 
   """A list of card brands supported by the merchant for Samsung Pay."""
-  supportedCardBrands: [CreditCardBrandCode]
+  supportedCardBrands: [CreditCardBrandCode!]
 }
 
 """The environment being used for Samsung Pay."""
@@ -2847,6 +3156,11 @@ type Search {
 
   """A paginated list of refunds that match the RefundSearchInput."""
   refunds(input: RefundSearchInput!, first: Int, after: String): RefundConnection
+
+  """
+  A paginated list of all types of Payment that match the PaymentSearchInput.
+  """
+  payments(input: PaymentSearchInput!, first: Int, after: String): PaymentConnection
 
   """A paginated list of disputes that match the DisputeSearchInput."""
   disputes(input: DisputeSearchInput!, first: Int, after: String): DisputeConnection
@@ -2922,6 +3236,37 @@ input SearchPaymentMethodSnapshotTypeInput {
   in: [PaymentMethodSnapshotSearchType!]
 }
 
+"""
+Input fields for searching for a transaction or refund created with a given source.
+"""
+input SearchPaymentSourceInput {
+  """The transaction source is one of these values."""
+  in: [PaymentSource!]
+}
+
+"""
+Input fields for searching for a transaction or refund with a given status.
+"""
+input SearchPaymentStatusInput {
+  """The transaction status is one of these values."""
+  in: [PaymentStatus!]
+}
+
+"""Payment status transition times."""
+input SearchPaymentStatusTransitionInput {
+  """Find transactions with a given failed at time."""
+  failedAt: SearchTimestampInput
+
+  """Find transactions with a given settled at time."""
+  settledAt: SearchTimestampInput
+
+  """Find transactions with a given submitted for settlement time."""
+  submittedForSettlementAt: SearchTimestampInput
+
+  """Find transactions with a given voided at time."""
+  voidedAt: SearchTimestampInput
+}
+
 """Input fields for searching for a range."""
 input SearchRangeInput {
   """Field is exactly this value."""
@@ -2967,22 +3312,20 @@ input SearchTimestampInput {
 }
 
 """
-Input fields for searching for a transaction or refund created with a given source.
+Input fields for searching for a transaction created with a given source.
 """
 input SearchTransactionSourceInput {
   """The transaction source is one of these values."""
-  in: [TransactionSource!]
+  in: [PaymentSource!]
 }
 
-"""
-Input fields for searching for a transaction or refund with a given status.
-"""
+"""Input fields for searching for a transaction with a given status."""
 input SearchTransactionStatusInput {
   """The transaction status is exactly this value."""
-  is: TransactionStatus
+  is: PaymentStatus
 
   """The transaction status is one of these values."""
-  in: [TransactionStatus!]
+  in: [PaymentStatus!]
 }
 
 """Transaction status transition times."""
@@ -3019,9 +3362,9 @@ input SearchVerificationStatusInput {
 }
 
 """Accompanying information for a settled transaction."""
-type SettledEvent implements TransactionStatusEvent {
+type SettledEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """Date and time when the transaction was settled."""
   timestamp: Timestamp
@@ -3035,7 +3378,7 @@ type SettledEvent implements TransactionStatusEvent {
   amount: MonetaryAmount
 
   """The source for the transaction change to the new status."""
-  source: TransactionSource
+  source: PaymentSource
 
   """Fields describing the payment processor response."""
   processorResponse: TransactionSettlementProcessorResponse
@@ -3045,9 +3388,9 @@ type SettledEvent implements TransactionStatusEvent {
 }
 
 """Accompanying information for a settlement declined transaction."""
-type SettlementDeclinedEvent implements TransactionStatusEvent {
+type SettlementDeclinedEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """Date and time when the processor declined to settle this transaction."""
   timestamp: Timestamp
@@ -3056,7 +3399,7 @@ type SettlementDeclinedEvent implements TransactionStatusEvent {
   amount: MonetaryAmount
 
   """The source for the transaction change to the new status."""
-  source: TransactionSource
+  source: PaymentSource
 
   """
   Fields describing the payment processor response to the settlement request.
@@ -3070,9 +3413,9 @@ type SettlementDeclinedEvent implements TransactionStatusEvent {
 """
 Accompanying information for a settlement pending transaction. This typically only occurs for PayPal transactions.
 """
-type SettlementPendingEvent implements TransactionStatusEvent {
+type SettlementPendingEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """Date and time when the transaction became settlement pending."""
   timestamp: Timestamp
@@ -3081,7 +3424,7 @@ type SettlementPendingEvent implements TransactionStatusEvent {
   amount: MonetaryAmount
 
   """The source for the transaction change to the new status."""
-  source: TransactionSource
+  source: PaymentSource
 
   """
   Fields describing the payment processor response to the settlement request.
@@ -3096,9 +3439,9 @@ type SettlementPendingEvent implements TransactionStatusEvent {
 Accompanying information for a transaction that is settling. This is typically a
 transient state during which the transaction is being settled with the processor.
 """
-type SettlingEvent implements TransactionStatusEvent {
+type SettlingEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """Date and time when the transaction began settling."""
   timestamp: Timestamp
@@ -3109,7 +3452,7 @@ type SettlingEvent implements TransactionStatusEvent {
   amount: MonetaryAmount
 
   """The source for the transaction change to the new status."""
-  source: TransactionSource
+  source: PaymentSource
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
@@ -3125,13 +3468,13 @@ input SubmitCreditCardForAccountUpdaterInput {
 }
 
 """
-Top-level fields returned when submitting a credit card for account updater.
+Top-level fields returned when submitting a credit card for Account Updater.
 """
 type SubmitCreditCardForAccountUpdaterPayload {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """The credit card that was submitted to account updater."""
+  """The credit card that was submitted to Account Updater."""
   paymentMethod: PaymentMethod
 }
 
@@ -3139,9 +3482,9 @@ type SubmitCreditCardForAccountUpdaterPayload {
 Accompanying information for a transaction that is submitted for settlement.
 This status indicates that the transaction is scheduled to be settled.
 """
-type SubmittedForSettlementEvent implements TransactionStatusEvent {
+type SubmittedForSettlementEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """Date and time when the transaction was submitted for settlement."""
   timestamp: Timestamp
@@ -3152,7 +3495,7 @@ type SubmittedForSettlementEvent implements TransactionStatusEvent {
   amount: MonetaryAmount
 
   """The source for the transaction change to the new status."""
-  source: TransactionSource
+  source: PaymentSource
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
@@ -3224,6 +3567,56 @@ type ThreeDSecureAuthentication {
   transactionStatusReason: String
 }
 
+"""
+An override field that a merchant can pass in to set the challenge window size
+to display to the end cardholder. The ACS will reply with content that is
+formatted appropriately to this window size to allow for the best user
+experience. The sizes are width x height in pixels of the window displayed in
+the cardholder browser window.
+"""
+enum ThreeDSecureAuthenticationAcsWindowSize {
+  FULL_PAGE
+  W250_H400
+  W390_H400
+  W500_H600
+  W600_H400
+}
+
+"""Indicates the delivery timeframe if applicable."""
+enum ThreeDSecureAuthenticationDeliveryTimeframe {
+  ELECTRONIC_DELIVERY
+  OVERNIGHT_SHIPPING
+  SAME_DAY_SHIPPING
+  TWO_OR_MORE_DAY_SHIPPING
+}
+
+"""Merchant product code."""
+enum ThreeDSecureAuthenticationMerchantProductCode {
+  ACCOMMODATION_RETAIL
+  AIRLINE
+  CAR_RENTAL
+  CASH_DISPENSING
+  DIGITAL_GOODS
+  FUEL
+  GENERAL_RETAIL
+  LUXURY_RETAIL
+  OTHER
+  RESTAURANT
+  SERVICES
+  TRAVEL
+}
+
+"""Indicates the shipping type for the transaction."""
+enum ThreeDSecureAuthenticationShippingType {
+  DIGITAL_GOODS
+  OTHER
+  SHIP_TO_ADDRESS_ON_FILE
+  SHIP_TO_BILLING_ADDRESS
+  SHIP_TO_OTHER_ADDRESS
+  SHIP_TO_STORE
+  TICKETS_NOT_SHIPPED
+}
+
 """The 3D Secure authentication status of the card."""
 enum ThreeDSecureAuthenticationStatus {
   AUTHENTICATE_ATTEMPT_SUCCESSFUL
@@ -3232,6 +3625,7 @@ enum ThreeDSecureAuthenticationStatus {
   AUTHENTICATE_REJECTED
   AUTHENTICATE_SIGNATURE_VERIFICATION_FAILED
   AUTHENTICATE_SUCCESSFUL
+  AUTHENTICATE_SUCCESSFUL_ISSUER_NOT_PARTICIPATING
   AUTHENTICATE_UNABLE_TO_AUTHENTICATE
   AUTHENTICATION_BYPASSED
   AUTHENTICATION_UNAVAILABLE
@@ -3253,6 +3647,16 @@ enum ThreeDSecureAuthenticationStatusIndicator {
   SUCCESSFUL_ATTEMPTS_TRANSACTION
   SUCCESSFUL_AUTHENTICATION
   UNABLE_TO_COMPLETE_AUTHENTICATION
+}
+
+"""Indicates the type of transaction for 3D Secure authentication."""
+enum ThreeDSecureAuthenticationTransactionType {
+  ADD_CARD
+  CARDHOLDER_VERIFICATION
+  INSTALLMENT
+  MAINTAIN_CARD
+  PAYMENT
+  RECURRING
 }
 
 """Indicates whether the card is enrolled in a 3D Secure program."""
@@ -3394,6 +3798,44 @@ type ThreeDSecureLookupData {
   termUrl: String
 }
 
+""" The shipping address of the transaction to be sent with 3D Secure Lookup requests.
+"""
+input ThreeDSecureLookupShippingAddressInput {
+  """
+  The given (first) name associated with the shipping address used for verification.
+  """
+  givenName: String
+
+  """
+  The surname (last name) associated with the shipping address used for verification.
+  """
+  surname: String
+
+  """The shipping phone number used for verification."""
+  phoneNumber: String
+
+  """Line 1 of the shipping address used for verification."""
+  line1: String
+
+  """Line 2 of the shipping address used for verification."""
+  line2: String
+
+  """Line 3 of the shipping address used for verification."""
+  line3: String
+
+  """City or locality of shipping address used for verification."""
+  locality: String
+
+  """State or region of shipping address used for verification."""
+  region: String
+
+  """Country code of shipping address used for verification."""
+  countryCode: String
+
+  """Postal code of shipping address used for verification."""
+  postalCode: String
+}
+
 """
 Indicates the shipping method chosen for the transaction in the 3D Secure lookup.
 """
@@ -3407,7 +3849,7 @@ enum ThreeDSecureLookupShippingMethod {
 }
 
 """
-Additional information about the transaction when authentication through 3D Secure.
+Additional information about the transaction when authenticating through 3D Secure.
 """
 input ThreeDSecureLookupTransactionInformationInput {
   """The email associated with the transaction."""
@@ -3420,6 +3862,185 @@ input ThreeDSecureLookupTransactionInformationInput {
 
   """The phone number associated with the transaction."""
   phoneNumber: String
+
+  """The shipping address for the transaction."""
+  shippingAddress: ThreeDSecureLookupShippingAddressInput
+
+  """The work phone number associated with the transaction."""
+  workPhoneNumber: String
+
+  """Indicates the type of transaction."""
+  transactionType: ThreeDSecureAuthenticationTransactionType
+
+  """Indicates the delivery timeframe if applicable."""
+  deliveryTimeframe: ThreeDSecureAuthenticationDeliveryTimeframe
+
+  """
+  For electronic delivery, email address to which the product was delivered.
+  """
+  deliveryEmail: String
+
+  """Indicates shipping type chosen for the transaction."""
+  shippingType: ThreeDSecureAuthenticationShippingType
+
+  """Merchant product code."""
+  productCode: ThreeDSecureAuthenticationMerchantProductCode
+
+  """
+  Indicates whether the cardholder is reordering merchandise purchased in a previous order.
+  """
+  reorderIndicator: Boolean
+
+  """
+  Indicates whether cardholder is placing an order with a future availability or release date.
+  """
+  preorderIndicator: Boolean
+
+  """Expected date that a pre-ordered purchase will be available."""
+  preorderDate: Date
+
+  """The purchase amount total for prepaid gift cards."""
+  giftCardAmount: Amount
+
+  """ISO 4217 currency code for the gift card purchased."""
+  giftCardCurrencyCode: CurrencyCodeAlpha
+
+  """Total count of individual prepaid gift cards purchased."""
+  giftCardCount: Int
+
+  """
+  Indicates whether the cardholder created the account during this transaction.
+  """
+  accountCreatedDuringTransaction: Boolean
+
+  """Date the cardholder opened the account."""
+  accountCreateDate: Date
+
+  """
+  Indicates whether the cardholder changed the account during this transaction.
+  This includes changes to the billing or shipping address, new payment accounts
+  or new users added.
+  """
+  accountChangedDuringTransaction: Boolean
+
+  """
+  Date the cardholder's account was last changed. This includes changes to the
+  billing or shipping address, new payment accounts or new users added.
+  """
+  accountChangeDate: Date
+
+  """
+  Indicates whether the cardholder changed or reset the password on the account during this transaction.
+  """
+  accountPasswordChangedDuringTransaction: Boolean
+
+  """Date the cardholder changed or reset the password on the account."""
+  accountPasswordChangeDate: Date
+
+  """
+  Indicates whether this transaction represents the first use of this shipping address.
+  """
+  firstUseOfShippingAddress: Boolean
+
+  """
+  Date when the shipping address used for this transaction was first used.
+  """
+  shippingAddressFirstUsageDate: Date
+
+  """
+  Number of transactions (successful or incomplete) for this cardholder account within the last 24 hours.
+  """
+  transactionCountDay: Int
+
+  """
+  Number of transactions (successful or incomplete) for this cardholder account within the last year.
+  """
+  transactionCountYear: Int
+
+  """
+  Number of attempts that have been made to add a card to this account in the last 24 hours.
+  """
+  addCardAttempts: Int
+
+  """
+  Number of purchases with this cardholder account during the previous six months.
+  """
+  accountPurchases: Int
+
+  """
+  Indicates whether the merchant experienced suspicious activity (including previous fraud) on the account.
+  """
+  suspiciousActivityObserved: Boolean
+
+  """
+  Indicates if the cardholder name on the account is identical to the shipping name used for the transaction.
+  """
+  accountNameMatchesShippingName: Boolean
+
+  """
+  Indicates whether the payment method was added to the cardholder account during this transaction.
+  """
+  paymentMethodAddedDuringTransaction: Boolean
+
+  """Date the payment method was added to the cardholder account."""
+  paymentMethodAddedToAccountDate: Date
+
+  """
+  An override field that a merchant can pass in to set the challenge window size
+  to display to the end cardholder. The ACS will reply with content that is
+  formatted appropriately to this window size to allow for the best user
+  experience. The sizes are width x height in pixels of the window displayed in
+  the cardholder browser window.
+  """
+  acsWindowSize: ThreeDSecureAuthenticationAcsWindowSize
+
+  """
+  This field indicates the maximum amount of time for all 3DS 2.0 messages to be
+  communicated between all components (in minutes). Minimum is 05. Defaults to 15.
+  """
+  sdkMaxTimeout: Int
+
+  """Indicates whether cardholder billing and shipping addresses match."""
+  billingAddressMatchesShippingAddress: Boolean
+
+  """Additional cardholder account information."""
+  accountId: String
+
+  """
+  The IP address of the cardholder. Both IPv4 and IPv6 formats are supported.
+  """
+  ipAddress: String
+
+  """Brief Description of items purchased."""
+  orderDescription: String
+
+  """Tax amount."""
+  taxAmount: Amount
+
+  """The exact content of the HTTP user agent header."""
+  userAgent: String
+
+  """
+  Indicates the maximum number of authorizations for installment payments. An
+  integer value greater than 1 indicating the maximum number of permitted
+  authorizations for installment payments.
+  """
+  installment: Int
+
+  """Datetime of original purchase."""
+  purchaseDate: Timestamp
+
+  """
+  The date after which no further recurring authorizations should be performed.
+  """
+  recurringEnd: Date
+
+  """
+  Integer value indicating the minimum number of days between recurring
+  authorizations. A frequency of monthly is indicated by the value 28. Multiple
+  of 28 days will be used to indicate months. Example: 6 months = 168.
+  """
+  recurringFrequency: Int
 }
 
 """Results of a merchant-performed 3D Secure authentication."""
@@ -3596,7 +4217,7 @@ input TokenizeSamsungPayCardInput {
   samsungPayCard: SamsungPayCardInput!
 }
 
-"""Top-level fields returned from a tokenized Samsung Pay Card."""
+"""Top-level fields returned from a tokenized Samsung Pay card."""
 type TokenizeSamsungPayCardPayload {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
@@ -3636,7 +4257,7 @@ input TokenizeUsBankLoginInput {
 }
 
 """A charge on a payment method."""
-type Transaction implements Node {
+type Transaction implements Node & Payment {
   """Unique identifier."""
   id: ID!
 
@@ -3656,7 +4277,7 @@ type Transaction implements Node {
   The multi-use payment method associated with the transaction. Only present if
   a multi-use payment method was used to create the transaction and it has not
   been deleted. The details of this PaymentMethod may have changed since the
-  transaction was created, details used for the transaction can be found in the
+  transaction was created; details used for the transaction can be found in the
   `paymentMethodSnapshot` field.
   """
   paymentMethod: PaymentMethod
@@ -3686,7 +4307,7 @@ type Transaction implements Node {
   purchaseOrderNumber: String
 
   """The current status of this transaction."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """Fields describing the payment processor response."""
   processorResponse: TransactionAuthorizationProcessorResponse @deprecated(reason: "Use relevant events in `statusEvents` instead.")
@@ -3704,7 +4325,7 @@ type Transaction implements Node {
   additional information on why each status occurred. Returned in reverse
   chronological order, with the most recent event first in the list.
   """
-  statusHistory: [TransactionStatusEvent!]
+  statusHistory: [PaymentStatusEvent!]
 
   """
   If the transaction request was performed through a shopping cart provider or
@@ -3714,8 +4335,8 @@ type Transaction implements Node {
   """
   channel: String
 
-  """How a transaction was created."""
-  source: TransactionSource
+  """How the transaction was created."""
+  source: PaymentSource
 
   """Customer associated with the transaction, if applicable."""
   customer: Customer
@@ -3755,7 +4376,8 @@ type Transaction implements Node {
 
   """
   The disbursement details associated with this transaction. This field is only
-  available after the transaction is SETTLED and you have an eligible merchant account.
+  available after the transaction is SETTLED and if you have an eligible
+  merchant account.
   """
   disbursementDetails: DisbursementDetails
 }
@@ -3939,7 +4561,8 @@ input TransactionInput {
 
 """
 The [transaction-level fee report](https://articles.braintreepayments.com/control-panel/reporting/transaction-level-fee-report)
-provides a breakdown of fees associated with individual transactions.
+provides a breakdown of fees per individual transactions and refunds. This type
+is no longer in use; see `PaymentLevelFeeReport` instead.
 """
 type TransactionLevelFeeReport {
   """The URL where you can access the requested report."""
@@ -4175,15 +4798,15 @@ type TransactionSettlementProcessorResponse {
   message: String
 
   """The processing bank's response to the provided CVV."""
-  cvvResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `TransactionStatusEvent` instead.")
+  cvvResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `PaymentStatusEvent` instead.")
 
   """
   The processing bank's response to the provided billing postal or zip code.
   """
-  avsPostalCodeResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `TransactionStatusEvent` instead.")
+  avsPostalCodeResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `PaymentStatusEvent` instead.")
 
   """The processing bank's response to the provided billing street address."""
-  avsStreetAddressResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `TransactionStatusEvent` instead.")
+  avsStreetAddressResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `PaymentStatusEvent` instead.")
 }
 
 """Information related to shipping a physical product."""
@@ -4220,123 +4843,6 @@ input TransactionShippingInput {
   *Required for Level 3 processing*.
   """
   shipsFromPostalCode: String
-}
-
-"""The origin of a request that created or changed a transaction."""
-enum TransactionSource {
-  API
-  CONTROL_PANEL
-  RECURRING
-  UNKNOWN
-}
-
-"""
-The status of the transaction, indicating where it is in the [transaction lifecycle](https://articles.braintreepayments.com/get-started/transaction-lifecycle)
-and its success or failure. For further details on why any given status
-occurred, consult the corresponding `TransactionStatusEvent` in the
-transaction's `statusHistory`.
-"""
-enum TransactionStatus {
-  """
-  The transaction spent too much time in the `AUTHORIZED` status and was marked
-  as expired. Expiration [time frames](https://developers.braintreepayments.com/reference/general/statuses#authorization-expired)
-  differ by card type, transaction type, and, in some cases, merchant category.
-  """
-  AUTHORIZATION_EXPIRED
-
-  """
-  The processor authorized the transaction, putting your customer's funds on
-  hold. Your customer may see a pending charge on his or her account. However,
-  before the customer is actually charged and before you receive the funds, you
-  must use the `captureTransaction` mutation. If you do not want to capture the
-  transaction, you should use the `reverseTransaction` mutation to avoid a
-  misuse of authorization fee.
-  """
-  AUTHORIZED
-
-  """
-  If a transaction remains in a status of `AUTHORIZING`, [contact us for assistance](https://help.braintreepayments.com?issue=TransactionProcessingQuestion).
-  """
-  AUTHORIZING
-
-  """
-  An error occurred when sending the transaction to the downstream processor.
-  See the transaction's `statusHistory` for the exact error.
-  """
-  FAILED
-
-  """
-  The transaction was [rejected](https://articles.braintreepayments.com/control-panel/transactions/gateway-rejections)
-  based on one or more settings or rules in your Braintree gateway. See the
-  transaction's `statusHistory` to determine which resulted in the decline.
-  """
-  GATEWAY_REJECTED
-
-  """
-  The processor declined the transaction while attempting to authorize it. See
-  the transaction's `statusHistory` to determine what reason the processor gave
-  for the decline.
-  """
-  PROCESSOR_DECLINED
-
-  """
-  The transaction has been settled, meaning your customer has been charged and
-  the process of disbursing the funds to your bank account will begin.
-  """
-  SETTLED
-  SETTLEMENT_CONFIRMED @deprecated(reason: "No longer applicable to any supported payment method types.")
-
-  """
-  The processor declined the transaction while attempting to capture it. See the
-  transaction's `statusHistory` to detemine why it was not settled. This status
-  is rare, and only certain types of transactions can be affected.
-  """
-  SETTLEMENT_DECLINED
-
-  """
-  The transaction has not yet fully settled. This status is rare, and will
-  generally resolve to a status of `SETTLED`. Only certain types of transactions
-  can be affected.
-  """
-  SETTLEMENT_PENDING
-
-  """
-  The transaction is in the process of being settled. This is a transitory state, and will resolve to a status of `SETTLED`.
-  """
-  SETTLING
-
-  """
-  The transaction has been successfully captured, and will be included in the
-  next settlement batch, at which time it will become settled.
-  """
-  SUBMITTED_FOR_SETTLEMENT
-
-  """
-  The transaction was voided, meaning it is no longer authorized, your
-  customer's funds are no longer on hold, and you can't use the
-  `captureTransaction` mutation on this transaction.
-  """
-  VOIDED
-}
-
-"""Status event in the lifecycle of a transaction."""
-interface TransactionStatusEvent {
-  """New status of the transaction."""
-  status: TransactionStatus
-
-  """Date and time when the status event occurred."""
-  timestamp: Timestamp
-
-  """The amount of the transaction applicable to the status."""
-  amount: MonetaryAmount
-
-  """Source that caused the transaction status event to occur."""
-  source: TransactionSource
-
-  """
-  Whether this is the final state for the transaction. If false, this transaction will pass into another subsequent state.
-  """
-  terminal: Boolean
 }
 
 """Information related to taxes on the transaction."""
@@ -4570,7 +5076,7 @@ type UsBankAccountVerificationDetails {
 }
 
 """
-The type of verification on an US bank account payment method. See our [ACH guide](https://articles.braintreepayments.com/guides/payment-methods/ach#verification-methods).
+The type of verification on a US bank account payment method. See our [ACH guide](https://articles.braintreepayments.com/guides/payment-methods/ach#verification-methods).
 """
 enum UsBankAccountVerificationMethod {
   """
@@ -5150,7 +5656,7 @@ type VisaCheckoutConfiguration {
   externalClientId: String
 
   """A list of card brands supported by the merchant for Visa Checkout."""
-  supportedCardBrands: [CreditCardBrandCode]
+  supportedCardBrands: [CreditCardBrandCode!]
 }
 
 """
@@ -5168,9 +5674,9 @@ type VisaCheckoutOriginDetails {
 }
 
 """Accompanying information for a transaction that has been voided."""
-type VoidedEvent implements TransactionStatusEvent {
+type VoidedEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
-  status: TransactionStatus
+  status: PaymentStatus
 
   """Date and time when the transaction was voided."""
   timestamp: Timestamp
@@ -5181,7 +5687,7 @@ type VoidedEvent implements TransactionStatusEvent {
   amount: MonetaryAmount
 
   """The source for the transaction change to the new status."""
-  source: TransactionSource
+  source: PaymentSource
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
