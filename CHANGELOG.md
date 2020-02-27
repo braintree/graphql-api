@@ -1,3 +1,10 @@
+# 2020-02-27
+
+* Add `fullName` field to `Address`.
+* Deprecate `Address.firstName` and `Address.lastName` in favor of `Address.fullName`.
+* Add `billingAddress` field to `PayPalAccountDetails`.
+* Add `cobrandedCardLabel` field to `PayPalAccountDetails`.
+
 # 2020-02-14
 
 * Add `LocalPaymentDetails` to `PaymentMethodSnapshot` union to support transactions with local payments.

@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Fri Feb 14 2020 16:27:46 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Feb 27 2020 20:12:33 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -48,10 +48,13 @@ type Address {
   extendedAddress: String
 
   """First name."""
-  firstName: String
+  firstName: String @deprecated(reason: "Use `fullName` instead.")
 
   """Last name."""
-  lastName: String
+  lastName: String @deprecated(reason: "Use `fullName` instead.")
+
+  """Full name."""
+  fullName: String
 
   """Locality/city."""
   locality: String
@@ -2496,6 +2499,9 @@ type PayPalAccountDetails {
   """The ID of the billing agreement for this PayPal account."""
   billingAgreementId: String
 
+  """The billing address associated with the PayPal account."""
+  billingAddress: Address
+
   """The email address associated with the PayPal account."""
   email: String
 
@@ -2507,6 +2513,9 @@ type PayPalAccountDetails {
 
   """The last name on the PayPal account."""
   lastName: String
+
+  """The label of the co-branded card used as a funding source."""
+  cobrandedCardLabel: String
 }
 
 """Configuration for PayPal."""
