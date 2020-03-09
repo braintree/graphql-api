@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Feb 27 2020 20:12:33 GMT+0000 (Coordinated Universal Time)
+# timestamp: Mon Mar 09 2020 15:52:30 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -786,6 +786,27 @@ type CreateClientTokenPayload {
   clientToken: String
 }
 
+"""
+Fields that are provided when creating a custom action payment context.
+"""
+input CreateCustomActionsPaymentContextInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  The merchant accound id that should be used when creating this payment context.
+  """
+  merchantAccountId: String!
+
+  """The action you wish to invoke when creating the payment context."""
+  actionName: String!
+
+  """
+  A list of fields used to create a PaymentContext during execution of a Custom Actions handler (Five (5) entries maximum).
+  """
+  customFields: [CustomActionsPaymentContextFieldInput!]
+}
+
 """Top-level field for creating a customer."""
 input CreateCustomerInput {
   """An identifier used to reconcile requests and responses."""
@@ -959,6 +980,59 @@ Braintree only accepts [specific alpha
 values](https://developers.braintreepayments.com/reference/general/currencies).
 """
 scalar CurrencyCodeAlpha
+
+"""Top-level fields returned from a Custom Actions payment context."""
+type CustomActionsPaymentContext {
+  """The identifier of the payment context."""
+  id: String!
+
+  """An ISO 8601 date string of when the payment context was created."""
+  createdAt: String!
+
+  """
+  A list of fields stored on a PaymentContext during execution of a Custom Actions handler (Five (5) entries maximum).
+  """
+  customFields: [CustomActionsPaymentContextField!]
+}
+
+"""
+Fields returned by the createPaymentContext custom actions event handler.
+"""
+type CustomActionsPaymentContextField {
+  """
+  An alphanumeric string used as a key to lookup a CustomField value (255 characters maximum).
+  """
+  name: String!
+
+  """
+  An alphanumeric string used to store a CustomField value (1024 characters maximum).
+  """
+  value: String!
+}
+
+"""Fields that are provided when creating the payment context."""
+input CustomActionsPaymentContextFieldInput {
+  """
+  An alphanumeric string used as a key to lookup a CustomField value (255 characters maximum).
+  """
+  name: String!
+
+  """
+  An alphanumeric string used to store a CustomField value (1024 characters maximum).
+  """
+  value: String!
+}
+
+"""
+Top-level fields returned from a created custom actions payment context.
+"""
+type CustomActionsPaymentContextPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The payment context data."""
+  customActionsPaymentContext: CustomActionsPaymentContext
+}
 
 """Details about a custom actions payment method."""
 type CustomActionsPaymentMethodDetails {
@@ -2343,6 +2417,11 @@ input PaymentSearchInput {
   """Find payments with an ID or IDs."""
   id: SearchValueInput
 
+  """
+  Find payments by their type. Use this field to search for payments by the direction of money movement.
+  """
+  type: SearchPaymentTypeInput
+
   """Find payments with a given status."""
   status: SearchPaymentStatusInput
 
@@ -2351,8 +2430,8 @@ input PaymentSearchInput {
   """
   statusTransition: SearchPaymentStatusTransitionInput
 
-  """Find payments with a given source."""
-  source: SearchPaymentSourceInput
+  """Find payments based on the time they were created."""
+  createdAt: SearchTimestampInput
 
   """Find payments for a given amount or currency."""
   amount: MonetaryAmountSearchInput
@@ -2360,11 +2439,43 @@ input PaymentSearchInput {
   """Find payments with a given orderId."""
   orderId: SearchTextInput
 
-  """Find payments with a given created at time."""
-  createdAt: SearchTimestampInput
-
   """Find payments processed through a merchant account ID or IDs."""
   merchantAccountId: SearchValueInput
+
+  """
+  Find payments by their disbursement date. Only use this search criteria if you
+  have an eligible merchant account. Note that payments can only be disbursed
+  after they reach the SETTLED status.
+  """
+  disbursementDate: SearchDateInput
+
+  """Find payments created with a given source."""
+  source: SearchPaymentSourceInput
+
+  """
+  Find payments created by a third party via the Grant API using a given OAuth application client ID.
+  """
+  facilitatorOAuthApplicationClientId: SearchValueInput
+}
+
+"""The type of a Payment, based primarily on implementing type."""
+enum PaymentSearchType {
+  """The payment is a Transaction."""
+  TRANSACTION
+
+  """
+  The payment is a Refund, and represents a refund of a transaction present in
+  this Braintree account. Unless you have processed any [detached credits](https://articles.braintreepayments.com/control-panel/transactions/refunds-voids-credits#detached-credits),
+  this type encompasses all refunds.
+  """
+  REFUND
+
+  """
+  Only use this field if you have processed [detached credits](https://articles.braintreepayments.com/control-panel/transactions/refunds-voids-credits#detached-credits).
+  The payment is a Refund, and represents a refund of a transaction not
+  processed through your Braintree account.
+  """
+  DETACHED_REFUND
 }
 
 """
@@ -2436,7 +2547,7 @@ enum PaymentStatus {
 
   """
   The processor declined the payment while attempting to capture it. See the
-  payment's `statusHistory` to detemine why it was not settled. This status is
+  payment's `statusHistory` to determine why it wasn't settled. This status is
   rare, and only certain types of transactions can be affected.
   """
   SETTLEMENT_DECLINED
@@ -2460,7 +2571,7 @@ enum PaymentStatus {
   SUBMITTED_FOR_SETTLEMENT
 
   """
-  The payment has been voided or canceled. For transactions, this means it is no
+  The payment has been voided or canceled. For transactions, this means it's no
   longer authorized, your customer's funds are no longer on hold, and you can't
   use the `captureTransaction` mutation on this transaction. For refunds, it
   means the customer will not receive the funds from the refund.
@@ -2866,8 +2977,35 @@ type Refund implements Node & Payment {
   """How the refund was created."""
   source: PaymentSource
 
-  """The original transaction that this refunds."""
+  """
+  The original transaction that this refunds. If this is not present, then this
+  refund represents a refund of a transaction that does not belong to this
+  Braintree gateway account.
+  """
   refundedTransaction: Transaction
+
+  """
+  Snapshot of payment method details that will receive the refund, typically
+  based on the original transaction. This will always be present. Equivalent to
+  `refundedTransaction.paymentMethodSnapshot`.
+  """
+  paymentMethodSnapshot: PaymentMethodSnapshot
+
+  """
+  The multi-use payment method that will receive the refund. Only present if a
+  multi-use payment method was used to create the original transaction and it
+  has not been since deleted. The details of this PaymentMethod may have changed
+  since the transaction was created; details used for the transaction can be
+  found in the `paymentMethodSnapshot` field. Equivalent to
+  `refundedTransaction.paymentMethod` (if present).
+  """
+  paymentMethod: PaymentMethod
+
+  """
+  The customer that the vaulted payment method (if it exists) belongs to.
+  Equivalent to `refundedTransaction.customer` (if present).
+  """
+  customer: Customer
 }
 
 """A paginated list of refunds."""
@@ -2912,17 +3050,43 @@ input RefundSearchInput {
   """Find refunds with an ID or IDs."""
   id: SearchValueInput
 
+  """Find refunds with the given status."""
+  status: SearchTransactionStatusInput
+
+  """
+  Find payments based on the time at which they transitioned to a given status.
+  """
+  statusTransition: SearchPaymentStatusTransitionInput
+
+  """Find refunds based on the time they were created."""
+  createdAt: SearchTimestampInput
+
   """Find refunds with a given amount or currency."""
   amount: MonetaryAmountSearchInput
-
-  """Find refunds with a given created at time."""
-  createdAt: SearchTimestampInput
 
   """Find refunds with a given orderId."""
   orderId: SearchTextInput
 
-  """Find refunds with the given status."""
-  status: SearchTransactionStatusInput
+  """
+  Find refunds processed through a merchant account ID or IDs. In most cases,
+  this will be the merchant account of the original refunded transaction.
+  """
+  merchantAccountId: SearchValueInput
+
+  """
+  Find refunds by their disbursement date. Only use this search criteria if you
+  have an eligible merchant account. Note that refunds can only be disbursed
+  after they reach the SETTLED status.
+  """
+  disbursementDate: SearchDateInput
+
+  """Find refunds created with a given source."""
+  source: SearchPaymentSourceInput
+
+  """
+  Find refunds created by a third party via the Grant API using a given OAuth application client ID.
+  """
+  facilitatorOAuthApplicationClientId: SearchValueInput
 }
 
 """Top-level input fields for refunding a transaction."""
@@ -3274,6 +3438,12 @@ input SearchPaymentStatusTransitionInput {
 
   """Find transactions with a given voided at time."""
   voidedAt: SearchTimestampInput
+}
+
+"""Input fields for searching for payments by implementing type."""
+input SearchPaymentTypeInput {
+  """The payment is a transaction and/or a refund."""
+  in: [PaymentSearchType!]
 }
 
 """Input fields for searching for a range."""
@@ -4755,25 +4925,25 @@ input TransactionSearchInput {
   """Find transactions with an ID or IDs."""
   id: SearchValueInput
 
+  """Find transactions with a given transaction status."""
+  status: SearchTransactionStatusInput
+
+  """
+  Find transactions based on the given transaction status transition times.
+  """
+  statusTransition: SearchTransactionStatusTransitionInput
+
+  """Find transactions based on the time they were created."""
+  createdAt: SearchTimestampInput
+
   """Find transactions for a given amount or currency."""
   amount: MonetaryAmountSearchInput
 
   """Find transactions with a given orderId."""
   orderId: SearchTextInput
 
-  """Find transactions with a given transaction status."""
-  status: SearchTransactionStatusInput
-
-  """Find transactions with a given transaction source."""
-  source: SearchTransactionSourceInput
-
-  """Find transactions with a given created at time."""
-  createdAt: SearchTimestampInput
-
-  """
-  Find transactions based on the given transaction status transition times.
-  """
-  statusTransition: SearchTransactionStatusTransitionInput
+  """Find payments processed through a merchant account ID or IDs."""
+  merchantAccountId: SearchValueInput
 
   """Find transactions with a given customer."""
   customer: SearchCustomerInput
@@ -4784,12 +4954,19 @@ input TransactionSearchInput {
   paymentMethodSnapshotType: SearchPaymentMethodSnapshotTypeInput
 
   """
+  Find transactions by their disbursement date. Only use this search criteria if
+  you have an eligible merchant account. Note that transactions can only be
+  disbursed after they reach the SETTLED status.
+  """
+  disbursementDate: SearchDateInput
+
+  """Find transactions created with a given transaction source."""
+  source: SearchTransactionSourceInput
+
+  """
   Find transactions created by a third party via the Grant API using a given OAuth application client ID.
   """
   facilitatorOAuthApplicationClientId: SearchValueInput
-
-  """Find transactions by their disbursement date."""
-  disbursementDate: SearchDateInput
 }
 
 """

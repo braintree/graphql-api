@@ -1,3 +1,12 @@
+# 2020-03-09
+
+* Add new mutation `createCustomActionsPaymentContext`.
+* Add `paymentMethodSnapshot`, `paymentMethod`, and `customer` fields to `Refund`.
+* Allow searching for `payments` by `type`, `disbursementDate`, `source`, and `facilitatorOAuthApplicationClientId`.
+* Allow searching for `refunds` by `merchantAccountId`, `disbursementDate`, `source`, and `facilitatorOAuthApplicationClientId`.
+* Allow searching for `transactions` by `merchantAccountId`.
+* Model detached refunds as `Refund`.
+
 # 2020-02-27
 
 * Add `fullName` field to `Address`.
