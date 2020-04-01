@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Mon Mar 09 2020 15:52:30 GMT+0000 (Coordinated Universal Time)
+# timestamp: Wed Apr 01 2020 21:48:52 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -793,11 +793,6 @@ input CreateCustomActionsPaymentContextInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """
-  The merchant accound id that should be used when creating this payment context.
-  """
-  merchantAccountId: String!
-
   """The action you wish to invoke when creating the payment context."""
   actionName: String!
 
@@ -1005,7 +1000,7 @@ type CustomActionsPaymentContextField {
   name: String!
 
   """
-  An alphanumeric string used to store a CustomField value (1024 characters maximum).
+  An alphanumeric string used to store a CustomField value (5000 characters maximum).
   """
   value: String!
 }
@@ -1018,7 +1013,7 @@ input CustomActionsPaymentContextFieldInput {
   name: String!
 
   """
-  An alphanumeric string used to store a CustomField value (1024 characters maximum).
+  An alphanumeric string used to store a CustomField value (5000 characters maximum).
   """
   value: String!
 }
@@ -2003,8 +1998,8 @@ type Mutation {
   """
   Partially capture funds from a transaction that was successfully authorized
   and return a payload that includes a new transaction with information about
-  the capture. This is only available for certain use cases. For more
-  information about if this mutation fits your use case [see our docs](https://articles.braintreepayments.com/guides/payment-methods/paypal/processing#multiple-partial-settlements).
+  the capture. This is only available for PayPal transactions and certain use
+  cases. For more information about if this mutation fits your use case [see our docs](https://articles.braintreepayments.com/guides/payment-methods/paypal/processing#multiple-partial-settlements).
   """
   partialCaptureTransaction(input: PartialCaptureTransactionInput!): PartialCaptureTransactionPayload
 

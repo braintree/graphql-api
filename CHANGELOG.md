@@ -1,3 +1,7 @@
+# 2020-04-01
+
+* Remove unused `merchantAccountId` input field from `CreateCustomActionsPaymentContextInput`.
+
 # 2020-03-09
 
 * Add new mutation `createCustomActionsPaymentContext`.
