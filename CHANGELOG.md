@@ -1,3 +1,21 @@
+# 2020-04-15
+
+* Add `customerAuthenticationIndicator` to `AuthenticationInsight`.
+* Add `amount`, `recurringCustomerConsent`, and `recurringMaxAmount` fields to `AuthenticationInsightInput`.
+* Add `authorizationExpiresAt` field to `AuthorizedEvent`.
+* Add `riskContext` to `AuthorizePayPalAccountOptionsInput` and `ChargePayPalAccountOptionsInput`.
+* Add `fraudProvider` to `ClientConfiguration`.
+* Deprecate `kount` field in `ClientConfiguration`.
+* `CustomActionsPaymentContext` now implements `Node` interface.
+* Add `updatedAt` to `CustomActionsPaymentContext`.
+* Add `CustomerAuthenticationIndicator` enum.
+* Add `RBI` to `CustomerAuthenticationRegulationEnvironment` enum.
+* Add `FraudProviderConfiguration` type.
+* Add `PayPalAccountInput`.
+* Add `PayPalTransactionRiskContextDataFieldInput`.
+* Add `PayPalTransactionRiskContextInput`.
+* Add `indirectPayee` field to `VaultPayPalBillingAgreementInput`.
+
 # 2020-04-01
 
 * Remove unused `merchantAccountId` input field from `CreateCustomActionsPaymentContextInput`.

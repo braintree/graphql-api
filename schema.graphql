@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Wed Apr 01 2020 21:48:52 GMT+0000 (Coordinated Universal Time)
+# timestamp: Wed Apr 15 2020 20:41:56 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -223,6 +223,9 @@ type AuthenticationInsight {
   transacting with this payment method and merchant account.
   """
   customerAuthenticationRegulationEnvironment: CustomerAuthenticationRegulationEnvironment
+
+  """A value indicating when to perform further customer authentication."""
+  customerAuthenticationIndicator: CustomerAuthenticationIndicator
 }
 
 """
@@ -233,6 +236,21 @@ input AuthenticationInsightInput {
   ID of the merchant account that will be used when charging this payment method.
   """
   merchantAccountId: ID!
+
+  """
+  The intended transaction amount to be authorized on this payment method.
+  """
+  amount: Amount
+
+  """
+  A flag indicating whether the customer has consented to further recurring transactions.
+  """
+  recurringCustomerConsent: Boolean
+
+  """
+  The maximum amount permitted for recurring transactions set by the customer.
+  """
+  recurringMaxAmount: Amount
 }
 
 """Accompanying information for an authorization expired transaction."""
@@ -282,6 +300,12 @@ type AuthorizedEvent implements PaymentStatusEvent {
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
+
+  """
+  The date/time the transaction will expire if it has the authorized status. For
+  more details on authorization expiration timeframes, see the [Statuses reference](https://developers.braintreepayments.com/reference/general/statuses#authorization-expired).
+  """
+  authorizationExpiresAt: Timestamp
 }
 
 """
@@ -330,6 +354,14 @@ input AuthorizePayPalAccountOptionsInput {
   Description of the transaction that is displayed to customers in PayPal email receipts.
   """
   description: String
+
+  """
+  Input fields setting the PayPal transaction context for risk assessment
+  purposes. In order to use this field, your PayPal account must be set up to
+  use the SetTransactionContext feature. This data will only be passed through
+  to PayPal, and won't be stored on the transaction itself.
+  """
+  riskContext: PayPalTransactionRiskContextInput
 
   """Deprecated: This field is no longer supported."""
   payee: PayPalPayeeOptionsInput
@@ -549,6 +581,14 @@ input ChargePayPalAccountOptionsInput {
   """
   description: String
 
+  """
+  Input fields setting the PayPal transaction context for risk assessment
+  purposes. In order to use this field, your PayPal account must be set up to
+  use the SetTransactionContext feature. This data will only be passed through
+  to PayPal, and won't be stored on the transaction itself.
+  """
+  riskContext: PayPalTransactionRiskContextInput
+
   """Deprecated: This field is no longer supported."""
   payee: PayPalPayeeOptionsInput
 }
@@ -645,14 +685,19 @@ type ClientConfiguration {
   """The enum of the current environment."""
   environment: ClientConfigurationEnvironment
 
+  """Configuration for fraud protection provider."""
+  fraudProvider: FraudProviderConfiguration
+
   """Configuration for Google Pay on Android and the web."""
   googlePay: GooglePayConfiguration
 
   """Deprecated, this field will always be null."""
   ideal: IDealConfiguration @deprecated(reason: "This field is included for supporting legacy clients.")
 
-  """Configuration for Kount fraud tools."""
-  kount: KountConfiguration
+  """
+  Deprecated, formerly configuration for Kount fraud tools, now this configuration lives under fraudProvider.
+  """
+  kount: KountConfiguration @deprecated(reason: "This field is included for supporting legacy clients.")
 
   """Configuration for Masterpass."""
   masterpass: MasterpassConfiguration
@@ -977,12 +1022,15 @@ values](https://developers.braintreepayments.com/reference/general/currencies).
 scalar CurrencyCodeAlpha
 
 """Top-level fields returned from a Custom Actions payment context."""
-type CustomActionsPaymentContext {
+type CustomActionsPaymentContext implements Node {
   """The identifier of the payment context."""
-  id: String!
+  id: ID!
 
   """An ISO 8601 date string of when the payment context was created."""
   createdAt: String!
+
+  """An ISO 8601 date string of when the payment context was updated."""
+  updatedAt: String!
 
   """
   A list of fields stored on a PaymentContext during execution of a Custom Actions handler (Five (5) entries maximum).
@@ -1119,6 +1167,20 @@ type Customer implements Node {
   transactions(first: Int, after: String): TransactionConnection
 }
 
+"""A value indicating when to perform further customer authentication."""
+enum CustomerAuthenticationIndicator {
+  """Indicates further authentication should be performed."""
+  REQUIRED
+
+  """Indicates further authentication is optional."""
+  OPTIONAL
+
+  """
+  Customer authentication indicator information is unavailable at this time.
+  """
+  UNAVAILABLE
+}
+
 """
 The customer authentication regulation environment that applies to the
 transaction, such as [PSD2](https://www.braintreepayments.com/blog/understanding-and-preparing-for-psd2-strong-customer-authentication/).
@@ -1129,6 +1191,9 @@ enum CustomerAuthenticationRegulationEnvironment {
   applies to this transaction.
   """
   PSDTWO
+
+  """Reserve Bank of India regulations apply to this transactions."""
+  RBI
 
   """
   Customer authentication regulation environment information is unavailable for this transaction at this time.
@@ -1664,6 +1729,17 @@ type FailedEvent implements PaymentStatusEvent {
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
+}
+
+"""Configuration for fraud protection provider."""
+type FraudProviderConfiguration {
+  """
+  The merchant ID used by the fraud protection provider to identify the fraud data collection request.
+  """
+  merchantId: String
+
+  """The name of the fraud provider."""
+  name: String
 }
 
 """The third-party provider used to generate the risk decision."""
@@ -2624,6 +2700,12 @@ type PayPalAccountDetails {
   cobrandedCardLabel: String
 }
 
+"""Input for identifying a PayPal account."""
+input PayPalAccountInput {
+  """The unique PayPal ID of the PayPal account."""
+  payerId: ID
+}
+
 """Configuration for PayPal."""
 type PayPalConfiguration {
   """
@@ -2786,6 +2868,27 @@ type PayPalTransactionDetails {
   Description of the transaction that is displayed to customers in PayPal email receipts.
   """
   description: String
+}
+
+"""A key-value pair for a PayPal SetTransactionContext field."""
+input PayPalTransactionRiskContextDataFieldInput {
+  """
+  The name of the field. Must correspond exactly to the PayPal key/field name.
+  """
+  name: String
+
+  """The value of the field. Maximum 4000 characters."""
+  value: String
+}
+
+"""
+Input fields setting the PayPal transaction context for risk assessment. In
+order to use this, your PayPal account must be set up to use the PayPal
+SetTransactionContext feature.
+"""
+input PayPalTransactionRiskContextInput {
+  """Provide a maximum of 100 fields."""
+  fields: [PayPalTransactionRiskContextDataFieldInput!]
 }
 
 """Top-level fields for performing a 3D Secure Lookup."""
@@ -5551,6 +5654,13 @@ input VaultPayPalBillingAgreementInput {
   merchants with the PayPal multi-account feature enabled in Braintree.
   """
   merchantAccountId: ID
+
+  """
+  The merchant (payee) PayPal account associated with the PayPal Billing
+  Agreement being vaulted. Only used when the specified merchant account is
+  specially configured to handle indirect PayPal accounts.
+  """
+  indirectPayee: PayPalAccountInput
 }
 
 """
