@@ -1,3 +1,7 @@
+# 2020-05-05
+
+* Add support for in-store locations and card readers
+
 # 2020-04-15
 
 * Add `customerAuthenticationIndicator` to `AuthenticationInsight`.

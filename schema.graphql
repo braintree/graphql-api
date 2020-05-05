@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Wed Apr 15 2020 20:41:56 GMT+0000 (Coordinated Universal Time)
+# timestamp: Tue May 05 2020 12:54:34 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -866,6 +866,24 @@ type CreateCustomerPayload {
   payment methods or creating transactions to associate those objects.
   """
   customer: Customer
+}
+
+"""Input fields for creating an in store location."""
+input CreateInStoreLocationInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Input fields to create an in-store Location."""
+  location: InStoreLocationInput!
+}
+
+"""Top-level fields returned when creating an in-store location."""
+type CreateInStoreLocationPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The in-store location."""
+  location: InStoreLocation
 }
 
 """A code identifying the card brand."""
@@ -1799,6 +1817,38 @@ enum GatewayRejectionReason {
   TOKEN_ISSUANCE
 }
 
+"""Input fields for generating a pairing code to pair an in store reader."""
+input GenerateInStoreReaderPairingCodeInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Client identifier."""
+  clientId: String!
+
+  """The reader serial number."""
+  serialNumber: String!
+}
+
+"""
+Top-level fields returned when generating a pairing code for an in-store reader.
+"""
+type GenerateInStoreReaderPairingCodePayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Reader specific identification code."""
+  deviceCode: String
+
+  """Generated code used to pair this reader with a merchant."""
+  userCode: String
+
+  """Redirect URI used for verification of the reader."""
+  verificationUri: String
+
+  """Time to expiration of the generated user and device codes."""
+  expiresIn: Int
+}
+
 """Configuration for Google Pay on Android and the web."""
 type GooglePayConfiguration {
   """A string used to identify the merchant to the customer."""
@@ -1849,6 +1899,118 @@ type IDealConfiguration {
   """A URL used to redirect the customer to the bank's web page."""
   assetsUrl: String
 }
+
+"""An in-store location."""
+type InStoreLocation {
+  """Unique identifier."""
+  id: ID!
+
+  """Name of the in-store location."""
+  name: String
+
+  """The address of the in-store location."""
+  address: InStoreLocationAddress
+}
+
+"""Input fields for an in-store location address."""
+type InStoreLocationAddress {
+  """The street address."""
+  streetAddress: String
+
+  """Extended address information, such as an apartment or suite number."""
+  extendedAddress: String
+
+  """Locality/city."""
+  locality: String
+
+  """State or province."""
+  region: String
+
+  """
+  Postal code in any country's format, otherwise known as CAP, CEP, Eircode, NPA, PIN, PLZ, or ZIP code.
+  """
+  postalCode: String
+
+  """Country code for the address in ISO 3166-1 alpha-3 format."""
+  countryCode: CountryCodeAlpha3
+}
+
+"""Input fields for an in-store Location Address."""
+input InStoreLocationAddressInput {
+  """The street address."""
+  streetAddress: String!
+
+  """Extended address information, such as an apartment or suite number."""
+  extendedAddress: String
+
+  """Locality/city."""
+  locality: String!
+
+  """State or province."""
+  region: String!
+
+  """
+  Postal code in any country's format, otherwise known as CAP, CEP, Eircode, NPA, PIN, PLZ, or ZIP code.
+  """
+  postalCode: String!
+
+  """Country code for the address in ISO 3166-1 alpha-3 format."""
+  countryCode: CountryCodeAlpha3!
+}
+
+"""Fields required for an instore location."""
+input InStoreLocationInput {
+  """Name of the Location."""
+  name: String!
+
+  """The address of the in-store Location."""
+  address: InStoreLocationAddressInput!
+}
+
+"""An in-store payment card reader."""
+type InStoreReader {
+  """Unique identifier."""
+  id: ID!
+
+  """Name given to the reader."""
+  name: String
+
+  """The unique serial number for the reader."""
+  serialNumber: String
+
+  """Vendor-specific information about the reader."""
+  vendor: InStoreReaderVendor
+
+  """The in-store location the reader is attached to."""
+  location: InStoreLocation
+
+  """Current status of the reader."""
+  status: ReaderStatus
+}
+
+"""Top-level fields returned for an in-store reader."""
+type InStoreReaderPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The reader."""
+  reader: InStoreReader
+}
+
+"""Fields that are reader specific for pairing a reader."""
+input InStoreReaderSetupInput {
+  """In-Store Location to attach Reader to."""
+  locationId: ID!
+
+  """Name given to the Reader."""
+  name: String!
+
+  """Merchant Account to use to process payments."""
+  merchantAccountId: ID!
+}
+
+"""A union of all possible in-store reader vendors."""
+union InStoreReaderVendor = VerifoneVendor
 
 """Configuration for Kount fraud tools."""
 type KountConfiguration {
@@ -2154,6 +2316,15 @@ type Mutation {
   Force a transaction to settle in the sandbox environment. Generates an error elsewhere.
   """
   sandboxSettleTransaction(input: SandboxSettleTransactionInput!): TransactionPayload
+
+  """Creates a new In-Store Location to associate Readers."""
+  createInStoreLocation(input: CreateInStoreLocationInput!): CreateInStoreLocationPayload
+
+  """Pairs a Reader to an account and In-Store Location."""
+  pairInStoreReader(input: PairInStoreReaderInput!): InStoreReaderPayload
+
+  """Creates a new InStoreReader."""
+  generateInStoreReaderPairingCode(input: GenerateInStoreReaderPairingCodeInput!): GenerateInStoreReaderPairingCodePayload
 }
 
 """Input fields for a network tokenized card."""
@@ -2218,6 +2389,18 @@ type PageInfo {
 
   """The cursor for the last item in the connection page."""
   endCursor: String
+}
+
+"""Input fields for pairing an in store reader."""
+input PairInStoreReaderInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Code displayed on Reader during pairing."""
+  pairingCode: String!
+
+  """Inputs for Reader."""
+  reader: InStoreReaderSetupInput!
 }
 
 """
@@ -3023,6 +3206,12 @@ type Query {
 
   """The available searches."""
   search: Search
+}
+
+"""Indicates the status of a Reader."""
+enum ReaderStatus {
+  ONLINE
+  OFFLINE
 }
 
 """The type of recurring payment a transaction represents."""
@@ -5876,6 +6065,15 @@ enum VerificationStatus {
 
   """Indicates that the verification is in the process of verifying."""
   VERIFYING
+}
+
+"""Verifone specific in-store reader information."""
+type VerifoneVendor {
+  """Model name or number of reader."""
+  model: String
+
+  """Current OS version running on the reader."""
+  osVersion: String
 }
 
 """Top-level input field for verifying a multi-use payment method."""
