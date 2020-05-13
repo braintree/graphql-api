@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Tue May 05 2020 12:54:34 GMT+0000 (Coordinated Universal Time)
+# timestamp: Wed May 13 2020 18:16:08 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -1822,11 +1822,8 @@ input GenerateInStoreReaderPairingCodeInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """Client identifier."""
-  clientId: String!
-
-  """The reader serial number."""
-  serialNumber: String!
+  """The reader device ID."""
+  deviceId: String!
 }
 
 """
@@ -3133,6 +3130,24 @@ type PerformThreeDSecureLookupPayload {
   paymentMethod: PaymentMethod
 }
 
+"""
+Top-level fields returned when fetching a customer's preferred payment methods.
+"""
+type PreferredPaymentMethodsPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  Probabilistic determination of whether Venmo is a preferred payment method.
+  """
+  venmoPreferred: Boolean
+
+  """
+  Probabilistic determination of whether PayPal is a preferred payment method.
+  """
+  paypalPreferred: Boolean
+}
+
 """Accompanying information for a processor declined transaction."""
 type ProcessorDeclinedEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
@@ -3206,6 +3221,9 @@ type Query {
 
   """The available searches."""
   search: Search
+
+  """The customer's preferred payment methods."""
+  preferredPaymentMethods: PreferredPaymentMethodsPayload
 }
 
 """Indicates the status of a Reader."""

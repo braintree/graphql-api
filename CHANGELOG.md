@@ -1,3 +1,9 @@
+# 2020-05-13
+
+* Remove unused `clientId` and `serialNumber` from `GenerateInStoreReaderPairingCodeInput`.
+* Add `deviceId` to `GenerateInStoreReaderPairingCodeInput`.
+* Add new query `preferredPaymentMethods`.
+
 # 2020-05-05
 
 * Add support for in-store locations and card readers
