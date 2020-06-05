@@ -1,3 +1,11 @@
+# 2020-06-05
+
+* Add `authorizeCreditCard` mutation.
+* Add `chargeCreditCard` mutation.
+* Add `vaultCreditCard` mutation.
+* Support external vault information via `TransactionExternalVaultOptionsInput` in the above credit card mutations.
+* Add `CreditCardTransactionDetails` `PaymentMethodSnapshot` union member to eventually replace `CreditCardDetails` on transaction payment method snapshot.
+
 # 2020-05-13
 
 * Remove unused `clientId` and `serialNumber` from `GenerateInStoreReaderPairingCodeInput`.

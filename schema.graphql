@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Wed May 13 2020 18:16:08 GMT+0000 (Coordinated Universal Time)
+# timestamp: Fri Jun 05 2020 17:34:32 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -17,6 +17,48 @@ type AcceptDisputePayload {
 
   """Information about the dispute that was accepted."""
   dispute: Dispute
+}
+
+"""An OAuth access token."""
+type AccessToken {
+  """The access token."""
+  accessToken: String
+
+  """The refresh token for getting a new access token."""
+  refreshToken: String
+
+  """The type of token."""
+  tokenType: OAuthTokenType
+
+  """Expiration in ISO time format."""
+  expiresAt: String
+}
+
+"""Top-level fields returned when obtaining an OAuth access token."""
+type AccessTokenPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The access token."""
+  accessToken: AccessToken
+}
+
+"""Information abou the business's ACH configuration."""
+input ACHConfigurationInput {
+  """
+  The ACH/NACHA company ID. Included in the NACHA file to help identify the company.
+  """
+  companyId: String!
+
+  """
+  The business's NACHA entry. Included in the NACHA file to help identify the company.
+  """
+  entry: String!
+
+  """
+  Should ACH initiation be enabled? If true, any failed transaction will be retried.
+  """
+  reinitiation: Boolean!
 }
 
 """
@@ -141,6 +183,12 @@ input AddressInput {
   countryName: String
 }
 
+"""Information about the business's relationship with American Express."""
+input AmericanExpressRelationshipInput {
+  """The business's American Express SE number."""
+  serviceEstablishmentNumber: String!
+}
+
 """
 A monetary amount, either a whole number or a number with exactly two or three decimal places.
 """
@@ -210,6 +258,57 @@ type ApplePayWebConfiguration {
   supportedCardBrands: [CreditCardBrandCode!]
 }
 
+"""Input fields for a Merchant Account Application bank account object."""
+input ApplicationBankAccountInput {
+  """The routing number of the bank that holds the account."""
+  routingNumber: UsBankRoutingNumber!
+
+  """The account number of the bank account."""
+  accountNumber: UsBankAccountNumber!
+
+  """The type of transfer setup on the account."""
+  transferType: ApplicationTransferType!
+
+  """The type of account."""
+  accountType: ApplicationBankAccountType!
+
+  """The purpose of account."""
+  accountPurpose: ApplicationBankAccountPurpose!
+
+  """The type of entity that holds the account."""
+  entityType: ApplicationEntityType!
+}
+
+"""The purpose of the merchant application bank account."""
+enum ApplicationBankAccountPurpose {
+  CHECKING
+  SAVINGS
+}
+
+"""The type of merchant application bank account."""
+enum ApplicationBankAccountType {
+  CORPORATION
+  PARTNERSHIP
+}
+
+"""The entity that holds the merchant application bank account."""
+enum ApplicationEntityType {
+  COMPANY
+}
+
+"""The status of a merchant account application."""
+enum ApplicationStatus {
+  APPROVED
+  PROCESSING
+  REJECTED
+}
+
+"""The type of transfer used for the bank account."""
+enum ApplicationTransferType {
+  BANK_ACCOUNT_USA
+  BANK_ACCOUNT_WIRE_USA
+}
+
 """
 Information about the [customer authentication regulation environment](https://developers.braintreepayments.com/guides/3d-secure/migration/javascript/v3#authentication-insight)
 that applies to the payment method when processed with the provided merchant account.
@@ -273,6 +372,25 @@ type AuthorizationExpiredEvent implements PaymentStatusEvent {
   terminal: Boolean
 }
 
+"""
+Top-level input fields for creating a transaction by authorizing a credit card.
+"""
+input AuthorizeCreditCardInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of a credit card payment method to be authorized."""
+  paymentMethodId: ID!
+
+  """Input fields related to the credit card being authorized."""
+  options: CreditCardTransactionOptionsInput
+
+  """
+  Input fields for the authorization, with details that will define the resulting transaction.
+  """
+  transaction: TransactionInput!
+}
+
 """Accompanying information for an authorized transaction."""
 type AuthorizedEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
@@ -325,16 +443,16 @@ input AuthorizePaymentMethodInput {
 }
 
 """
-Top-level input fields for creating a transaction by authorizing a payment method.
+Top-level input fields for creating a transaction by authorizing a PayPal account.
 """
 input AuthorizePayPalAccountInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """ID of a payment method to be authorized."""
+  """ID of a PayPal payment method to be authorized."""
   paymentMethodId: ID!
 
-  """Input fields related to the PayPal account being charged."""
+  """Input fields related to the PayPal account being authorized."""
   options: AuthorizePayPalAccountOptionsInput
 
   """
@@ -368,16 +486,16 @@ input AuthorizePayPalAccountOptionsInput {
 }
 
 """
-Top-level input fields for creating a transaction by authorizing a payment method.
+Top-level input fields for creating a transaction by authorizing a Venmo account.
 """
 input AuthorizeVenmoAccountInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """ID of a payment method to be authorized."""
+  """ID of a Venmo payment method to be authorized."""
   paymentMethodId: ID!
 
-  """Input fields related to the Venmo account being charged."""
+  """Input fields related to the Venmo account being authorized."""
   options: AuthorizeVenmoAccountOptionsInput
 
   """
@@ -468,6 +586,145 @@ type BraintreeApiConfiguration {
   accessToken: String
 }
 
+"""The biller's ID type."""
+enum BusinessIDType {
+  EMPLOYER_IDENTIFICATION_NUMBER
+}
+
+"""General information about the business associated with the account."""
+input BusinessInput {
+  """The biller's business type."""
+  type: BusinessType!
+
+  """The DBA (Doing Business As) name of the business."""
+  dbaName: String!
+
+  """
+  The business's legal name. Max 100 characters. Valid characters: letters, numbers, spaces, ! & ' ( ) + , - / : .
+  """
+  legalName: String!
+
+  """
+  The business's federal tax ID (EIN). Not required if business `type` is `SOLE_PROPRIETORSHIP`.
+  """
+  federalTaxId: USTaxIdentificationNumber
+
+  """The biller's ID type."""
+  idType: BusinessIDType
+
+  """The country that issued the business's ID."""
+  idIssuer: CountryCodeAlpha3
+
+  """The business's U.S. state of registration."""
+  stateOfRegistration: UsStateCode!
+
+  """The business's merchant category code."""
+  merchantCategoryCode: MerchantCategoryCode
+
+  """The business's start date. Must be after 1700."""
+  startDate: Date!
+
+  """
+  A URL to an logo image. Required for Venmo onboarding. Constraints TBD.
+  """
+  logoUrl: String
+
+  """The business's email address."""
+  email: String
+
+  """The business's address. No P.O. Boxes."""
+  address: AddressInput!
+
+  """The country code for the business's phone number."""
+  phoneCountryCode: Int!
+
+  """The business's phone number. 9 digits. No extensions. Numbers only."""
+  phoneNumber: String!
+
+  """The type of phone number for the business."""
+  phoneType: BusinessPhoneType!
+
+  """The business's customer support email."""
+  supportEmail: String
+
+  """The business's website. Must be a valid URL."""
+  website: String!
+
+  """
+  The business's annual processing volume. Must be less than 1 billion USD.
+  """
+  annualVolume: Int!
+
+  """
+  The business's average transaction size. Must be less than 1 billion USD.
+  """
+  averageTransactionSize: Int!
+
+  """
+  The business's largest transaction size. Must be less than 1 billion USD.
+  """
+  largestTransactionSize: Int!
+
+  """
+  Whether payment is collected in arrears (after goods have been delivered).
+  """
+  arrears: Boolean
+
+  """
+  Percentage of the business's transactions are billed in arrears. Must be between 0 and 100.
+  """
+  percentageOneTime: Int
+
+  """
+  If the biller delivers goods, the number of days after charge they are delivered.
+  """
+  deliveryDays: Int
+
+  """The business's refund policy."""
+  refundPolicy: RefundPolicy
+
+  """
+  If applicable, the breakdown of monthly, quarterly, semi-annual, and annual subscriptions offered by the business.
+  """
+  subscriptions: BusinessSubscriptionInput
+}
+
+"""The type of phone number for the business."""
+enum BusinessPhoneType {
+  BUSINESS
+  CUSTOMER_SERVICE
+  MOBILE
+  WORK
+}
+
+"""
+A breakdown of the business's subscription frequency. All percentages provided must add up to 100.
+"""
+input BusinessSubscriptionInput {
+  """The percentage of the business's subscriptions that are monthly."""
+  percentMonthly: Int!
+
+  """The percentage of the business's subscriptions that are quarterly."""
+  percentQuarterly: Int!
+
+  """The percentage of the business's subscriptions that are semi-annual."""
+  percentSemiAnnual: Int!
+
+  """The percentage of the business's subscriptions that are annual."""
+  percentAnnual: Int!
+}
+
+"""The biller's business type."""
+enum BusinessType {
+  PRIVATE_CORPORATION
+  PUBLIC_CORPORATION
+  TAX_EXEMPT
+  LIMITED_LIABILITY_CORPORATION
+  SOLE_PROPRIETORSHIP
+  PARTNERSHIP_LLP
+  GOVERNMENT_ENTITY
+}
+
 """Top-level input fields for capturing an authorized transaction."""
 input CaptureTransactionInput {
   """An identifier used to reconcile requests and responses."""
@@ -532,6 +789,25 @@ enum Challenge {
   POSTAL_CODE
   cvv
   postal_code
+}
+
+"""
+Top-level input fields for creating a transaction by charging a credit card.
+"""
+input ChargeCreditCardInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of a credit card payment method to be charged."""
+  paymentMethodId: ID!
+
+  """Input fields for creating a credit card transaction."""
+  options: CreditCardTransactionOptionsInput
+
+  """
+  Input fields for the charge, with details that will define the resulting transaction.
+  """
+  transaction: TransactionInput!
 }
 
 """
@@ -813,6 +1089,31 @@ country code. Braintree only accepts [specific alpha-3 values](https://developer
 """
 scalar CountryCodeAlpha3
 
+"""
+Input fields for obtaining an OAuth access token for an in-store reader.
+"""
+input CreateAccessTokenForReaderInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """A reader specific identification code."""
+  deviceCode: String!
+
+  """ A globally unique reader device id generated by the reader."""
+  deviceId: ID!
+}
+
+"""
+Input fields for obtaining an OAuth access token using an authorization grant.
+"""
+input CreateAccessTokenFromAuthorizationCodeInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """A authorization code."""
+  authorizationCode: String!
+}
+
 """Top-level input field for generating a client token."""
 input CreateClientTokenInput {
   """An identifier used to reconcile requests and responses."""
@@ -884,6 +1185,34 @@ type CreateInStoreLocationPayload {
 
   """The in-store location."""
   location: InStoreLocation
+}
+
+"""Input fields for applying for a merchant account."""
+input CreateMerchantAccountApplicationInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """General information about the business associated with the account."""
+  business: BusinessInput!
+
+  """
+  A minimum of one and a maximum of five owners can be submitted. One owner must be the authorized signer on the account.
+  """
+  owners: [OwnerInput!]!
+
+  """Information about the business's relationship with American Express."""
+  americanExpressRelationship: AmericanExpressRelationshipInput
+
+  """The bank account to be used for sales."""
+  salesAccount: ApplicationBankAccountInput!
+
+  """
+  Configuration for businesses registered with various discount programs (MVV, VPP, Loans).
+  """
+  discountProgramRegistration: DiscountProgramRegistrationInput
+
+  """Configuration for processing via ACH."""
+  achConfiguration: ACHConfigurationInput
 }
 
 """A code identifying the card brand."""
@@ -1025,6 +1354,31 @@ scalar CreditCardLast4
 
 """A number that passes Luhn validation."""
 scalar CreditCardNumber
+
+"""Credit card specific details on a transaction or verification."""
+type CreditCardTransactionDetails {
+  """The details of the credit card itself."""
+  creditCard: CreditCardDetails
+
+  """
+  The network transaction identifier provided by the payment network. If this
+  transaction was created in order to verify a payment method before storing it
+  in an external vault, then this value can be pased when creating subsequent
+  transactions with the same payment method.
+  """
+  networkTransactionId: String
+}
+
+"""
+Input fields for creating a transaction by authorizing or charging a credit card.
+"""
+input CreditCardTransactionOptionsInput {
+  """
+  Details about this transaction if it's being created from a credit card that
+  is or will be stored in an non-Braintree vault.
+  """
+  externalVault: TransactionExternalVaultOptionsInput
+}
 
 """Information specific to verifications of credit card payment methods."""
 type CreditCardVerificationDetails {
@@ -1407,6 +1761,44 @@ type DisbursementDetails {
 }
 
 """
+Information about the business's particpation in various discount programs.
+"""
+input DiscountProgramRegistrationInput {
+  """The business's MVV (Merchant Verification Value) registration type."""
+  registrationType: MVVRegistrationType!
+
+  """
+  The business's existing MVV (Merchant Verification Value) registration number, if they have one.
+  """
+  registrationIdentifier: String
+
+  """
+  The number of customers the business has. Required if `registrationType` is `UTIL_RATE` or `LOAN_VPP`.
+  """
+  numberOfCustomers: Int
+
+  """
+  The means by which customers pay their bills. Required if  `registrationType` is `UTIL_RATE` or `LOAN_VPP`.
+  """
+  acceptanceChannel: [MVVAcceptanceChannel]
+
+  """
+  The business's MVV utility type. Required if `registrationType` is `UTIL_RATE`.
+  """
+  utilityType: [MVVUtilityType]
+
+  """
+  Does the business accept payday loans? Required if `registrationType` is `LOAN_VPP`.
+  """
+  loanPayday: Boolean
+
+  """
+  Does the business charge fees for debt repayment? Required if `registrationType` is `LOAN_VPP`.
+  """
+  loanFee: Boolean
+}
+
+"""
 [A case raised by a customer to either request information about or to challenge a charge](https://articles.braintreepayments.com/risk-and-security/chargebacks-retrievals/overview).
 These are initiated via a customer's payment provider, such as their bank, and
 require a merchant to provide evidence or further information.
@@ -1710,6 +2102,19 @@ A card brand-specific two-digit string describing the mode of the transaction.
 """
 scalar ECommerceIndicator
 
+"""A credit card's assocation with an external vault."""
+enum ExternalVaultStatus {
+  """
+  The payment method has not been vaulted in an exernal vault, but it will be if this transaction is successfully processed.
+  """
+  WILL_VAULT
+
+  """
+  The payment method for this transaction has been vaulted in an external vault.
+  """
+  VAULTED
+}
+
 """
 Fields capturing information about a third party that provided payment
 information for this transaction via the Grant API, Shared Vault, or Google Pay.
@@ -1822,8 +2227,8 @@ input GenerateInStoreReaderPairingCodeInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """The reader device ID."""
-  deviceId: String!
+  """The reader device id."""
+  deviceId: ID!
 }
 
 """
@@ -1972,8 +2377,8 @@ type InStoreReader {
   """Name given to the reader."""
   name: String
 
-  """The unique serial number for the reader."""
-  serialNumber: String
+  """A globally unique reader device id generated by the reader."""
+  deviceId: ID
 
   """Vendor-specific information about the reader."""
   vendor: InStoreReaderVendor
@@ -2000,10 +2405,7 @@ input InStoreReaderSetupInput {
   locationId: ID!
 
   """Name given to the Reader."""
-  name: String!
-
-  """Merchant Account to use to process payments."""
-  merchantAccountId: ID!
+  name: String
 }
 
 """A union of all possible in-store reader vendors."""
@@ -2105,6 +2507,33 @@ type Merchant {
   timezone: String
 }
 
+"""A record of a merchant account application."""
+type MerchantAccountApplication {
+  """
+  A unique ID for the account application. Can be used to query the status of the onboarding request in the future.
+  """
+  id: ID!
+
+  """The status of the application."""
+  status: ApplicationStatus
+}
+
+"""
+Top-level fields returned when submitting an application for a merchant account.
+"""
+type MerchantAccountApplicationPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The Merchant Account Application."""
+  merchantAccountApplication: MerchantAccountApplication
+}
+
+"""
+An [ISO 18245](https://en.wikipedia.org/wiki/ISO_18245) Merchant Category Code. Four digits.
+"""
+scalar MerchantCategoryCode
+
 """A monetary amount with currency."""
 type MonetaryAmount {
   """
@@ -2148,6 +2577,11 @@ type Mutation {
   authorizeVenmoAccount(input: AuthorizeVenmoAccountInput!): TransactionPayload
 
   """
+  Authorize a credit card of any origin and return a payload that includes details of the resulting transaction.
+  """
+  authorizeCreditCard(input: AuthorizeCreditCardInput!): TransactionPayload
+
+  """
   Capture an authorized transaction and return a payload that includes details of the transaction.
   """
   captureTransaction(input: CaptureTransactionInput!): TransactionPayload
@@ -2179,6 +2613,11 @@ type Mutation {
   chargeVenmoAccount(input: ChargeVenmoAccountInput!): TransactionPayload
 
   """
+  Charge a credit card of any origin and return a payload that includes details of the resulting transaction.
+  """
+  chargeCreditCard(input: ChargeCreditCardInput!): TransactionPayload
+
+  """
   Vault payment information from a single-use payment method and return a
   payload that includes a new multi-use payment method. When vaulting a credit
   card, this mutation will also verify that card by default.
@@ -2190,6 +2629,13 @@ type Mutation {
   return a payload that includes a new multi-use payment method.
   """
   vaultUsBankAccount(input: VaultUsBankAccountInput!): VaultPaymentMethodPayload
+
+  """
+  Vault payment information from a single-use credit card and return a payload
+  that includes a new multi-use payment method. By default, this mutation will
+  also verify the card.
+  """
+  vaultCreditCard(input: VaultCreditCardInput!): VaultPaymentMethodPayload
 
   """
   Refund a settled transaction and return a payload that includes details of the refund.
@@ -2319,9 +2765,30 @@ type Mutation {
 
   """Pairs a Reader to an account and In-Store Location."""
   pairInStoreReader(input: PairInStoreReaderInput!): InStoreReaderPayload
+}
 
-  """Creates a new InStoreReader."""
-  generateInStoreReaderPairingCode(input: GenerateInStoreReaderPairingCodeInput!): GenerateInStoreReaderPairingCodePayload
+"""Means by which customers by their bills."""
+enum MVVAcceptanceChannel {
+  FACE_TO_FACE
+  MAIL
+  PHONE
+  WEB
+}
+
+"""Supported MVV (Merchant Verification Value) programs."""
+enum MVVRegistrationType {
+  LOAN_VPP
+  TAX_DEBIT
+  UTIL_RATE
+  UTIL_VPP
+}
+
+"""Supported MVV (Merchant Verification Value) utility types."""
+enum MVVUtilityType {
+  ELECTRIC
+  GAS
+  TRASH
+  WATER
 }
 
 """Input fields for a network tokenized card."""
@@ -2371,6 +2838,101 @@ type OAuthApplication {
   clientId: String
 }
 
+"""OAuth access token type."""
+enum OAuthTokenType {
+  BEARER
+}
+
+"""The owner's address type."""
+enum OwnerAddressType {
+  HOME
+  MAILING
+}
+
+"""The type of identity number provided for the owner."""
+enum OwnerIDType {
+  INDIVIDUAL_TAX_IDENTIFICATION_NUMBER
+  SOCIAL_SECURITY_NUMBER
+}
+
+"""
+An owner of the business. A minimum of one and a maximum of five owners can be
+submitted. One owner must be the authorized signer on the account.
+"""
+input OwnerInput {
+  """
+  Whether this owner acts as the authorized signer on the account. This should only be true for one owner.
+  """
+  authorizedSigner: Boolean
+
+  """The role that the owner holds."""
+  role: OwnerRole!
+
+  """The position that the owner holds."""
+  position: OwnerPosition!
+
+  """The % of the business that the owner owns. Must be between 0 and 100."""
+  ownershipPercentage: Int!
+
+  """The owner's first name."""
+  firstName: String!
+
+  """The owner's last name."""
+  lastName: String!
+
+  """The owner's email address."""
+  email: String!
+
+  """The owner's address."""
+  address: AddressInput!
+
+  """The owner's address type."""
+  addressType: OwnerAddressType!
+
+  """The owner's date of birth. Format: YYYY-MM-DD."""
+  dateOfBirth: Date!
+
+  """The country code for the owner's phone number."""
+  phoneCountryCode: Int!
+
+  """The owner's phone number. No extensions, numbers only."""
+  phoneNumber: String!
+
+  """The phone number type for the owner's phone number."""
+  phoneType: OwnerPhoneType!
+
+  """The owner's ID type. Required for authorized signer."""
+  idType: OwnerIDType
+
+  """The owner's ID number. Must be a valid US SSN or TIN."""
+  idNumber: USTaxIdentificationNumber
+
+  """The country that issued the owner's ID."""
+  idIssuer: CountryCodeAlpha3
+}
+
+"""The owner's phone type."""
+enum OwnerPhoneType {
+  HOME
+  MOBILE
+}
+
+"""The position that the owner holds in the business."""
+enum OwnerPosition {
+  BENEFICIAL_OWNER
+  CHAIRMAN
+  DIRECTOR
+  PARTNER
+  SECRETARY
+  TREASURER
+}
+
+"""The role that the owner holds in the business."""
+enum OwnerRole {
+  BENEFICIAL_OWNER
+  SIGNIFICANT_RESPONSIBILITY
+}
+
 """The page information for a connection."""
 type PageInfo {
   """Whether or not there is a next page available."""
@@ -2394,7 +2956,7 @@ input PairInStoreReaderInput {
   clientMutationId: String
 
   """Code displayed on Reader during pairing."""
-  pairingCode: String!
+  userCode: String!
 
   """Inputs for Reader."""
   reader: InStoreReaderSetupInput!
@@ -2637,7 +3199,7 @@ A union of all possible payment method details as they were used in a
 transaction or verification. PaymentMethodSnapshot preserves values used to
 create a given transaction or verify a payment method at that moment in time.
 """
-union PaymentMethodSnapshot = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalTransactionDetails | VenmoAccountDetails | UsBankAccountDetails | LocalPaymentDetails
+union PaymentMethodSnapshot = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalTransactionDetails | VenmoAccountDetails | UsBankAccountDetails | LocalPaymentDetails | CreditCardTransactionDetails
 
 """
 A value identifying the type of payment method used for a transaction. For
@@ -3221,9 +3783,6 @@ type Query {
 
   """The available searches."""
   search: Search
-
-  """The customer's preferred payment methods."""
-  preferredPaymentMethods: PreferredPaymentMethodsPayload
 }
 
 """Indicates the status of a Reader."""
@@ -3349,6 +3908,13 @@ input RefundInput {
 
 """A union of all possible payment method refund details."""
 union RefundPaymentMethodDetails = PayPalRefundDetails | PayPalLocalPaymentRefundDetails
+
+"""Supported refund policies."""
+enum RefundPolicy {
+  EXCHANGE_ONLY
+  NO_REFUND_OR_EXCHANGE
+  REFUND_CARDHOLDER
+}
 
 """Input fields for searching for refunds."""
 input RefundSearchInput {
@@ -4943,6 +5509,26 @@ input TransactionDescriptorInput {
   url: String
 }
 
+"""
+Input for transactions created with credit cards vaulted in an external vault,
+not the Braintree Vault. Do not use for transactions created from Braintree
+multi-use payment methods, or from single-use payment methods which will not be
+stored in an external vault.
+"""
+input TransactionExternalVaultOptionsInput {
+  """The credit card's assocation with an external vault."""
+  status: ExternalVaultStatus!
+
+  """
+  The network transaction ID of the first _transaction_ after which this payment
+  method was stored in the external vault. If the `status` is `WILL_VAULT`, do
+  not pass this value; the network transaction ID of the resulting transaction
+  can be passed in this field for _subsequent_ transactions. If the `status` is
+  `VAULTED`, but the customer is directly initiating the charge, do not pass this value.
+  """
+  verifyingNetworkTransactionId: String
+}
+
 """Input fields for creating a transaction."""
 input TransactionInput {
   """
@@ -5718,8 +6304,43 @@ enum UsStateCode {
   WY
 }
 
+"""A nine-digit Employer Identification Number or Social Security Number."""
+scalar USTaxIdentificationNumber
+
 """A US ZIP code. Supports DDDDD and DDDDD-DDDD formats."""
 scalar UsZipCode
+
+"""Options used to indicate when a credit card is externally vaulted."""
+input VaultCreditCardExternalVaultOptionsInput {
+  """
+  For use if this credit card is stored in an external vault. The network
+  transaction ID of the first _transaction_ after which this credit card was
+  stored in the external vault.
+  """
+  verifyingNetworkTransactionId: String
+}
+
+"""
+Top-level input field for vaulting a credit card so it can be used multiple times.
+"""
+input VaultCreditCardInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of an existing single-use credit card payment method to be vaulted."""
+  paymentMethodId: ID!
+
+  """Input fields that specify options for verifying the credit card."""
+  verification: VaultPaymentMethodVerificationOptionsInput
+
+  """Options used to indicate when a credit card is externally vaulted."""
+  externalVault: VaultCreditCardExternalVaultOptionsInput
+
+  """
+  ID of the customer to associate the resulting multi-use payment method with.
+  """
+  customerId: ID
+}
 
 """Top-level input field for vaulting a limited use PayPal account."""
 input VaultLimitedUsePayPalAccountInput {
