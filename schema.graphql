@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Fri Jun 05 2020 17:34:32 GMT+0000 (Coordinated Universal Time)
+# timestamp: Mon Jun 08 2020 21:09:12 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -1420,7 +1420,7 @@ type CustomActionsPaymentContextField {
   name: String!
 
   """
-  An alphanumeric string used to store a CustomField value (5000 characters maximum).
+  An alphanumeric string used to store a CustomField value (7168 characters maximum).
   """
   value: String!
 }
@@ -1433,7 +1433,7 @@ input CustomActionsPaymentContextFieldInput {
   name: String!
 
   """
-  An alphanumeric string used to store a CustomField value (5000 characters maximum).
+  An alphanumeric string used to store a CustomField value (7168 characters maximum).
   """
   value: String!
 }
@@ -5459,6 +5459,11 @@ type TransactionAuthorizationProcessorResponse {
 
   """The processor's unique ID or "code" for the authorization."""
   authorizationId: String
+
+  """
+  If present, any additional information recieved from the processor. May provide further insight into the `legacyCode`.
+  """
+  additionalInformation: String
 }
 
 """A paginated list of transactions."""

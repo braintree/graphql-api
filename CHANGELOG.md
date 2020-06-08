@@ -1,3 +1,7 @@
+# 2020-06-08
+
+* Add `additionalInformation` to `TransactionAuthorizationProcessorResponse`.
+
 # 2020-06-05
 
 * Add `authorizeCreditCard` mutation.
