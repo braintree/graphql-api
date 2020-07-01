@@ -1,3 +1,9 @@
+# 2020-07-01
+
+* Add `networkResponse` field to various relevant `PaymentStatusEvent` types.
+* Add `networkResponse` field to `Verification`.
+* Add `additionalInformation` field to `VerificationProcessorResponse`.
+
 # 2020-06-08
 
 * Add `additionalInformation` to `TransactionAuthorizationProcessorResponse`.

@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Mon Jun 08 2020 21:09:12 GMT+0000 (Coordinated Universal Time)
+# timestamp: Wed Jul 01 2020 19:12:28 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -412,6 +412,9 @@ type AuthorizedEvent implements PaymentStatusEvent {
   Fields describing the payment processor response to the authorization request.
   """
   processorResponse: TransactionAuthorizationProcessorResponse
+
+  """Fields describing the network response to the authorization request."""
+  networkResponse: PaymentNetworkResponse
 
   """Risk decision for this transaction."""
   riskDecision: RiskDecision
@@ -2147,6 +2150,9 @@ type FailedEvent implements PaymentStatusEvent {
   """
   processorResponse: TransactionAuthorizationProcessorResponse
 
+  """Fields describing the network response to the authorization request."""
+  networkResponse: PaymentNetworkResponse
+
   """Risk decision for this transaction."""
   riskDecision: RiskDecision
 
@@ -2195,6 +2201,9 @@ type GatewayRejectedEvent implements PaymentStatusEvent {
   settings, the AVS and CVV responses may be the reason for the rejection.
   """
   processorResponse: TransactionAuthorizationProcessorResponse
+
+  """Fields describing the network response to the authorization request."""
+  networkResponse: PaymentNetworkResponse
 
   """
   Risk decision for this transaction. If the gatewayRejectionReason is fraud, this may be the reason for the rejection.
@@ -3225,6 +3234,21 @@ enum PaymentMethodUsage {
   SINGLE_USE
 }
 
+"""
+The network response.  When present, this field can provide additional detail
+about why an authorization or verification was declined, but the
+processorResponse should be considered the source of truth.
+"""
+type PaymentNetworkResponse {
+  """
+  The network response code for [authorizations](https://developers.braintreepayments.com/reference/response/transaction/#network-response-codes) or [verifications](https://developers.braintreepayments.com/reference/response/credit-card-verification#network-response-codes).
+  """
+  code: String
+
+  """The network response text."""
+  message: String
+}
+
 """Input fields for searching for any type of Payment."""
 input PaymentSearchInput {
   """Find payments with an ID or IDs."""
@@ -3731,6 +3755,9 @@ type ProcessorDeclinedEvent implements PaymentStatusEvent {
   Fields describing the payment processor response and why they declined the transaction.
   """
   processorResponse: TransactionAuthorizationProcessorResponse
+
+  """Fields describing the network response to the authorization request."""
+  networkResponse: PaymentNetworkResponse
 
   """Risk decision for this transaction."""
   riskDecision: RiskDecision
@@ -6601,6 +6628,9 @@ type Verification implements Node {
   """
   processorResponse: VerificationProcessorResponse
 
+  """Fields describing the network response to the verification request."""
+  networkResponse: PaymentNetworkResponse
+
   """Date and time at which the verification was created."""
   createdAt: Timestamp
 
@@ -6664,6 +6694,11 @@ type VerificationProcessorResponse {
 
   """The processing bank's response to the provided billing street address."""
   avsStreetAddressResponse: AvsCvvResponseCode
+
+  """
+  If present, any additional information recieved from the processor. May provide further insight into the `legacyCode`.
+  """
+  additionalInformation: String
 }
 
 """Input fields for searching for verifications."""
