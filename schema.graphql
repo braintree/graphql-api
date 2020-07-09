@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Wed Jul 01 2020 19:12:28 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Jul 09 2020 19:57:20 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -46,12 +46,14 @@ type AccessTokenPayload {
 """Information abou the business's ACH configuration."""
 input ACHConfigurationInput {
   """
-  The ACH/NACHA company ID. Included in the NACHA file to help identify the company.
+  The ACH/NACHA company name. Included in the NACHA file to help identify the company.
   """
-  companyId: String!
+  companyName: String
 
   """
-  The business's NACHA entry. Included in the NACHA file to help identify the company.
+  This is included in the NACHA file to help identify the company's business
+  type and will appear in the description section of a customer's bank
+  statement. Examples: "Bill Pay", "Utility", etc.
   """
   entry: String!
 
@@ -59,6 +61,13 @@ input ACHConfigurationInput {
   Should ACH initiation be enabled? If true, any failed transaction will be retried.
   """
   reinitiation: Boolean!
+
+  """
+  Additional information that you would like to include on the customer's bank
+  statement (e.g. phone number) for ACH transactions. Note: this is up to the
+  customer's bank to display, as not all banks support this field.
+  """
+  softDescriptor: String
 }
 
 """
@@ -1195,6 +1204,9 @@ input CreateMerchantAccountApplicationInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
+  """A unique identifier to track the progress of individual applications."""
+  uniqueIdentifier: String!
+
   """General information about the business associated with the account."""
   business: BusinessInput!
 
@@ -2227,8 +2239,13 @@ enum GatewayRejectionReason {
   CVV
   DUPLICATE
   FRAUD
+  MANUAL_TRANSACTIONS_DISABLED
+  PAYMENT_METHOD_BLOCKED
+  RISK_THRESHOLD
   THREE_D_SECURE
   TOKEN_ISSUANCE
+  TOO_MANY_CONFIRMATION_ATTEMPTS
+  UNION_PAY_ENROLLMENT_REQUIRED
 }
 
 """Input fields for generating a pairing code to pair an in store reader."""
@@ -2434,6 +2451,7 @@ The type of object the legacy ID represents when converting it to a global ID.
 enum LegacyIdType {
   CUSTOMER
   DISPUTE
+  MERCHANT_ACCOUNT_APPLICATION
   PAYMENT_METHOD
   REFUND
   TRANSACTION
@@ -2522,6 +2540,9 @@ type MerchantAccountApplication {
   A unique ID for the account application. Can be used to query the status of the onboarding request in the future.
   """
   id: ID!
+
+  """Legacy unique ID."""
+  legacyId: ID!
 
   """The status of the application."""
   status: ApplicationStatus
@@ -3897,6 +3918,9 @@ type Refund implements Node & Payment {
   Equivalent to `refundedTransaction.customer` (if present).
   """
   customer: Customer
+
+  """Line items for this refund."""
+  lineItems: [TransactionLineItem!]
 }
 
 """A paginated list of refunds."""
@@ -3931,6 +3955,13 @@ input RefundInput {
   The refund's order ID. Defaults to the order ID of the original transaction.
   """
   orderId: String
+
+  """
+  Line items for this refund. Up to 249 line items may be specified.
+  
+  Only allowed for Custom Actions transactions.
+  """
+  lineItems: [TransactionLineItemInput!]
 }
 
 """A union of all possible payment method refund details."""

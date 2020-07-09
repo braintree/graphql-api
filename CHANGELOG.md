@@ -1,3 +1,8 @@
+# 2020-07-09
+
+* Add additional values to `GatewayRejectionReason` enum.
+* Add `lineItems` to `Refund` and `RefundInput`.
+
 # 2020-07-01
 
 * Add `networkResponse` field to various relevant `PaymentStatusEvent` types.
@@ -24,7 +29,7 @@
 
 # 2020-05-05
 
-* Add support for in-store locations and card readers
+* Add support for in-store locations and card readers.
 
 # 2020-04-15
 
