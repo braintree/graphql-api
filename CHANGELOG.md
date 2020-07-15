@@ -1,3 +1,10 @@
+# 2020-07-15
+
+* Add `billingAddress` to `CreditCardDetails`, `TokenizeNetworkTokenInput`.
+* Add `updateCreditCardBillingAddress` mutation.
+* Add `itemType` to `TransactionLineItem`, `TransactionLineItemInput`.
+* Rename `VaultPaymentMethodVerificationOptionsInput` to `PaymentMethodVerificationOptionsInput`.
+
 # 2020-07-09
 
 * Add additional values to `GatewayRejectionReason` enum.
