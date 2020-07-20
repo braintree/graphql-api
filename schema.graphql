@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Wed Jul 15 2020 20:30:44 GMT+0000 (Coordinated Universal Time)
+# timestamp: Mon Jul 20 2020 19:14:04 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -5447,7 +5447,7 @@ type Transaction implements Node & Payment {
   status: PaymentStatus
 
   """Fields describing the payment processor response."""
-  processorResponse: TransactionAuthorizationProcessorResponse @deprecated(reason: "Use relevant events in `statusEvents` instead.")
+  processorResponse: TransactionAuthorizationProcessorResponse @deprecated(reason: "Use relevant events in `statusHistory` instead.")
 
   """Risk data evaluated for this transaction."""
   riskData: RiskData

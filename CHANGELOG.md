@@ -1,3 +1,7 @@
+# 2020-07-20
+
+* Fix `processorResponse` deprecation reason. Fixes [#13](https://github.com/braintree/graphql-api/issues/13)
+
 # 2020-07-15
 
 * Add `billingAddress` to `CreditCardDetails`, `TokenizeNetworkTokenInput`.
