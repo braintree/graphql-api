@@ -1,3 +1,10 @@
+# 2020-08-05
+
+* Add `discountAmount`, `lineItems`, `purchaseOrderNumber`, `shipping`, and `tax` fields to `CaptureTransactionOptionsInput` and `PartialCaptureTransactionOptionsInput`.
+* Add `refundCreditCard` mutation.
+* Add `paymentInitiator` to `TransactionInput`.
+* Deprecate `recurring` field on `TransactionInput`.
+
 # 2020-07-20
 
 * Fix `processorResponse` deprecation reason. Fixes [#13](https://github.com/braintree/graphql-api/issues/13)

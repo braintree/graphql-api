@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Mon Jul 20 2020 19:14:04 GMT+0000 (Coordinated Universal Time)
+# timestamp: Wed Aug 05 2020 20:09:24 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -785,12 +785,48 @@ input CaptureTransactionOptionsInput {
   descriptor: TransactionDescriptorInput
 
   """
+  Discount amount that was included in the total transaction amount. Does not
+  add to the total amount the payment method will be charged. This value can't be negative.
+  
+  *Required for Level 3 processing*.
+  """
+  discountAmount: String
+
+  """
+  Line items for this transaction. Up to 249 line items may be specified.
+  
+  *Required for Level 3 processing*.
+  """
+  lineItems: [TransactionLineItemInput!]
+
+  """
   Additional information about the transaction. On PayPal transactions, this
   field maps to the PayPal invoice number. PayPal invoice numbers must be unique
   in your PayPal business account. Maximum 255 characters or 127 for PayPal
   transactions. If specified, this will update the existing order ID on the transaction.
   """
   orderId: String
+
+  """
+  A purchase order identification value you associate with this transaction.
+  
+  *Required for Level 2 processing*.
+  """
+  purchaseOrderNumber: String
+
+  """
+  Shipping information.
+  
+  *Required for Level 3 processing*.
+  """
+  shipping: TransactionShippingInput
+
+  """
+  Tax information about the transaction.
+  
+  *Required for Level 2 processing*.
+  """
+  tax: TransactionTaxInput
 }
 
 """
@@ -1748,6 +1784,15 @@ type DeletePaymentMethodFromVaultPayload {
   clientMutationId: String
 }
 
+"""Specific input fields for describing a detached refund."""
+input DetachedRefundInput {
+  """The amount to refund."""
+  amount: Amount!
+
+  """The refund's order ID."""
+  orderId: String
+}
+
 """
 Disbursement details contain information about how and when the transaction was
 disbursed, including timing and currency information. This field is only
@@ -2684,6 +2729,16 @@ type Mutation {
   reverseRefund(input: ReverseRefundInput!): RefundTransactionPayload
 
   """
+  Create a detached refund (unassociated with any previous Braintree payment) to
+  a credit card and return a payload that includes details of the refund.
+  
+  We have previously referred to this as issuing a "detached credit," and it is
+  disallowed by default. See the [documentation](https://articles.braintreepayments.com/control-panel/transactions/refunds-voids-credits#detached-credits)
+  for more information regarding eligibility and configuration.
+  """
+  refundCreditCard(input: RefundCreditCardInput!): RefundCreditCardPayload
+
+  """
   Update custom fields on a transaction. Custom fields are [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
   """
   updateTransactionCustomFields(input: UpdateTransactionCustomFieldsInput!): UpdateTransactionCustomFieldsPayload
@@ -3055,12 +3110,48 @@ input PartialCaptureTransactionOptionsInput {
   amount: Amount!
 
   """
+  Discount amount that was included in the total transaction amount. Does not
+  add to the total amount the payment method will be charged. This value can't be negative.
+  
+  *Required for Level 3 processing*.
+  """
+  discountAmount: String
+
+  """
+  Line items for this transaction. Up to 249 line items may be specified.
+  
+  *Required for Level 3 processing*.
+  """
+  lineItems: [TransactionLineItemInput!]
+
+  """
   Additional information about the transaction. On PayPal transactions, this
   field maps to the PayPal invoice number. PayPal invoice numbers must be unique
   in your PayPal business account. Maximum 255 characters or 127 for PayPal
   transactions. If specified, this will update the existing order ID on the transaction.
   """
   orderId: String
+
+  """
+  A purchase order identification value you associate with this transaction.
+  
+  *Required for Level 2 processing*.
+  """
+  purchaseOrderNumber: String
+
+  """
+  Shipping information.
+  
+  *Required for Level 3 processing*.
+  """
+  shipping: TransactionShippingInput
+
+  """
+  Tax information about the transaction.
+  
+  *Required for Level 2 processing*.
+  """
+  tax: TransactionTaxInput
 }
 
 """Top-level output field from partially capturing a transaction."""
@@ -3136,6 +3227,16 @@ type PaymentConnectionEdge {
 
   """The transaction or refund."""
   node: Payment
+}
+
+"""
+The initiator of the payment. Payment can either be merchant-initiated or customer-initiated.
+"""
+enum PaymentInitiator {
+  MOTO
+  RECURRING_FIRST
+  RECURRING
+  UNSCHEDULED
 }
 
 """
@@ -3970,6 +4071,29 @@ type RefundConnectionEdge {
 
   """The refund."""
   node: Refund
+}
+
+"""Top-level input fields for creating a detached refund."""
+input RefundCreditCardInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of the credit card to be refunded."""
+  paymentMethodId: ID!
+
+  """Input fields containing details about the refund."""
+  refund: DetachedRefundInput!
+}
+
+"""
+Top-level output field from creating a detached refund for a credit card.
+"""
+type RefundCreditCardPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The information about the created refund."""
+  refund: Refund
 }
 
 """Specific input fields for describing a refund."""
@@ -5671,8 +5795,15 @@ input TransactionInput {
   """
   descriptor: TransactionDescriptorInput
 
-  """The type of recurring payment the transaction represents."""
+  """
+  Deprecated: This field is included for supporting legacy clients. Please use `paymentInitiator` instead.
+  """
   recurring: RecurringType
+
+  """
+  The initiator of the payment. Payment can either be merchant-initiated or customer-initiated.
+  """
+  paymentInitiator: PaymentInitiator
 
   """
   For partners and shopping carts only. If you are a shopping cart provider or
