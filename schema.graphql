@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Wed Aug 05 2020 20:09:24 GMT+0000 (Coordinated Universal Time)
+# timestamp: Wed Aug 12 2020 19:26:09 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -283,9 +283,6 @@ input ApplicationBankAccountInput {
 
   """The purpose of account."""
   accountPurpose: ApplicationBankAccountPurpose!
-
-  """The type of entity that holds the account."""
-  entityType: ApplicationEntityType!
 }
 
 """The purpose of the merchant application bank account."""
@@ -298,11 +295,6 @@ enum ApplicationBankAccountPurpose {
 enum ApplicationBankAccountType {
   CORPORATION
   PARTNERSHIP
-}
-
-"""The entity that holds the merchant application bank account."""
-enum ApplicationEntityType {
-  COMPANY
 }
 
 """The status of a merchant account application."""
@@ -359,6 +351,27 @@ input AuthenticationInsightInput {
   The maximum amount permitted for recurring transactions set by the customer.
   """
   recurringMaxAmount: Amount
+}
+
+"""
+Records or authorization adjustments performed when a transaction is captured
+for less or more than its original auhorization amount.
+"""
+type AuthorizationAdjustment {
+  """
+  Difference between the authorized amount and the amount captured. Negative
+  values indicate the authorized amount was adjusted down.
+  """
+  amount: MonetaryAmount
+
+  """Indicates if the adjustment was successful or not."""
+  successful: Boolean
+
+  """Date and time when this adjustment was performed."""
+  timestamp: Timestamp
+
+  """Processor response from this adjustment."""
+  processorResponse: TransactionAuthorizationAdjustmentProcessorResponse
 }
 
 """Accompanying information for an authorization expired transaction."""
@@ -616,10 +629,8 @@ input BusinessInput {
   """
   legalName: String!
 
-  """
-  The business's federal tax ID (EIN). Not required if business `type` is `SOLE_PROPRIETORSHIP`.
-  """
-  federalTaxId: USTaxIdentificationNumber
+  """The business's federal tax ID (EIN)."""
+  federalTaxId: USTaxIdentificationNumber!
 
   """The biller's ID type."""
   idType: BusinessIDType
@@ -631,18 +642,16 @@ input BusinessInput {
   stateOfRegistration: UsStateCode!
 
   """The business's merchant category code."""
-  merchantCategoryCode: MerchantCategoryCode
+  merchantCategoryCode: MerchantCategoryCode!
 
   """The business's start date. Must be after 1700."""
   startDate: Date!
 
-  """
-  A URL to an logo image. Required for Venmo onboarding. Constraints TBD.
-  """
+  """A URL to an logo image. Required for Venmo onboarding."""
   logoUrl: String
 
   """The business's email address."""
-  email: String
+  email: String!
 
   """The business's address. No P.O. Boxes."""
   address: AddressInput!
@@ -655,9 +664,6 @@ input BusinessInput {
 
   """The type of phone number for the business."""
   phoneType: BusinessPhoneType!
-
-  """The business's customer support email."""
-  supportEmail: String
 
   """The business's website. Must be a valid URL."""
   website: String!
@@ -734,7 +740,7 @@ enum BusinessType {
   LIMITED_LIABILITY_CORPORATION
   SOLE_PROPRIETORSHIP
   PARTNERSHIP_LLP
-  GOVERNMENT_ENTITY
+  GOVERNMENT_AGENCY
 }
 
 """Top-level input fields for capturing an authorized transaction."""
@@ -1432,6 +1438,13 @@ input CreditCardTransactionOptionsInput {
   is or will be stored in an non-Braintree vault.
   """
   externalVault: TransactionExternalVaultOptionsInput
+
+  """
+  A billing address to use for the transaction. If a billing address was
+  provided when tokenizing or is present on the vaulted credit card, it will be
+  *merged* with this input value, with priority given to this input value.
+  """
+  billingAddress: AddressInput
 }
 
 """Information specific to verifications of credit card payment methods."""
@@ -2946,7 +2959,6 @@ enum OwnerAddressType {
 
 """The type of identity number provided for the owner."""
 enum OwnerIDType {
-  INDIVIDUAL_TAX_IDENTIFICATION_NUMBER
   SOCIAL_SECURITY_NUMBER
 }
 
@@ -2955,11 +2967,6 @@ An owner of the business. A minimum of one and a maximum of five owners can be
 submitted. One owner must be the authorized signer on the account.
 """
 input OwnerInput {
-  """
-  Whether this owner acts as the authorized signer on the account. This should only be true for one owner.
-  """
-  authorizedSigner: Boolean
-
   """The role that the owner holds."""
   role: OwnerRole!
 
@@ -2985,7 +2992,7 @@ input OwnerInput {
   addressType: OwnerAddressType!
 
   """The owner's date of birth. Format: YYYY-MM-DD."""
-  dateOfBirth: Date!
+  dateOfBirth: Date
 
   """The country code for the owner's phone number."""
   phoneCountryCode: Int!
@@ -5647,6 +5654,25 @@ type Transaction implements Node & Payment {
 }
 
 """
+Record of processor response data received in response to authorization adjustment requests.
+"""
+type TransactionAuthorizationAdjustmentProcessorResponse {
+  """
+  The [processor response code](https://developers.braintreepayments.com/reference/general/processor-responses/authorization-responses)
+  indicating the result of attempting the adjustment.
+  """
+  legacyCode: String
+
+  """The text explanation of the processor response code."""
+  message: String
+
+  """
+  Whether or not the decline is the result of a temporary issue. Only present if adjustment is declined.
+  """
+  declineType: ProcessorDeclineType
+}
+
+"""
 Detailed response information from the processor when attempting to authorize a transaction.
 """
 type TransactionAuthorizationProcessorResponse {
@@ -6395,7 +6421,7 @@ input UsBankAccountInput {
   achMandate: String!
 }
 
-"""An account number containing 4-17 digits."""
+"""An account number containing 1-17 digits."""
 scalar UsBankAccountNumber
 
 """The ownership type of US Bank Account."""

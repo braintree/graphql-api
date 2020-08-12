@@ -1,3 +1,7 @@
+# 2020-08-12
+
+* Add `billingAddress` to `CreditCardTransactionOptionsInput`.
+
 # 2020-08-05
 
 * Add `discountAmount`, `lineItems`, `purchaseOrderNumber`, `shipping`, and `tax` fields to `CaptureTransactionOptionsInput` and `PartialCaptureTransactionOptionsInput`.
