@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Wed Aug 12 2020 19:26:09 GMT+0000 (Coordinated Universal Time)
+# timestamp: Wed Aug 19 2020 21:13:11 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -835,6 +835,12 @@ input CaptureTransactionOptionsInput {
   tax: TransactionTaxInput
 }
 
+"""The type of account to be used when transacting with a combo card."""
+enum CardAccountType {
+  CREDIT
+  DEBIT
+}
+
 """
 A list of challenges that are required by the current merchant to process a given credit card.
 """
@@ -1427,6 +1433,11 @@ type CreditCardTransactionDetails {
   transactions with the same payment method.
   """
   networkTransactionId: String
+
+  """
+  For combo cards, what account type was used for this specific transaction.
+  """
+  accountType: CardAccountType
 }
 
 """
@@ -1445,12 +1456,23 @@ input CreditCardTransactionOptionsInput {
   *merged* with this input value, with priority given to this input value.
   """
   billingAddress: AddressInput
+
+  """The type of account to be used when transacting with a combo card."""
+  accountType: CardAccountType
 }
 
 """Information specific to verifications of credit card payment methods."""
 type CreditCardVerificationDetails {
   """The amount used when performing the verification. May be 0."""
   amount: MonetaryAmount
+}
+
+"""
+Input fields for creating a transaction by authorizing or charging a credit card.
+"""
+input CreditCardVerificationOptionsInput {
+  """The type of account to be used when verifying a combo card."""
+  accountType: CardAccountType
 }
 
 """
@@ -2758,6 +2780,9 @@ type Mutation {
 
   """Run a verification on a multi-use payment method."""
   verifyPaymentMethod(input: VerifyPaymentMethodInput!): VerifyPaymentMethodPayload
+
+  """Run a verification on a multi-use credit card payment method."""
+  verifyCreditCard(input: VerifyCreditCardInput!): VerifyPaymentMethodPayload
 
   """Run a verification on a multi-use US bank account payment method."""
   verifyUsBankAccount(input: VerifyUsBankAccountInput!): VerifyPaymentMethodPayload
@@ -4653,6 +4678,9 @@ type SettledEvent implements PaymentStatusEvent {
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
+
+  """The ID of the settlement batch in which the transaction was processed."""
+  settlementBatchId: String
 }
 
 """Accompanying information for a settlement declined transaction."""
@@ -6643,6 +6671,16 @@ input VaultCreditCardInput {
   ID of the customer to associate the resulting multi-use payment method with.
   """
   customerId: ID
+
+  """The type of account to be used when verifying a combo card."""
+  accountType: CardAccountType
+
+  """
+  A billing address to associate with the vaulted credit card. If billing
+  address data was included when tokenizing the credit card, it will be *merged*
+  with this input value.
+  """
+  billingAddress: AddressInput
 }
 
 """Top-level input field for vaulting a limited use PayPal account."""
@@ -7009,6 +7047,21 @@ type VerifoneVendor {
 
   """Current OS version running on the reader."""
   osVersion: String
+}
+
+"""Top-level input field for verifying a multi-use credit card."""
+input VerifyCreditCardInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of an existing multi-use payment method to be vaulted."""
+  paymentMethodId: ID!
+
+  """ID of the merchant account to use when verifying the credit card."""
+  merchantAccountId: ID
+
+  """Input fields for verifying a credit card."""
+  options: CreditCardVerificationOptionsInput
 }
 
 """Top-level input field for verifying a multi-use payment method."""

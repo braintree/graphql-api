@@ -1,3 +1,12 @@
+# 2020-08-19
+
+* Add `CardAccountType` enum.
+* Add `accountType` field to `CreditCardTransactionDetails`.
+* Add `accountType` field to `CreditCardTransactionOptionsInput`.
+* Add `accountType` and `billingAddress` fields to `VaultCreditCardInput`.
+* Add `verifyCreditCard` mutation.
+* Add `settlementBatchId` field to `SettledEvent`.
+
 # 2020-08-12
 
 * Add `billingAddress` to `CreditCardTransactionOptionsInput`.
