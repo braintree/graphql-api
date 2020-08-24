@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Wed Aug 19 2020 21:13:11 GMT+0000 (Coordinated Universal Time)
+# timestamp: Mon Aug 24 2020 18:48:59 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -2969,6 +2969,9 @@ interface Node {
 type OAuthApplication {
   """The unique identifier of the OAuth application."""
   clientId: String
+
+  """The name of the OAuth application."""
+  name: String
 }
 
 """OAuth access token type."""
@@ -3647,6 +3650,12 @@ type PayPalAccountDetails {
 
   """The label of the co-branded card used as a funding source."""
   cobrandedCardLabel: String
+
+  """
+  Additional information if the PayPal account was provided from a third-party
+  origin, such as Apple Pay, Google Pay, or another digital wallet.
+  """
+  origin: PaymentMethodOrigin
 }
 
 """Input for identifying a PayPal account."""
@@ -3817,6 +3826,11 @@ type PayPalTransactionDetails {
   Description of the transaction that is displayed to customers in PayPal email receipts.
   """
   description: String
+
+  """
+  Additional information if the credit card was provided from a third-party origin, such as Google Pay.
+  """
+  origin: PaymentMethodOrigin
 }
 
 """A key-value pair for a PayPal SetTransactionContext field."""
@@ -5732,6 +5746,9 @@ type TransactionAuthorizationProcessorResponse {
   If present, any additional information recieved from the processor. May provide further insight into the `legacyCode`.
   """
   additionalInformation: String
+
+  """The processor's reference number for the authorization."""
+  retrievalReferenceNumber: String
 }
 
 """A paginated list of transactions."""

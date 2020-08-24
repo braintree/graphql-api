@@ -1,3 +1,9 @@
+# 2020-08-24
+
+* Add `name` field to `OAuthApplication`.
+* Add `origin` field to `PayPalAccountDetails` and `PayPalTransactionDetails`.
+* Add `retrievalReferenceNumber` field to `TransactionAuthorizationProcessorResponse`.
+
 # 2020-08-19
 
 * Add `CardAccountType` enum.
