@@ -1,3 +1,12 @@
+# 2020-09-03
+
+* Add `tokenizedCvv` to `CreditCardTransactionOptionsInput`.
+* Add `FRAUD_PROTECTION_ENTERPRISE` to `FraudServiceProvider` enum.
+* Add `tokenizedCvv` to `TokenizeCvvPayload`.
+* Add `authorizationAdjustments` to `Transaction`.
+* Change `authorizePayPalAccount` and `chargePayPalAccount` to return `PayPalTransactionPayload` instead of `TransactionPayload`.
+* Deprecate `singleUseToken` on `TokenizeCvvPayload`.
+
 # 2020-08-24
 
 * Add `name` field to `OAuthApplication`.
