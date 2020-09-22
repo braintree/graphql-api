@@ -1,3 +1,7 @@
+# 2020-09-22
+
+* Add `riskData` field to `CreditCardVerificationOptionsInput`, `VaultCreditCardInput`, and `VaultPaymentMethodInput`.
+
 # 2020-09-03
 
 * Add `tokenizedCvv` to `CreditCardTransactionOptionsInput`.

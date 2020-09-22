@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Sep 03 2020 20:14:13 GMT+0000 (Coordinated Universal Time)
+# timestamp: Tue Sep 22 2020 21:10:50 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -1478,6 +1478,11 @@ Input fields for creating a transaction by authorizing or charging a credit card
 input CreditCardVerificationOptionsInput {
   """The type of account to be used when verifying a combo card."""
   accountType: CardAccountType
+
+  """
+  Customer device information, which is sent directly to supported processors for fraud analysis.
+  """
+  riskData: RiskDataInput
 }
 
 """
@@ -6744,6 +6749,11 @@ input VaultCreditCardInput {
   with this input value.
   """
   billingAddress: AddressInput
+
+  """
+  Customer device information, which is sent directly to supported processors for fraud analysis.
+  """
+  riskData: RiskDataInput
 }
 
 """Top-level input field for vaulting a limited use PayPal account."""
@@ -6832,6 +6842,11 @@ input VaultPaymentMethodInput {
   for you in our standard 3D Secure integration.
   """
   threeDSecurePassThrough: ThreeDSecurePassThroughInput
+
+  """
+  Customer device information, which is sent directly to supported processors for fraud analysis.
+  """
+  riskData: RiskDataInput
 }
 
 """Top-level output field from vaulting a payment method."""
