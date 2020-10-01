@@ -1,3 +1,11 @@
+# 2020-10-01
+
+* Add `fraudTools` and `threeDSecureAuthentication` to `CreditCardTransactionOptionsInput`.
+* Add `tokenizedCvv` to `CreditCardVerificationOptionsInput`.
+* Add `merchantAccountId` to `DeletePaymentMethodFromVaultPayload`.
+* Add `refundUsBankAccount` mutation.
+* Deprecate `threeDSecurePassThrough` on `TransactionInput`.
+
 # 2020-09-22
 
 * Add `riskData` field to `CreditCardVerificationOptionsInput`, `VaultCreditCardInput`, and `VaultPaymentMethodInput`.
