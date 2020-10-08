@@ -1,3 +1,9 @@
+# 2020-10-07
+
+* Change type of `CreditCardDetails.threeDSecure` from `ThreeDSecureAuthentication` to `ThreeDSecureDetails`.
+* Add `emvData` to `TransactionAuthorizationProcessorResponse`.
+* Add `imageUrl` to `TransactionLineItemInput` and `TransactionLineItem`.
+
 # 2020-10-01
 
 * Add `fraudTools` and `threeDSecureAuthentication` to `CreditCardTransactionOptionsInput`.

@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Oct 01 2020 22:45:29 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Oct 08 2020 15:18:56 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -278,9 +278,6 @@ input ApplicationBankAccountInput {
   """The type of transfer setup on the account."""
   transferType: ApplicationTransferType!
 
-  """The type of account."""
-  accountType: ApplicationBankAccountType!
-
   """The purpose of account."""
   accountPurpose: ApplicationBankAccountPurpose!
 }
@@ -289,12 +286,6 @@ input ApplicationBankAccountInput {
 enum ApplicationBankAccountPurpose {
   CHECKING
   SAVINGS
-}
-
-"""The type of merchant application bank account."""
-enum ApplicationBankAccountType {
-  CORPORATION
-  PARTNERSHIP
 }
 
 """The status of a merchant account application."""
@@ -1371,12 +1362,8 @@ type CreditCardDetails {
   """The billing address associated with the credit card."""
   billingAddress: Address
 
-  """
-  Contains relevant data fields if the payment method has been authenticated
-  using 3D Secure. Only available on 3D Secure authenticated single-use payment
-  methods and 3D Secure paymentMethodSnapshots.
-  """
-  threeDSecure: ThreeDSecureAuthentication
+  """3D Secure information for the payment method."""
+  threeDSecure: ThreeDSecureDetails
 
   """A URL to an image logo representing the card brand."""
   imageUrl: String @deprecated(reason: "This field is included for supporting legacy clients.")
@@ -4925,9 +4912,7 @@ type SubmittedForSettlementEvent implements PaymentStatusEvent {
   terminal: Boolean
 }
 
-"""
-Data fields for a payment method that has been authenticated using 3D Secure.
-"""
+"""Information about the 3D Secure authentication for a payment method."""
 type ThreeDSecureAuthentication {
   """
   The cardholder authentication verification value. This value should be
@@ -5140,6 +5125,85 @@ type ThreeDSecureConfiguration {
   Authentication information for initializing Cardinal's songbird.js library.
   """
   cardinalAuthenticationJWT: String
+}
+
+"""3D Secure information for the payment method."""
+type ThreeDSecureDetails {
+  """
+  Contains relevant data fields if the payment method has been authenticated
+  using 3D Secure. Only available on 3D Secure authenticated single-use payment
+  methods and 3D Secure paymentMethodSnapshots.
+  """
+  authentication: ThreeDSecureAuthentication
+
+  """
+  Information about the [customer authentication regulation environment](https://developers.braintreepayments.com/guides/3d-secure/migration/javascript/v3#authentication-insight)
+  that applies to the payment method when processed with the provided merchant
+  account. This can be used to determine whether to perform 3D Secure
+  authentication.
+  """
+  authenticationInsight(input: AuthenticationInsightInput!): AuthenticationInsight
+
+  """
+  The cardholder authentication verification value. This value should be
+  appended to the authorization message signifying that the transaction has been
+  successfully authenticated with 3D Secure. This value will be encoded
+  according to the merchant's configuration with CardinalCommerce, with either
+  Base64 or Hex encoding. The decoded value will be of different length and
+  format per card scheme.
+  """
+  cavv: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.cavv instead.")
+
+  """
+  A unique identifier for the 3D Secure interaction with the card brand directory server.
+  """
+  directoryServerTransactionId: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.directoryServerTransactionId instead.")
+
+  """The electronic commerce indicator."""
+  eciFlag: ECommerceIndicator @deprecated(reason: "Use ThreeDSecureDetails.authentication.eciFlag instead.")
+
+  """A boolean indicating if the card has received liability shift."""
+  liabilityShifted: Boolean @deprecated(reason: "Use ThreeDSecureDetails.authentication.liabilityShifted instead.")
+
+  """A boolean indicating if the card is eligible for liability shift."""
+  liabilityShiftPossible: Boolean @deprecated(reason: "Use ThreeDSecureDetails.authentication.liabilityShiftPossible instead.")
+
+  """Indicates whether the card is enrolled in a 3D Secure program."""
+  cardEnrolled: ThreeDSecureCardEnrolled @deprecated(reason: "Use ThreeDSecureDetails.authentication.cardEnrolled instead.")
+
+  """The 3D Secure authentication status of the card."""
+  authenticationStatus: ThreeDSecureAuthenticationStatus @deprecated(reason: "Use ThreeDSecureDetails.authentication.authenticationStatus instead.")
+
+  """The version of the 3D Secure protocol used during authentication."""
+  version: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.version instead.")
+
+  """A unique identifier for the 3D Secure interaction with the provider."""
+  xId: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.xId instead.")
+
+  """
+  A unique identifier for the 3D Secure interaction with the 3D Secure server.
+  """
+  threeDSecureServerTransactionId: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.threeDSecureServerTransactionId instead.")
+
+  """
+  A unique identifier for the 3D Secure interaction with the access control server.
+  """
+  acsTransactionId: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.acsTransactionId instead.")
+
+  """
+  Indicates the current status of the 3D Secure authentication from the 3D Secure server for 3D Secure 1.0 authentications.
+  """
+  paresStatus: ThreeDSecureAuthenticationStatusIndicator @deprecated(reason: "Use ThreeDSecureDetails.authentication.paresStatus instead.")
+
+  """
+  Indicates the current status of the 3D Secure authentication from the 3D Secure server for 3D Secure 2.0 authentications.
+  """
+  transactionStatus: ThreeDSecureAuthenticationStatusIndicator @deprecated(reason: "Use ThreeDSecureDetails.authentication.transactionStatus instead.")
+
+  """
+  Indicates the reason for the transaction status. This will be null if status is `SUCCESSFUL_AUTHENTICATION`.
+  """
+  transactionStatusReason: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.transactionStatusReason instead.")
 }
 
 """ The billing address of the cardholder sent with 3D Secure Lookup requests.
@@ -5591,7 +5655,7 @@ type TokenizeCreditCardPayload {
   account. This can be used to determine whether to perform 3D Secure
   authentication.
   """
-  authenticationInsight(input: AuthenticationInsightInput!): AuthenticationInsight
+  authenticationInsight(input: AuthenticationInsightInput!): AuthenticationInsight @deprecated(reason: "Use paymentMethod.details.threeDSecure.authenticationInsight instead.")
 }
 
 """Top-level input fields for tokenizing Custom Actions."""
@@ -5905,6 +5969,11 @@ type TransactionAuthorizationProcessorResponse {
 
   """The processor's reference number for the authorization."""
   retrievalReferenceNumber: String
+
+  """
+  Response EMV data provided by the processor if this was an EMV transaction.
+  """
+  emvData: String
 }
 
 """A paginated list of transactions."""
@@ -6148,6 +6217,9 @@ type TransactionLineItem {
 
   """The type of the line item, i.e., physical, digital etc."""
   itemType: String
+
+  """URL to an image that represents the product. Max 1024 characters."""
+  imageUrl: String
 }
 
 """Data for individual line items on a transaction."""
@@ -6250,6 +6322,9 @@ input TransactionLineItemInput {
 
   """The type of the line item, i.e., physical, digital etc."""
   itemType: String
+
+  """URL to an image that represents the product. Max 1024 characters."""
+  imageUrl: String
 }
 
 """
