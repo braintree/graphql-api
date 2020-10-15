@@ -1,3 +1,7 @@
+# 2020-10-15
+
+* Add `settlementBatchId` and `paymentMethod` fields to `TransactionSearchInput`, `PaymentSearchInput`, and `RefundSearchInput`.
+
 # 2020-10-07
 
 * Change type of `CreditCardDetails.threeDSecure` from `ThreeDSecureAuthentication` to `ThreeDSecureDetails`.
