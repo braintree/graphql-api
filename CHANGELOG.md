@@ -1,3 +1,8 @@
+# 2020-10-29
+
+* Add `customer` field to `PaymentSearchInput` and `RefundSearchInput`, allowing searching for Payments and Refunds by customer information.
+* Add `phone` field, representing a phone number, to `PayPalAccountDetails`.
+
 # 2020-10-15
 
 * Add `settlementBatchId` and `paymentMethod` fields to `TransactionSearchInput`, `PaymentSearchInput`, and `RefundSearchInput`.

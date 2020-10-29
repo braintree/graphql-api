@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Oct 15 2020 19:25:39 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Oct 29 2020 23:29:52 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -3525,6 +3525,9 @@ input PaymentSearchInput {
   """Find payments processed through a merchant account ID or IDs."""
   merchantAccountId: SearchValueInput
 
+  """Find payments with a given customer."""
+  customer: SearchCustomerInput
+
   """
   Find payments by their disbursement date. Only use this search criteria if you
   have an eligible merchant account. Note that payments can only be disbursed
@@ -3708,6 +3711,9 @@ type PayPalAccountDetails {
 
   """The email address associated with the PayPal account."""
   email: String
+
+  """The primary phone number associated with the PayPal account."""
+  phone: String
 
   """The PayPal ID of the PayPal account."""
   payerId: String
@@ -4289,6 +4295,9 @@ input RefundSearchInput {
   this will be the merchant account of the original refunded transaction.
   """
   merchantAccountId: SearchValueInput
+
+  """Find refunds with a given customer."""
+  customer: SearchCustomerInput
 
   """
   Find refunds by their disbursement date. Only use this search criteria if you
