@@ -1,3 +1,10 @@
+# 2020-11-05
+
+* Add `acquirerReferenceNumber` to `CreditCardTransactionDetails`.
+* Add `descriptor` to `PartialCaptureTransactionOptionsInput`.
+* Add `limitedUseOrderId` to `PayPalAccountDetails`.
+* Add `requestChargeFromInStoreReader` and `requestCancelFromInStoreReader` mutations.
+
 # 2020-10-29
 
 * Add `customer` field to `PaymentSearchInput` and `RefundSearchInput`, allowing searching for Payments and Refunds by customer information.

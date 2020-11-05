@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Oct 29 2020 23:29:52 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Nov 05 2020 22:10:05 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -1446,6 +1446,11 @@ type CreditCardTransactionDetails {
   For combo cards, what account type was used for this specific transaction.
   """
   accountType: CardAccountType
+
+  """
+  Reference value assigned to a card transaction once it has been processed.
+  """
+  acquirerReferenceNumber: String
 }
 
 """
@@ -2458,6 +2463,59 @@ type IDealConfiguration {
   assetsUrl: String
 }
 
+"""Reference object for an in-store charge request."""
+type InStoreContext implements Node {
+  """A unique ID for this charge request."""
+  id: ID!
+
+  """The transaction representing the charge on the payment method."""
+  transaction: Transaction
+
+  """The reader requested to be charged."""
+  reader: InStoreReader
+
+  """
+  The status of the context created when the charge was requested. A status of
+  COMPLETE does not indicate a successful payment.
+  """
+  status: InStoreContextStatus!
+}
+
+"""
+Top-level fields returned when requesting a state change on an in-store reader.
+"""
+type InStoreContextPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The in-store context created when the charge flow is initiated."""
+  inStoreContext: InStoreContext
+}
+
+"""
+Potential statuses of a context created when an in-store charge is requested.
+"""
+enum InStoreContextStatus {
+  """The context was successfully cancelled."""
+  CANCELLED
+
+  """Payment was successful. The context was ended."""
+  COMPLETE
+
+  """Payment was not successful. The context was ended."""
+  FAILED
+
+  """
+  Payment flow in-progress. Waiting for Customer to provide payment method.
+  """
+  PENDING
+
+  """
+  Payment flow in-progress. Customer payment method submitted for transaction processing.
+  """
+  PROCESSING
+}
+
 """An in-store location."""
 type InStoreLocation {
   """Unique identifier."""
@@ -2563,6 +2621,42 @@ input InStoreReaderSetupInput {
 
 """A union of all possible in-store reader vendors."""
 union InStoreReaderVendor = VerifoneVendor
+
+"""Input fields for creating an in-store transaction."""
+input InStoreTransactionInput {
+  """
+  Billing amount of the request. This value must be greater than 0, and must
+  match the currency format of the merchant account. This can only contain
+  numbers and one decimal point (e.g. x.xx). Can't be greater than the maximum
+  allowed by the processor.
+  """
+  amount: Amount!
+
+  """
+  Merchant account ID used to process the transaction. Currency is also
+  determined by merchant account ID. If no merchant account ID is specified, we
+  will use your default merchant account.
+  """
+  merchantAccountId: ID
+
+  """
+  Additional information about the transaction. On PayPal transactions, this
+  field maps to the PayPal invoice number. PayPal invoice numbers must be unique
+  in your PayPal business account. Maximum 255 characters or 127 for PayPal transactions.
+  """
+  orderId: String
+
+  """
+  Collection of custom field/value pairs. You must [set up each custom field in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#creating-a-custom-field)
+  prior to passing it with a request.
+  """
+  customFields: [CustomFieldInput!]
+
+  """
+  Fields used to define what will appear on a customer's bank statement for a specific purchase.
+  """
+  descriptor: TransactionDescriptorInput
+}
 
 """Configuration for Kount fraud tools."""
 type KountConfiguration {
@@ -2952,6 +3046,12 @@ type Mutation {
 
   """Pairs a Reader to an account and In-Store Location."""
   pairInStoreReader(input: PairInStoreReaderInput!): InStoreReaderPayload
+
+  """Request an in-store reader to begin the charge flow."""
+  requestChargeFromInStoreReader(input: RequestChargeFromInStoreReaderInput!): InStoreContextPayload
+
+  """Request an in-store reader to cancel the charge flow."""
+  requestCancelFromInStoreReader(input: RequestCancelFromInStoreReaderInput!): InStoreContextPayload
 }
 
 """Means by which customers by their bills."""
@@ -3241,6 +3341,13 @@ input PartialCaptureTransactionOptionsInput {
   *Required for Level 2 processing*.
   """
   tax: TransactionTaxInput
+
+  """
+  Fields used to define what will appear on a customer's bank statement for a
+  specific purchase. If specified, this will update the existing descriptor on
+  the transaction.
+  """
+  descriptor: TransactionDescriptorInput
 }
 
 """Top-level output field from partially capturing a transaction."""
@@ -3732,6 +3839,9 @@ type PayPalAccountDetails {
   origin, such as Apple Pay, Google Pay, or another digital wallet.
   """
   origin: PaymentMethodOrigin
+
+  """Limited use PayPal provided Order ID (starts with O-)."""
+  limitedUseOrderId: String
 }
 
 """Input for identifying a PayPal account."""
@@ -4381,6 +4491,27 @@ type Report {
 
   """Top-level fields returned in the payment-level fee report query."""
   paymentLevelFees(date: Date!, merchantAccountId: ID): PaymentLevelFeeReport
+}
+
+"""Input fields for requesting a cancel during an in-store charge flow."""
+input RequestCancelFromInStoreReaderInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Unique ID for the charge flow."""
+  inStoreContextId: ID!
+}
+
+"""Input fields for beginning the in-store charge flow."""
+input RequestChargeFromInStoreReaderInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of the Reader to request a charge from."""
+  readerId: ID!
+
+  """Information about the requested in-store transaction."""
+  transaction: InStoreTransactionInput!
 }
 
 """Input fields for reversing a refund."""
