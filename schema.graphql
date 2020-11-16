@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Nov 05 2020 22:10:05 GMT+0000 (Coordinated Universal Time)
+# timestamp: Mon Nov 16 2020 21:53:33 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -919,6 +919,9 @@ input ChargePayPalAccountOptionsInput {
 
   """Deprecated: This field is no longer supported."""
   payee: PayPalPayeeOptionsInput
+
+  """Buyer selected PayPal financing option."""
+  selectedFinancingOption: SelectedPayPalFinancingOptionInput
 }
 
 """
@@ -1275,6 +1278,8 @@ enum CreditCardBrandCode {
   AMERICAN_EXPRESS
   DINERS
   DISCOVER
+  HIPER
+  HIPERCARD
   INTERNATIONAL_MAESTRO
   JCB
   MASTERCARD
@@ -1286,6 +1291,8 @@ enum CreditCardBrandCode {
   american_express
   diners
   discover
+  hiper
+  hipercard
   international_maestro
   jcb
   mastercard
@@ -2247,6 +2254,11 @@ enum DisputeType {
 }
 
 """
+An [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Durations) Duration that accepts Days, Hours, Minutes and Seconds.
+"""
+scalar Duration
+
+"""
 A card brand-specific two-digit string describing the mode of the transaction.
 """
 scalar ECommerceIndicator
@@ -2753,6 +2765,33 @@ type Merchant {
 
   """The timezone that the merchant operates in."""
   timezone: String
+
+  """A paginated list of merchant accounts that belongs to this merchant."""
+  merchantAccounts(first: Int, after: String): MerchantAccountConnection
+}
+
+"""Information about a merchant account associated with a merchant."""
+type MerchantAccount {
+  """
+  Unique identifier for the merchant account. Used to determine what merchant
+  account processed or will process a given Payment.
+  """
+  id: ID!
+
+  """The ISO code for the currency the merchant account uses."""
+  currencyCode: CurrencyCodeAlpha
+
+  """
+  The status of a merchant account. This determines whether the merchant account can be used to create a Payment.
+  """
+  status: MerchantAccountStatus
+
+  """
+  Whether this merchant account is the default for this merchant. The default
+  merchant account is used to process all Payments where a merchant account ID
+  is not specified.
+  """
+  isDefault: Boolean
 }
 
 """A record of a merchant account application."""
@@ -2780,6 +2819,46 @@ type MerchantAccountApplicationPayload {
   merchantAccountApplication: MerchantAccountApplication
 }
 
+"""A paginated list of merchant accounts."""
+type MerchantAccountConnection {
+  """A list of merchant accounts."""
+  edges: [MerchantAccountConnectionEdge]
+
+  """Information about the page of merchant accounts contained in `edges`."""
+  pageInfo: PageInfo!
+}
+
+"""A merchant account within a MerchantAccountConnection."""
+type MerchantAccountConnectionEdge {
+  """
+  This merchant account's location within the MerchantAccountConnection. Used for requesting additional pages.
+  """
+  cursor: String
+
+  """The merchant account."""
+  node: MerchantAccount
+}
+
+"""
+The status of a merchant account. This determines whether the merchant account
+can be used to create a Payment, and whether funds can continue to flow to the
+associated bank account.
+"""
+enum MerchantAccountStatus {
+  """The merchant account can be used to create transactions and refunds."""
+  ACTIVE
+
+  """
+  The merchant account is still being set up, and cannot be used to create transactions or refunds yet.
+  """
+  PENDING
+
+  """
+  The merchant account cannot be used to process transactions or refunds.
+  """
+  SUSPENDED
+}
+
 """
 An [ISO 18245](https://en.wikipedia.org/wiki/ISO_18245) Merchant Category Code. Four digits.
 """
@@ -2793,7 +2872,21 @@ type MonetaryAmount {
   value: Amount
 
   """The ISO code for the money's currency."""
-  currencyIsoCode: CurrencyCodeAlpha
+  currencyIsoCode: CurrencyCodeAlpha @deprecated(reason: "Use `currencyCode` instead.")
+
+  """The currency code for the monetary amount."""
+  currencyCode: CurrencyCodeAlpha
+}
+
+"""Input fields representing an amount with currency."""
+input MonetaryAmountInput {
+  """
+  The amount of money, either a whole number or a number with up to 3 decimal places.
+  """
+  value: Amount!
+
+  """The currency code for the monetary amount."""
+  currencyCode: CurrencyCodeAlpha!
 }
 
 """Input fields for searching for a transaction or refund amount."""
@@ -2801,8 +2894,15 @@ input MonetaryAmountSearchInput {
   """Find transactions for a given amount."""
   value: SearchRangeInput
 
-  """Find transactions with a given currency."""
+  """
+  Deprecated: Please use `currencyCode` instead.
+  
+  Find transactions with a given currency.
+  """
   currencyIsoCode: SearchTextInput
+
+  """Find transactions with a given currency."""
+  currencyCode: SearchTextInput
 }
 
 """A two-digit, zero-padded month."""
@@ -3440,7 +3540,9 @@ The [payment-level fee report (formerly known as the transaction-level fee repor
 provides a breakdown of fees per individual payments (encompassing transactions and refunds).
 """
 type PaymentLevelFeeReport {
-  """The URL where you can access the requested report."""
+  """
+  The URL where the generated report is stored. Download the report from this URL.
+  """
   url: String
 }
 
@@ -3915,6 +4017,78 @@ enum PayPalEnvironment {
   offline
 }
 
+"""Possible identifiers for credit products provided via PayPal."""
+enum PayPalFinancingCreditProductIdentifier {
+  """Brazil Credit Card Installments."""
+  CREDIT_CARD_INSTALLMENTS_BR
+
+  """Mexico Credit Card Installments."""
+  CREDIT_CARD_INSTALLMENTS_MX
+
+  """United States Credit Card."""
+  CREDIT_CARD_US
+
+  """Germany PayPal Credit."""
+  PAYPAL_CREDIT_DE
+
+  """United Kingdom PayPal Credit."""
+  PAYPAL_CREDIT_UK
+
+  """United States PayPal Credit."""
+  PAYPAL_CREDIT_US
+
+  """France Pay Later."""
+  PAY_LATER_FR
+
+  """Great Britain Pay Later."""
+  PAY_LATER_GB
+
+  """United States Pay Later."""
+  PAY_LATER_US
+
+  """Germany Pay Upon Invoice."""
+  PAY_UPON_INVOICE_DE
+}
+
+"""PayPal financing options available for a transaction."""
+type PayPalFinancingOption {
+  """The credit product identifier."""
+  creditProductIdentifier: PayPalFinancingCreditProductIdentifier
+
+  """Financing options the transaction qualifies for."""
+  qualifyingFinancingOptions: [PayPalQualifyingFinancingOption!]
+}
+
+"""PayPal Financing option credit type."""
+enum PayPalFinancingOptionCreditType {
+  INSTALLMENT
+  NO_INTEREST
+  PAY_UPON_INVOICE
+  SAME_AS_CASH
+}
+
+"""
+Input fields for requesting information about PayPal financing options.
+"""
+input PayPalFinancingOptionsInput {
+  """
+  ID of an existing multi-use PayPal payment method to request financing options for.
+  """
+  paymentMethodId: ID!
+
+  """The transaction currency and total amount to finance."""
+  amount: MonetaryAmountInput!
+
+  """The financing country code."""
+  countryCode: CountryCodeAlpha2!
+}
+
+"""PayPal financing options response payload."""
+type PayPalFinancingOptionsPayload {
+  """PayPal financing options."""
+  financingOptions: [PayPalFinancingOption!]
+}
+
 """
 Additional information about the local payment method specific to PayPal.
 """
@@ -3947,6 +4121,56 @@ type PayPalLocalPaymentRefundDetails {
 input PayPalPayeeOptionsInput {
   """The email address associated with the payee PayPal account."""
   email: String
+}
+
+"""PayPal qualifying financing options for a product."""
+type PayPalQualifyingFinancingOption {
+  """APR percentage."""
+  apr: Percentage
+
+  """Nominal rate percentage."""
+  nominalRate: Percentage
+
+  """Total number of payments over which to finance the transaction."""
+  term: Int
+
+  """The duration between each interval or payment."""
+  intervalDuration: Duration
+
+  """The country or region for the financing option."""
+  countryCode: CountryCodeAlpha2
+
+  """Credit type."""
+  creditType: PayPalFinancingOptionCreditType
+
+  """The minimum qualifying amount for a transaction."""
+  minimumAmount: MonetaryAmount
+
+  """The monthly interest rate for this financing option."""
+  monthlyInterestRate: Percentage
+
+  """The amount for transaction periodic payments."""
+  periodicPayment: MonetaryAmount
+
+  """The amount for transaction monthly payments."""
+  monthlyPayment: MonetaryAmount
+
+  """The discount amount on the transaction for this financing option."""
+  discountAmount: MonetaryAmount
+
+  """The discount percentage for this financing option."""
+  discountPercentage: Percentage
+
+  """The total interest cost for this financing option."""
+  totalInterest: MonetaryAmount
+
+  """The total amount for the transaction, including interest."""
+  totalCost: MonetaryAmount
+
+  """
+  Indicates whether the financing option's credit fee is funded by PayPal.
+  """
+  paypalSubsidized: Boolean
 }
 
 """PayPal-specific refund details."""
@@ -4006,7 +4230,7 @@ type PayPalTransactionDetails {
   transactionFeeAmount: String @deprecated(reason: "Use `transactionFee.value` instead.")
 
   """The currency code for the currency of the PayPal transaction fee."""
-  transactionFeeCurrencyIsoCode: String @deprecated(reason: "Use `transactionFee.currencyIsoCode` instead.")
+  transactionFeeCurrencyIsoCode: String @deprecated(reason: "Use `transactionFee.currencyCode` instead.")
 
   """
   Description of the transaction that is displayed to customers in PayPal email receipts.
@@ -4017,6 +4241,9 @@ type PayPalTransactionDetails {
   Additional information if the credit card was provided from a third-party origin, such as Google Pay.
   """
   origin: PaymentMethodOrigin
+
+  """Buyer selected financing option at the time of creating a transaction."""
+  selectedFinancingOption: SelectedPayPalFinancingOptionDetails
 }
 
 """Top-level output field from creating a PayPal transaction."""
@@ -4056,6 +4283,11 @@ input PayPalTransactionRiskContextInput {
   """Provide a maximum of 100 fields."""
   fields: [PayPalTransactionRiskContextDataFieldInput!]
 }
+
+"""
+The percentage, as a fixed-point, signed decimal number. For example, define a 19.99% interest rate as `19.99`.
+"""
+scalar Percentage
 
 """Top-level fields for performing a 3D Secure Lookup."""
 input PerformThreeDSecureLookupInput {
@@ -4121,7 +4353,7 @@ Top-level fields returned when fetching a customer's preferred payment methods.
 """
 type PreferredPaymentMethodsPayload {
   """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
+  clientMutationId: String @deprecated(reason: "clientMutationId is not applicable to queries.")
 
   """
   Probabilistic determination of whether Venmo is a preferred payment method.
@@ -4210,6 +4442,11 @@ type Query {
 
   """The available searches."""
   search: Search
+
+  """
+  Retrieve PayPal financing options that include payment installment plans.
+  """
+  paypalFinancingOptions(input: PayPalFinancingOptionsInput!): PayPalFinancingOptionsPayload
 }
 
 """Indicates the status of a Reader."""
@@ -4933,6 +5170,43 @@ input SearchVerificationStatusInput {
 
   """The verification status is one of these values."""
   in: [VerificationStatus!]
+}
+
+"""Details about a selected financing option by a PayPal buyer."""
+type SelectedPayPalFinancingOptionDetails {
+  """Total number of payments over which to finance the transaction."""
+  term: Int
+
+  """The amount for each monthly payment."""
+  monthlyPayment: MonetaryAmount
+
+  """
+  The percent discount off the total transaction amount due to the selected financing option.
+  """
+  discountPercentage: Percentage
+
+  """The amount reduced from the total transaction amount."""
+  discountAmount: MonetaryAmount
+}
+
+"""Input fields indicating a selected financing option by a PayPal buyer."""
+input SelectedPayPalFinancingOptionInput {
+  """Total number of payments over which to finance the transaction."""
+  term: Int!
+
+  """The currency code for the monthly payment and discount amount."""
+  currencyCode: CurrencyCodeAlpha!
+
+  """The amount for each monthly payment."""
+  monthlyPayment: Amount!
+
+  """
+  The percent discount off the total transaction amount due to the selected financing option.
+  """
+  discountPercentage: Percentage
+
+  """The amount reduced from the total transaction amount."""
+  discountAmount: Amount
 }
 
 """Accompanying information for a settled transaction."""

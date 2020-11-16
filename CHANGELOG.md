@@ -1,3 +1,13 @@
+# 2020-11-12
+
+* Add `HIPERCARD` and `HIPER` values to `CreditCardBrandCode` enum.
+* Add `merchantAccounts` field to the `Merchant` type, allowing retrieval of a list of merchant accounts via the `viewer` query.
+* Add `paypalFinancingOptions` query to return PayPal financing options, along with associated inputs, types, and scalars.
+* Add `selectedFinancingOption` field to `ChargePayPalAccountOptionsInput` to provide PayPal financing options on `chargePayPalAccount` mutation.
+* Add `selectedFinancingOption` field to `PayPalTransactionDetails` to return PayPal financing options.
+* Deprecate `currencyIsoCode` field name in favor of `currencyCode`.
+* Deprecate `clientMutationId` field on query payloads.
+
 # 2020-11-05
 
 * Add `acquirerReferenceNumber` to `CreditCardTransactionDetails`.
