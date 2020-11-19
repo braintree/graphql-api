@@ -1,3 +1,10 @@
+# 2020-11-19
+
+* Rename `SearchCustomerInput` input type to `SearchPaymentCustomerInput`.
+* Add additional fields to `SearchPaymentCustomerInput` to allow searching for Payments by more customer details.
+* Add `ELO` value to `CreditCardBrandCode` enum.
+* Update `Address` type with global field names.
+
 # 2020-11-12
 
 * Add `HIPERCARD` and `HIPER` values to `CreditCardBrandCode` enum.

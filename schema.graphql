@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Mon Nov 16 2020 21:53:33 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Nov 19 2020 22:25:32 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -93,10 +93,20 @@ type Address {
   company: String
 
   """The street address."""
-  streetAddress: String
+  streetAddress: String @deprecated(reason: "Use `addressLine1` instead.")
+
+  """
+  The first line of the street address, such as street number, street name.
+  """
+  addressLine1: String
 
   """Extended address information, such as an apartment or suite number."""
-  extendedAddress: String
+  extendedAddress: String @deprecated(reason: "Use `addressLine2` instead.")
+
+  """
+  Extended address information, such as an apartment number or suite number.
+  """
+  addressLine2: String
 
   """First name."""
   firstName: String @deprecated(reason: "Use `fullName` instead.")
@@ -108,10 +118,18 @@ type Address {
   fullName: String
 
   """Locality/city."""
-  locality: String
+  locality: String @deprecated(reason: "Use `adminArea2` instead.")
+
+  """A city, town, or village."""
+  adminArea2: String
 
   """State or province."""
-  region: String
+  region: String @deprecated(reason: "Use `adminArea1` instead.")
+
+  """
+  Highest level subdivision, such as state, province, or ISO-3166-2 subdivison.
+  """
+  adminArea1: String
 
   """
   Postal code, otherwise known as CAP, CEP, Eircode, NPA, PIN, PLZ, or ZIP code.
@@ -1278,6 +1296,7 @@ enum CreditCardBrandCode {
   AMERICAN_EXPRESS
   DINERS
   DISCOVER
+  ELO
   HIPER
   HIPERCARD
   INTERNATIONAL_MAESTRO
@@ -1291,6 +1310,7 @@ enum CreditCardBrandCode {
   american_express
   diners
   discover
+  elo
   hiper
   hipercard
   international_maestro
@@ -3735,7 +3755,7 @@ input PaymentSearchInput {
   merchantAccountId: SearchValueInput
 
   """Find payments with a given customer."""
-  customer: SearchCustomerInput
+  customer: SearchPaymentCustomerInput
 
   """
   Find payments by their disbursement date. Only use this search criteria if you
@@ -4644,7 +4664,7 @@ input RefundSearchInput {
   merchantAccountId: SearchValueInput
 
   """Find refunds with a given customer."""
-  customer: SearchCustomerInput
+  customer: SearchPaymentCustomerInput
 
   """
   Find refunds by their disbursement date. Only use this search criteria if you
@@ -4979,12 +4999,6 @@ type Search {
   customers(input: CustomerSearchInput!, first: Int, after: String): CustomerConnection
 }
 
-"""Input fields for searching transactions by customer."""
-input SearchCustomerInput {
-  """Find transactions with a given customer ID."""
-  id: SearchValueInput
-}
-
 """
 Input fields for searching for a date. These ranges are precise to the day.
 """
@@ -5020,6 +5034,24 @@ input SearchDisputeTypeInput {
 
   """The dispute type is one of these values."""
   in: [DisputeType!]
+}
+
+"""Input fields for searching payments by customer."""
+input SearchPaymentCustomerInput {
+  """Find payments with a given customer ID."""
+  id: SearchValueInput
+
+  """Find payments with a given first name."""
+  firstName: SearchTextInput
+
+  """Find payments with a given last name."""
+  lastName: SearchTextInput
+
+  """Find payments with a given customer company."""
+  company: SearchTextInput
+
+  """Find payments with a customer email."""
+  email: SearchTextInput
 }
 
 """
@@ -6817,7 +6849,7 @@ input TransactionSearchInput {
   merchantAccountId: SearchValueInput
 
   """Find transactions with a given customer."""
-  customer: SearchCustomerInput
+  customer: SearchPaymentCustomerInput
 
   """
   Find transactions created by charging payment methods of the given type.
