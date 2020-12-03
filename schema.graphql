@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Nov 19 2020 22:25:32 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Dec 03 2020 19:54:22 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -138,6 +138,9 @@ type Address {
 
   """Country code for the address in ISO 3166-1 alpha-3 format."""
   countryCode: CountryCodeAlpha3
+
+  """Phone number."""
+  phoneNumber: String
 }
 
 """Input fields for an Address."""
@@ -742,15 +745,18 @@ input BusinessSubscriptionInput {
   percentAnnual: Int!
 }
 
-"""The biller's business type."""
+"""The type of the business."""
 enum BusinessType {
+  ASSOCIATION
   GOVERNMENT_AGENCY
   LIMITED_LIABILITY_CORPORATION
-  PARTNERSHIP_LLP
+  NONPROFIT
+  PARTNERSHIP
+  PARTNERSHIP_LLP @deprecated(reason: "No longer applicable, use PARTNERSHIP instead.")
   PRIVATE_CORPORATION
   PUBLIC_CORPORATION
   SOLE_PROPRIETORSHIP
-  TAX_EXEMPT
+  TAX_EXEMPT @deprecated(reason: "No longer applicable, use NONPROFIT instead.")
 }
 
 """Top-level input fields for capturing an authorized transaction."""
@@ -1303,6 +1309,7 @@ enum CreditCardBrandCode {
   JCB
   MASTERCARD
   SOLO
+  SWITCH
   UK_MAESTRO
   UNION_PAY
   UNKNOWN
@@ -1317,6 +1324,7 @@ enum CreditCardBrandCode {
   jcb
   mastercard
   solo
+  switch
   uk_maestro
   union_pay
   unknown
@@ -1551,15 +1559,15 @@ values](https://developers.braintreepayments.com/reference/general/currencies).
 scalar CurrencyCodeAlpha
 
 """Top-level fields returned from a Custom Actions payment context."""
-type CustomActionsPaymentContext implements Node {
+type CustomActionsPaymentContext implements Node & PaymentContext {
   """The identifier of the payment context."""
   id: ID!
 
-  """An ISO 8601 date string of when the payment context was created."""
-  createdAt: String!
+  """Date and time when the payment context was created."""
+  createdAt: Timestamp!
 
-  """An ISO 8601 date string of when the payment context was updated."""
-  updatedAt: String!
+  """Date and time when the payment context was updated."""
+  updatedAt: Timestamp!
 
   """
   A list of fields stored on a PaymentContext during execution of a Custom Actions handler (Five (5) entries maximum).
@@ -2283,6 +2291,19 @@ A card brand-specific two-digit string describing the mode of the transaction.
 """
 scalar ECommerceIndicator
 
+"""
+The internationalized email address.<blockquote><strong>Note:</strong> Up to 64
+characters are allowed before and 255 characters are allowed after the
+<code>@</code> sign.
+However, the generally accepted maximum length for an email address is 254 characters.
+The pattern verifies that an unquoted <code>@</code> sign exists.</blockquote>
+
+minLength: 3
+maxLength: 254
+pattern: <code>^.+@[^\"\\-].+$</code>.
+"""
+scalar EmailAddress
+
 """A credit card's assocation with an external vault."""
 enum ExternalVaultStatus {
   """
@@ -2631,6 +2652,43 @@ type InStoreReader {
 
   """Current status of the reader."""
   status: ReaderStatus
+}
+
+"""The authorization mode used to perform the transaction."""
+enum InStoreReaderAuthorizationMode {
+  CARD
+  ISSUER
+}
+
+"""
+Additional information about the payment method supplied by an in-store payment reader.
+"""
+type InStoreReaderOriginDetails {
+  """
+  The preferred name associated with the application used to process an EMV transaction.
+  """
+  applicationPreferredName: String
+
+  """
+  The identifier specifying which EMV application was used to process the transaction.
+  """
+  applicationIdentifier: String
+
+  """An indicator for whether the transaction was verified via pin."""
+  pinVerified: Boolean
+
+  """
+  The input mode used on the payment reader to facilitate an in-store transaction.
+  """
+  inputMode: PaymentReaderInputMode
+
+  """
+  The authorization mode used to perform the transaction on the payment reader.
+  """
+  authorizationMode: InStoreReaderAuthorizationMode
+
+  """The ID of the terminal that was processed this transaction."""
+  terminalId: String
 }
 
 """Top-level fields returned for an in-store reader."""
@@ -3545,6 +3603,18 @@ type PaymentConnectionEdge {
   node: Payment
 }
 
+"""Context associated with a transaction."""
+interface PaymentContext {
+  """Unique identifier."""
+  id: ID!
+
+  """Date and time when the payment context was created."""
+  createdAt: Timestamp!
+
+  """Date and time when the payment context was updated."""
+  updatedAt: Timestamp!
+}
+
 """
 The initiator of the payment. Payment can either be merchant-initiated or customer-initiated.
 """
@@ -3638,7 +3708,7 @@ A union of all possible payment method origin details.
 PaymentMethodOriginDetails contain additional information specific to the third
 party the payment method was provided by.
 """
-union PaymentMethodOriginDetails = ApplePayOriginDetails | GooglePayOriginDetails | MasterpassOriginDetails | NetworkTokenOriginDetails | SamsungPayOriginDetails | VisaCheckoutOriginDetails | PayPalLocalPaymentOriginDetails
+union PaymentMethodOriginDetails = ApplePayOriginDetails | GooglePayOriginDetails | MasterpassOriginDetails | NetworkTokenOriginDetails | SamsungPayOriginDetails | VisaCheckoutOriginDetails | PayPalLocalPaymentOriginDetails | InStoreReaderOriginDetails
 
 """
 A value identifying the third-party origin from which a customer provided their payment method.
@@ -3646,6 +3716,7 @@ A value identifying the third-party origin from which a customer provided their 
 enum PaymentMethodOriginType {
   APPLE_PAY
   GOOGLE_PAY
+  IN_STORE_READER
   MASTERPASS
   NETWORK_TOKEN
   PAYPAL
@@ -3768,11 +3839,6 @@ input PaymentSearchInput {
   source: SearchPaymentSourceInput
 
   """
-  Find payments created by a third party via the Grant API using a given OAuth application client ID.
-  """
-  facilitatorOAuthApplicationClientId: SearchValueInput
-
-  """
   Find payments by the batch ID under which the payment was submitted for settlement.
   """
   settlementBatchId: SearchTextInput
@@ -3781,6 +3847,14 @@ input PaymentSearchInput {
   Find payments based on information about the payment method used for the payment.
   """
   paymentMethod: PaymentPaymentMethodSearchInput
+
+  """
+  Find payments created by a third party via the Grant API using a given OAuth application client ID.
+  """
+  facilitatorOAuthApplicationClientId: SearchValueInput
+
+  """Find payments with a user ID or IDs."""
+  userId: SearchValueInput
 }
 
 """The type of a Payment, based primarily on implementing type."""
@@ -4677,11 +4751,6 @@ input RefundSearchInput {
   source: SearchPaymentSourceInput
 
   """
-  Find refunds created by a third party via the Grant API using a given OAuth application client ID.
-  """
-  facilitatorOAuthApplicationClientId: SearchValueInput
-
-  """
   Find refunds by the batch ID under which the refund was submitted for settlement.
   """
   settlementBatchId: SearchTextInput
@@ -4690,6 +4759,14 @@ input RefundSearchInput {
   Find refunds based on information about the payment method used for the refund.
   """
   paymentMethod: PaymentPaymentMethodSearchInput
+
+  """
+  Find refunds created by a third party via the Grant API using a given OAuth application client ID.
+  """
+  facilitatorOAuthApplicationClientId: SearchValueInput
+
+  """Find refunds with a user ID or IDs."""
+  userId: SearchValueInput
 }
 
 """Top-level input fields for refunding a transaction."""
@@ -6290,8 +6367,17 @@ type Transaction implements Node & Payment {
   """
   customFields: [CustomField!]
 
+  """The ID of the merchant that processed this transaction."""
+  merchantId: String
+
   """The ID of the merchant account that processed this transaction."""
   merchantAccountId: ID
+
+  """The display name of the merchant that processed this transaction."""
+  merchantName: String
+
+  """The address of the merchant that processed this transaction."""
+  merchantAddress: Address
 
   """
   The order ID for this transaction. For PayPal transactions, the PayPal Invoice ID.
@@ -6867,11 +6953,6 @@ input TransactionSearchInput {
   source: SearchTransactionSourceInput
 
   """
-  Find transactions created by a third party via the Grant API using a given OAuth application client ID.
-  """
-  facilitatorOAuthApplicationClientId: SearchValueInput
-
-  """
   Find transactions by the batch ID under which the transaction was submitted for settlement.
   """
   settlementBatchId: SearchTextInput
@@ -6880,6 +6961,14 @@ input TransactionSearchInput {
   Find transactions based on information about the payment method used for the transaction.
   """
   paymentMethod: PaymentPaymentMethodSearchInput
+
+  """
+  Find transactions created by a third party via the Grant API using a given OAuth application client ID.
+  """
+  facilitatorOAuthApplicationClientId: SearchValueInput
+
+  """Find transactions with a user ID or IDs."""
+  userId: SearchValueInput
 }
 
 """

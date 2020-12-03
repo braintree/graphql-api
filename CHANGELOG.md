@@ -1,3 +1,10 @@
+# 2020-12-03
+
+* Add `SWITCH` value to `CreditCardBrandCode` enum.
+* Add `userId` input to `PaymentSearchInput`, `TransactionSearchInput` and `RefundSearchInput`.
+* Add `phoneNumber` field to `Address`.
+* Add `merchantId`, `merchantName`, and `merchantAddress` fields to `Transaction`.
+
 # 2020-11-19
 
 * Rename `SearchCustomerInput` input type to `SearchPaymentCustomerInput`.
