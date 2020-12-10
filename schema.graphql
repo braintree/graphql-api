@@ -1,5 +1,5 @@
 # source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Dec 03 2020 19:54:22 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Dec 10 2020 21:17:22 GMT+0000 (Coordinated Universal Time)
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
@@ -152,9 +152,19 @@ input AddressInput {
   streetAddress: String
 
   """
+  The first line of the street address, such as street number, street name. 255 character maximum.
+  """
+  addressLine1: String
+
+  """
   Extended address information, such as an apartment or suite number. 255 character maximum.
   """
   extendedAddress: String
+
+  """
+  Extended address information, such as apartment number or suite number. 255 character maximum.
+  """
+  addressLine2: String
 
   """First name. 255 character maximum."""
   firstName: String
@@ -165,8 +175,16 @@ input AddressInput {
   """Locality/city. 255 character maximum."""
   locality: String
 
+  """A city, town or village. 255 character maximum."""
+  adminArea2: String
+
   """State or province. 255 character maximum."""
   region: String
+
+  """
+  Highest level subdivision, such as state, province or ISO-3166-2 subdivision. 255 character maximum.
+  """
+  adminArea1: String
 
   """
   Postal code in any country's format, otherwise known as CAP, CEP, Eircode,
@@ -7708,7 +7726,7 @@ type VenmoConfiguration {
   environment: VenmoEnvironment
 }
 
-"""The environment being used for Pay with Venmo."""
+"""The environment being used for Venmo."""
 enum VenmoEnvironment {
   PRODUCTION
   SANDBOX
