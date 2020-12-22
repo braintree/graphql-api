@@ -1,6 +1,3 @@
-# source: https://payments.braintree-api.com/graphql
-# timestamp: Thu Dec 10 2020 21:17:22 GMT+0000 (Coordinated Universal Time)
-
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
   """An identifier used to reconcile requests and responses."""
@@ -765,7 +762,6 @@ input BusinessSubscriptionInput {
 
 """The type of the business."""
 enum BusinessType {
-  ASSOCIATION
   GOVERNMENT_AGENCY
   LIMITED_LIABILITY_CORPORATION
   NONPROFIT
@@ -2388,7 +2384,7 @@ type FraudProviderConfiguration {
   name: String
 }
 
-"""The third-party provider used to generate the risk decision."""
+"""The fraud service provider used to generate the risk decision."""
 enum FraudServiceProvider {
   FRAUD_PROTECTION
   FRAUD_PROTECTION_ENTERPRISE
@@ -3597,6 +3593,12 @@ interface Payment {
 
   """How the payment was created."""
   source: PaymentSource
+
+  """
+  Snapshot of payment method details used to create the payment, preserved at
+  the time the transaction was created. This will always be present.
+  """
+  paymentMethodSnapshot: PaymentMethodSnapshot
 }
 
 """A paginated list of transactions and refunds."""
@@ -3762,6 +3764,7 @@ enum PaymentMethodSnapshotSearchType {
   CREDIT_CARD_VIA_NETWORK_TOKEN
   CREDIT_CARD_VIA_SAMSUNG_PAY
   CREDIT_CARD_VIA_VISA_CHECKOUT
+  LOCAL_PAYMENT
   PAYPAL
   US_BANK_ACCOUNT
   VENMO_ACCOUNT
@@ -3805,12 +3808,6 @@ type PaymentNetworkResponse {
 
   """The network response text."""
   message: String
-}
-
-"""Input fields for searching for payments by payment method criteria."""
-input PaymentPaymentMethodSearchInput {
-  """The payment method ID used for the payment."""
-  paymentMethodId: SearchValueInput
 }
 
 """Input fields for searching for any type of Payment."""
@@ -3864,7 +3861,7 @@ input PaymentSearchInput {
   """
   Find payments based on information about the payment method used for the payment.
   """
-  paymentMethod: PaymentPaymentMethodSearchInput
+  paymentMethod: SearchPaymentPaymentMethodInput
 
   """
   Find payments created by a third party via the Grant API using a given OAuth application client ID.
@@ -4776,7 +4773,7 @@ input RefundSearchInput {
   """
   Find refunds based on information about the payment method used for the refund.
   """
-  paymentMethod: PaymentPaymentMethodSearchInput
+  paymentMethod: SearchPaymentPaymentMethodInput
 
   """
   Find refunds created by a third party via the Grant API using a given OAuth application client ID.
@@ -4917,7 +4914,7 @@ type RiskData {
   """
   deviceDataCaptured: Boolean
 
-  """The third-party provider used to generate the risk decision."""
+  """The fraud service provider used to generate the risk decision."""
   fraudServiceProvider: FraudServiceProvider
 }
 
@@ -5094,6 +5091,50 @@ type Search {
   customers(input: CustomerSearchInput!, first: Int, after: String): CustomerConnection
 }
 
+"""Input fields for searching for payments by credit card brand."""
+input SearchCreditCardBrandCodeInput {
+  """Credit card brand code is exactly this value."""
+  is: CreditCardBrandCode
+
+  """Credit card brand code is one of these values."""
+  in: [CreditCardBrandCode!]
+}
+
+"""
+Input fields for searching for payments by payment method snapshot credit card expiration date criteria.
+"""
+input SearchCreditCardExpirationDateInput {
+  """Field is exactly this value."""
+  is: SearchCreditCardExpirationMonthYearInput
+
+  """Field is not this value."""
+  isNot: SearchCreditCardExpirationMonthYearInput
+}
+
+"""
+Input fields for searching for payments by payment method snapshot credit card expiration date criteria.
+"""
+input SearchCreditCardExpirationMonthYearInput {
+  """The month of the credit card expiration as MM."""
+  expirationMonth: String!
+
+  """The year of the credit card expiration as YYYY."""
+  expirationYear: String!
+}
+
+"""
+Input fields for searching for payments by payment method snapshot credit card number criteria.
+"""
+input SearchCreditCardNumberInput {
+  """
+  Up to the first six digits of the credit card number (the credit card's BIN).
+  """
+  startsWith: String
+
+  """Up to four digits of the last four digits of the credit card number."""
+  endsWith: String
+}
+
 """
 Input fields for searching for a date. These ranges are precise to the day.
 """
@@ -5131,6 +5172,28 @@ input SearchDisputeTypeInput {
   in: [DisputeType!]
 }
 
+"""
+Input fields for searching for payments by payment method snapshot credit card details criteria.
+"""
+input SearchPaymentCreditCardDetailsInput {
+  """The credit card number used for the payment."""
+  number: SearchCreditCardNumberInput
+
+  """
+  Find payments based on the expiration date of the credit card used for the payment.
+  """
+  expirationDate: SearchCreditCardExpirationDateInput
+
+  """The unique identifier of the credit card number used for the payment."""
+  uniqueNumberIdentifier: SearchTextInput
+
+  """The card holder name of the credit card number used for the payment."""
+  cardholderName: SearchTextInput
+
+  """The brand code of the credit card number used for the payment."""
+  brandCode: SearchCreditCardBrandCodeInput
+}
+
 """Input fields for searching payments by customer."""
 input SearchPaymentCustomerInput {
   """Find payments with a given customer ID."""
@@ -5166,6 +5229,45 @@ input SearchPaymentMethodSnapshotTypeInput {
   customer provided that payment method.
   """
   in: [PaymentMethodSnapshotSearchType!]
+}
+
+"""Input fields for searching for payments by payment method criteria."""
+input SearchPaymentPaymentMethodInput {
+  """The ID of the vaulted payment method used for the payment."""
+  paymentMethodId: SearchValueInput
+
+  """The snapshot of the payment method at the time of payment creation."""
+  paymentMethodSnapshot: SearchPaymentPaymentMethodSnapshotInput
+}
+
+"""
+Input fields for searching for payments by payment method snapshot criteria.
+"""
+input SearchPaymentPaymentMethodSnapshotInput {
+  """Find payments based on the payment instrument type."""
+  type: SearchPaymentMethodSnapshotTypeInput
+
+  """
+  Find payments made with credit cards, based on the details of the credit card
+  used for the payment. Passing an object with non-empty, non-null fields will
+  scope your search to *only* credit card payment methods. This overrides the `type` field.
+  """
+  creditCardDetails: SearchPaymentCreditCardDetailsInput
+
+  """
+  Find payments made with PayPal, based on the PayPal details used for the
+  payment. Passing a value here will scope your search to *only* PayPal payment
+  methods. This overrides the `type` field.
+  """
+  payPalDetails: SearchPaymentPayPalDetailsInput
+}
+
+"""
+Input fields for searching for payments by payment method snapshot PayPal details criteria.
+"""
+input SearchPaymentPayPalDetailsInput {
+  """"The email address of the PayPal payer."""
+  email: SearchTextInput
 }
 
 """
@@ -6978,7 +7080,7 @@ input TransactionSearchInput {
   """
   Find transactions based on information about the payment method used for the transaction.
   """
-  paymentMethod: PaymentPaymentMethodSearchInput
+  paymentMethod: SearchPaymentPaymentMethodInput
 
   """
   Find transactions created by a third party via the Grant API using a given OAuth application client ID.
@@ -8025,3 +8127,4 @@ type VoidedEvent implements PaymentStatusEvent {
 
 """A four-digit year."""
 scalar Year
+

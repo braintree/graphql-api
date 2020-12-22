@@ -1,3 +1,10 @@
+# 2020-12-21
+
+* Add `paymentMethodSnapshot` field to `Payment` interface.
+* Add `LOCAL_PAYMENT` value to `PaymentMethodSnapshotSearchType`.
+* Rename `PaymentPaymentMethodSearchInput` to `SearchPaymentPaymentMethodInput`.
+* Add `paymentMethodSnapshot` input to `SearchPaymentPaymentMethodInput`.
+
 # 2020-12-10
 
 * Add `addressLine1`, `addressLine2`, `adminArea2`, and `adminArea1` to `AddressInput`.
