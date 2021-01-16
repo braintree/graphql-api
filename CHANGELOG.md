@@ -1,3 +1,9 @@
+# 2021-01-14
+
+* Support SCA exemptions by adding `scaExemption` input field to `CreditCardTransactionOptionsInput` and `scaExemptionRequested` field to `Transaction`.
+* Add values to `ThreeDSecureAuthenticationStatus` enum.
+* Deprecate `AUTHENTICATE_SUCCESSFUL_ISSUER_NOT_PARTICIPATING` in `ThreeDSecureAuthenticationStatus` enum.
+
 # 2020-12-21
 
 * Add `paymentMethodSnapshot` field to `Payment` interface.
