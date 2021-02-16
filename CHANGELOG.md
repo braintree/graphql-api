@@ -1,3 +1,24 @@
+# 2021-02-11
+
+* Use `CountryCode` instead of `CountryCodeAlpha3` to expand accepted ISO formats.
+* The `verification` field on `VaultCreditCardInput` is now `VaultCreditCardVerificationOptionsInput` to allow credit card specific options.
+* The `category` field on `DisputeEvidence`, `DisputeFileEvidence`, and `DisputeTextEvidence` is now `DisputeEvidenceCategory` scalar instead of a `String`.
+* Add `CITI` value to `CreditCardBrandCode` enum.
+* Add mutation `createDisputeTextEvidence` to allow associating text evidence to a dispute.
+* Add mutation `deleteDisputeEvidence` to allow deleting evidence from a dispute.
+* Add mutation `finalizeDispute` to allow finalizing an open dispute.
+* Add mutation `requestRefundFromInStoreReader`.
+* Add mutation `removeCreditCardFromAccountUpdater`.
+* Add `vaultPaymentMethodAfterTransacting` field to `TransactionInput` to allow automatically vaulting a single-use payment method after charging it.
+* Add `threeDSecurePassThrough` field to `VaultCreditCardInput` to return merchant-performed 3D Secure authentication results.
+* Add `paymentMethodIds` field and deprecate `paymentMethodId` to `SubmitCreditCardForAccountUpdaterInput` to allow multiple payment methods at a time.
+* Add `content` field to `DisputeTextEvidence`, and deprecate the `comment` field.
+* Add `amount` field to `CreditCardVerificationOptionsInput` to allow verifying credit cards for a particular amount.
+* Add `directoryServerTransactionId` field to `ThreeDSecurePassThroughInput` (and correct documentation for `threeDSecureServerTransactionId`).
+* Add `refund` field to `InStoreContext`.
+* Add `customFields` and `descriptor` fields to `Refund`.
+* Add `customFields` and `descriptor` fields to `DetachedRefundInput`.
+
 # 2021-01-14
 
 * Support SCA exemptions by adding `scaExemption` input field to `CreditCardTransactionOptionsInput` and `scaExemptionRequested` field to `Transaction`.

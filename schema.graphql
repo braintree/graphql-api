@@ -133,8 +133,8 @@ type Address {
   """
   postalCode: String
 
-  """Country code for the address in ISO 3166-1 alpha-3 format."""
-  countryCode: CountryCodeAlpha3
+  """Country code for the address."""
+  countryCode: CountryCode
 
   """Phone number."""
   phoneNumber: String
@@ -193,11 +193,11 @@ input AddressInput {
   postalCode: String
 
   """
-  Country code for the address in ISO 3166-1 alpha-3 format.
+  Country code for the address.
   
   *Required for Level 3 processing*.
   """
-  countryCode: CountryCodeAlpha3
+  countryCode: CountryCode
 
   """
   Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
@@ -247,7 +247,7 @@ type ApplePayConfiguration {
   """The merchant's Apple Pay country code."""
   countryCode: CountryCodeAlpha2
 
-  """The merchant's Apple Pay currency ISO code."""
+  """The merchant's Apple Pay currency code."""
   currencyCode: CurrencyCodeAlpha
 
   """
@@ -291,7 +291,7 @@ type ApplePayWebConfiguration {
   """The merchant's Apple Pay country code."""
   countryCode: CountryCodeAlpha2
 
-  """The merchant's Apple Pay currency ISO code."""
+  """The merchant's Apple Pay currency code."""
   currencyCode: CurrencyCodeAlpha
 
   """
@@ -607,10 +607,8 @@ type BinRecord {
   """The name of the bank that issued the card."""
   issuingBank: String
 
-  """
-  The country code of the country that issued the card in ISO 3166-1 alpha-3 format.
-  """
-  countryOfIssuance: CountryCodeAlpha3
+  """The country code of the country that issued the card."""
+  countryOfIssuance: CountryCode
 
   """
   A code representing any special program from the card issuer the card is part of.
@@ -664,7 +662,7 @@ input BusinessInput {
   idType: BusinessIDType
 
   """The country that issued the business's ID."""
-  idIssuer: CountryCodeAlpha3
+  idIssuer: CountryCode
 
   """The business's U.S. state of registration."""
   stateOfRegistration: UsStateCode!
@@ -1194,14 +1192,16 @@ enum ConfirmMicroTransferAmountsStatus {
 """
 An [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
 country code. Braintree only accepts [specific alpha-2 values](https://developers.braintreepayments.com/reference/general/countries#list-of-countries).
+Clients using a Braintree version prior to 2021-02-01 should use an [ISO 3166-1
+alpha-3](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) country code.
 """
-scalar CountryCodeAlpha2
+scalar CountryCode
 
 """
-An [ISO 3166-1 alpha-3](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)
-country code. Braintree only accepts [specific alpha-3 values](https://developers.braintreepayments.com/reference/general/countries#list-of-countries).
+An [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+country code. Braintree only accepts [specific alpha-2 values](https://developers.braintreepayments.com/reference/general/countries#list-of-countries).
 """
-scalar CountryCodeAlpha3
+scalar CountryCodeAlpha2
 
 """
 Input fields for obtaining an OAuth access token for an in-store reader.
@@ -1283,6 +1283,30 @@ type CreateCustomerPayload {
   customer: Customer
 }
 
+"""Top-level input fields for creating text evidence for a dispute."""
+input CreateDisputeTextEvidenceInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The ID of the dispute to create the evidence for."""
+  disputeId: ID!
+
+  """The category of the text evidence."""
+  category: DisputeTextEvidenceCategory
+
+  """The content of the text evidence."""
+  content: String!
+}
+
+"""Top-level field returned when creating text evidence for a dispute."""
+type CreateDisputeTextEvidencePayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The evidence object created."""
+  evidence: DisputeTextEvidence
+}
+
 """Input fields for creating an in store location."""
 input CreateInStoreLocationInput {
   """An identifier used to reconcile requests and responses."""
@@ -1335,6 +1359,7 @@ input CreateMerchantAccountApplicationInput {
 """A code identifying the card brand."""
 enum CreditCardBrandCode {
   AMERICAN_EXPRESS
+  CITI
   DINERS
   DISCOVER
   ELO
@@ -1350,6 +1375,7 @@ enum CreditCardBrandCode {
   UNKNOWN
   VISA
   american_express
+  citi
   diners
   discover
   elo
@@ -1587,6 +1613,9 @@ input CreditCardVerificationOptionsInput {
   The CVV for the credit card to be used when verifying the credit card, securely tokenized with the `tokenizeCvv` mutation.
   """
   tokenizedCvv: ID
+
+  """The amount to use to verify the credit card."""
+  amount: Amount
 }
 
 """
@@ -1902,6 +1931,24 @@ type DeleteCustomerPayload {
   clientMutationId: String
 }
 
+"""Input fields for deleting dispute evidence."""
+input DeleteDisputeEvidenceInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The ID of the evidence to be deleted."""
+  evidenceId: ID!
+
+  """The ID of the dispute that the evidence belongs to."""
+  disputeId: ID!
+}
+
+"""Top-level field returned when deleting evidence from a dispute."""
+type DeleteDisputeEvidencePayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+}
+
 """
 Top-level input fields for deleting a payment method referenced by a single-use token.
 """
@@ -1950,6 +1997,19 @@ input DetachedRefundInput {
   ID of the merchant account that will be used when performing the refund.
   """
   merchantAccountId: ID
+
+  """
+  Collection of custom field/value pairs. You must [set up each custom field in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#creating-a-custom-field)
+  prior to passing it with a request.
+  """
+  customFields: [CustomFieldInput!]
+
+  """
+  Fields used to define what will appear on a customer's statement (for
+  instance, credit card or bank statement) for this refund. This should match
+  the original transaction if possible.
+  """
+  descriptor: TransactionDescriptorInput
 }
 
 """
@@ -2128,7 +2188,52 @@ interface DisputeEvidence {
   sentToProcessorAt: Timestamp
 
   """The evidence category."""
-  category: String
+  category: DisputeEvidenceCategory
+}
+
+"""The evidence category that specifies which requirement it satisfies."""
+enum DisputeEvidenceCategory {
+  AVS_RESPONSE
+  CARRIER_NAME
+  CARRIER_NAME_OTHER
+  CREDIT_ISSUED_AMOUNT
+  CREDIT_ISSUED_DATE_TIME
+  DEVICE_ID
+  DEVICE_NAME
+  DOWNLOAD_DATE_TIME
+  EVIDENCE_TYPE
+  GENERAL
+  GEOGRAPHICAL_LOCATION
+  LEGIT_PAYMENTS_FOR_SAME_MERCHANDISE
+  MERCHANT_WEBSITE_OR_APP_ACCESS
+  PRIOR_DIGITAL_GOODS_TRANSACTION_ARN
+  PRIOR_DIGITAL_GOODS_TRANSACTION_DATE_TIME
+  PRIOR_DIGITAL_GOODS_TRANSACTION_ID
+  PRIOR_NON_DISPUTED_TRANSACTION_ARN
+  PRIOR_NON_DISPUTED_TRANSACTION_DATE_TIME
+  PRIOR_NON_DISPUTED_TRANSACTION_EMAIL_ADDRESS
+  PRIOR_NON_DISPUTED_TRANSACTION_ID
+  PRIOR_NON_DISPUTED_TRANSACTION_IP_ADDRESS
+  PRIOR_NON_DISPUTED_TRANSACTION_PHONE_NUMBER
+  PRIOR_NON_DISPUTED_TRANSACTION_PHYSICAL_ADDRESS
+  PROFILE_SETUP_OR_APP_ACCESS
+  PROOF_OF_3D_SECURE
+  PROOF_OF_AUTHORIZED_SIGNER
+  PROOF_OF_DELIVERY
+  PROOF_OF_DELIVERY_EMP_ADDRESS
+  PROOF_OF_POSSESSION_OR_USAGE
+  PURCHASER_EMAIL_ADDRESS
+  PURCHASER_IP_ADDRESS
+  PURCHASER_NAME
+  RECURRING_TRANSACTION_ARN
+  RECURRING_TRANSACTION_DATE_TIME
+  RECURRING_TRANSACTION_ID
+  REFUND_ID
+  SIGNED_DELIVERY_FORM
+  SIGNED_ORDER_FORM
+  TICKET_PROOF
+  TRACKING_NUMBER
+  TRACKING_URL
 }
 
 """Images, files, or other evidence supporting a dispute case."""
@@ -2149,7 +2254,7 @@ type DisputeFileEvidence implements DisputeEvidence {
   url: String
 
   """The evidence category."""
-  category: String
+  category: DisputeEvidenceCategory
 }
 
 """Information about the dispute provided by the processor."""
@@ -2271,10 +2376,42 @@ type DisputeTextEvidence implements DisputeEvidence {
   sentToProcessorAt: Timestamp
 
   """The body for text evidence."""
-  comment: String
+  comment: String @deprecated(reason: "Use `content` for name instead.")
+
+  """The body for text evidence."""
+  content: String
 
   """The evidence category."""
-  category: String
+  category: DisputeEvidenceCategory
+}
+
+"""
+For text evidence: the evidence category that specifies which requirement it satisfies.
+"""
+enum DisputeTextEvidenceCategory {
+  AVS_RESPONSE
+  CREDIT_ISSUED_AMOUNT
+  CREDIT_ISSUED_DATE_TIME
+  DEVICE_ID
+  DEVICE_NAME
+  DOWNLOAD_DATE_TIME
+  GEOGRAPHICAL_LOCATION
+  PRIOR_DIGITAL_GOODS_TRANSACTION_ARN
+  PRIOR_DIGITAL_GOODS_TRANSACTION_DATE_TIME
+  PRIOR_DIGITAL_GOODS_TRANSACTION_ID
+  PRIOR_NON_DISPUTED_TRANSACTION_ARN
+  PRIOR_NON_DISPUTED_TRANSACTION_DATE_TIME
+  PRIOR_NON_DISPUTED_TRANSACTION_EMAIL_ADDRESS
+  PRIOR_NON_DISPUTED_TRANSACTION_ID
+  PRIOR_NON_DISPUTED_TRANSACTION_IP_ADDRESS
+  PRIOR_NON_DISPUTED_TRANSACTION_PHONE_NUMBER
+  PRIOR_NON_DISPUTED_TRANSACTION_PHYSICAL_ADDRESS
+  PURCHASER_EMAIL_ADDRESS
+  PURCHASER_IP_ADDRESS
+  PURCHASER_NAME
+  RECURRING_TRANSACTION_ARN
+  RECURRING_TRANSACTION_DATE_TIME
+  RECURRING_TRANSACTION_ID
 }
 
 """Transaction input fields for searching for disputes."""
@@ -2511,6 +2648,24 @@ type FailedEvent implements PaymentStatusEvent {
   terminal: Boolean
 }
 
+"""Top-level input fields for finalizing a dispute."""
+input FinalizeDisputeInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The ID of the dispute to be finalized."""
+  disputeId: ID!
+}
+
+"""Top-level field returned when finalizing a dispute."""
+type FinalizeDisputePayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Information about the dispute that was finalized."""
+  dispute: Dispute
+}
+
 """Configuration for fraud protection provider."""
 type FraudProviderConfiguration {
   """
@@ -2679,6 +2834,9 @@ type InStoreContext implements Node {
   """The transaction representing the charge on the payment method."""
   transaction: Transaction
 
+  """The refund representing the refund on the payment method."""
+  refund: Refund
+
   """The reader requested to be charged."""
   reader: InStoreReader
 
@@ -2704,7 +2862,7 @@ type InStoreContextPayload {
 Potential statuses of a context created when an in-store charge is requested.
 """
 enum InStoreContextStatus {
-  """The context was successfully cancelled."""
+  """The context was successfully canceled."""
   CANCELLED
 
   """Payment was successful. The context was ended."""
@@ -2755,8 +2913,8 @@ type InStoreLocationAddress {
   """
   postalCode: String
 
-  """Country code for the address in ISO 3166-1 alpha-3 format."""
-  countryCode: CountryCodeAlpha3
+  """Country code for the address."""
+  countryCode: CountryCode
 }
 
 """Input fields for an in-store Location Address."""
@@ -2778,8 +2936,8 @@ input InStoreLocationAddressInput {
   """
   postalCode: String!
 
-  """Country code for the address in ISO 3166-1 alpha-3 format."""
-  countryCode: CountryCodeAlpha3!
+  """Country code for the address."""
+  countryCode: CountryCode!
 }
 
 """Fields required for an instore location."""
@@ -2856,6 +3014,42 @@ input InStoreReaderSetupInput {
 
 """A union of all possible in-store reader vendors."""
 union InStoreReaderVendor = VerifoneVendor
+
+"""Input fields for creating an in-store transaction."""
+input InStoreRefundInput {
+  """
+  Refund amount of the request. This value must be greater than 0, and must
+  match the currency format of the merchant account. This can only contain
+  numbers and one decimal point (e.g. x.xx). Can't be greater than the maximum
+  allowed by the processor.
+  """
+  amount: Amount!
+
+  """
+  Merchant account ID used to process the refund. Currency is also determined by
+  merchant account ID. If no merchant account ID is specified, we will use your
+  default merchant account.
+  """
+  merchantAccountId: ID
+
+  """
+  Additional information about the refund. On PayPal refunds, this field maps to
+  the PayPal invoice number. PayPal invoice numbers must be unique in your
+  PayPal business account. Maximum 255 characters or 127 for PayPal refunds.
+  """
+  orderId: String
+
+  """
+  Collection of custom field/value pairs. You must [set up each custom field in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#creating-a-custom-field)
+  prior to passing it with a request.
+  """
+  customFields: [CustomFieldInput!]
+
+  """
+  Fields used to define what will appear on a customer's bank statement for a specific purchase.
+  """
+  descriptor: TransactionDescriptorInput
+}
 
 """Input fields for creating an in-store transaction."""
 input InStoreTransactionInput {
@@ -3353,6 +3547,22 @@ type Mutation {
   acceptDispute(input: AcceptDisputeInput!): AcceptDisputePayload
 
   """
+  Finalizes a dispute and returns a payload that includes the dispute that was
+  finalized. Only disputes with a status of OPEN can be finalized.
+  """
+  finalizeDispute(input: FinalizeDisputeInput!): FinalizeDisputePayload
+
+  """
+  Creates text evidence to a dispute and returns a payload that includes the
+  evidence that was created. Only disputes with a status of OPEN can have text
+  evidence created for them.
+  """
+  createDisputeTextEvidence(input: CreateDisputeTextEvidenceInput!): CreateDisputeTextEvidencePayload
+
+  """Deletes evidence from a dispute."""
+  deleteDisputeEvidence(input: DeleteDisputeEvidenceInput!): DeleteDisputeEvidencePayload
+
+  """
   Vault an existing PayPal Billing Agreement that was not created through
   Braintree. Only use this mutation if you need to import PayPal Billing
   Agreements from an existing PayPal integration into your Braintree account.
@@ -3375,6 +3585,9 @@ type Mutation {
 
   """Request an in-store reader to cancel the charge flow."""
   requestCancelFromInStoreReader(input: RequestCancelFromInStoreReaderInput!): InStoreContextPayload
+
+  """Request an in-store reader to start an unreferenced refund flow."""
+  requestRefundFromInStoreReader(input: RequestRefundFromInStoreReaderInput!): InStoreContextPayload
 }
 
 """Means by which customers by their bills."""
@@ -3515,7 +3728,7 @@ input OwnerInput {
   idNumber: USTaxIdentificationNumber
 
   """The country that issued the owner's ID."""
-  idIssuer: CountryCodeAlpha3
+  idIssuer: CountryCode
 }
 
 """The owner's phone type."""
@@ -4787,6 +5000,20 @@ type Refund implements Node & Payment {
 
   """Line items for this refund."""
   lineItems: [TransactionLineItem!]
+
+  """
+  Collection of custom field/value pairs passed when creating the refund. Custom
+  fields are [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
+  For all refunds except "detached refunds", these will always be null.
+  """
+  customFields: [CustomField!]
+
+  """
+  Fields used to define what will appear on a customer's statement (for
+  instance, credit card or bank statement) for this refund. This will always
+  match the descriptor from the refunded transaction (if present).
+  """
+  descriptor: TransactionDescriptor
 }
 
 """A paginated list of refunds."""
@@ -4974,6 +5201,30 @@ type RefundUsBankAccountPayload {
   refund: Refund
 }
 
+"""Input fields for removing credit cards from Account Updater."""
+input RemoveCreditCardFromAccountUpdaterInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """A list of IDs of credit cards to be removed from Account Updater."""
+  paymentMethodIds: [ID!]!
+}
+
+"""
+Top-level fields returned when removing credit cards from Account Updater.
+"""
+type RemoveCreditCardFromAccountUpdaterPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  The credit cards that were submitted to be removed from Account Updater. Cards
+  that were unsuccessfully submitted will have a null entry in the list in the
+  same position as they were submitted and an associated error.
+  """
+  paymentMethods: [PaymentMethod]
+}
+
 """Top-level fields returned for a report query."""
 type Report {
   """Top-level fields returned in the transaction-level fee report query."""
@@ -5002,6 +5253,18 @@ input RequestChargeFromInStoreReaderInput {
 
   """Information about the requested in-store transaction."""
   transaction: InStoreTransactionInput!
+}
+
+"""Input fields for beginning the in-store refund flow."""
+input RequestRefundFromInStoreReaderInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of the Reader to request a refund from."""
+  readerId: ID!
+
+  """Information about the requested in-store refund."""
+  refund: InStoreRefundInput!
 }
 
 """Input fields for reversing a refund."""
@@ -5692,19 +5955,32 @@ input SubmitCreditCardForAccountUpdaterInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """ID of the credit card to submit for Account Updater."""
-  paymentMethodId: ID!
+  """
+  Deprecated: Please use `paymentMethodIds` instead.
+  ID of the credit card to submit for Account Updater.
+  """
+  paymentMethodId: ID
+
+  """A list of IDs of credit cards to be submitted for Account Updater."""
+  paymentMethodIds: [ID!]
 }
 
 """
-Top-level fields returned when submitting a credit card for Account Updater.
+Top-level fields returned when submitting credit cards for Account Updater.
 """
 type SubmitCreditCardForAccountUpdaterPayload {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
   """The credit card that was submitted to Account Updater."""
-  paymentMethod: PaymentMethod
+  paymentMethod: PaymentMethod @deprecated(reason: "Use `paymentMethods` instead.")
+
+  """
+  The credit cards that were submitted to Account Updater. Cards that were
+  unsuccessfully submitted will have a null entry in the list in the same
+  position as they were submitted and an associated error.
+  """
+  paymentMethods: [PaymentMethod]
 }
 
 """
@@ -6028,7 +6304,8 @@ type ThreeDSecureDetails {
   transactionStatusReason: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.transactionStatusReason instead.")
 }
 
-""" The billing address of the cardholder sent with 3D Secure Lookup requests.
+"""
+The billing address of the cardholder sent with 3D Secure Lookup requests.
 """
 input ThreeDSecureLookupBillingAddressInput {
   """
@@ -6129,7 +6406,8 @@ type ThreeDSecureLookupData {
   termUrl: String
 }
 
-""" The shipping address of the transaction to be sent with 3D Secure Lookup requests.
+"""
+The shipping address of the transaction to be sent with 3D Secure Lookup requests.
 """
 input ThreeDSecureLookupShippingAddressInput {
   """
@@ -6399,8 +6677,7 @@ input ThreeDSecurePassThroughInput {
   xId: String
 
   """
-  Transaction identifier resulting from 3D Secure 2 authentication. This field
-  must be supplied for Mastercard Identity Check.
+  3D Secure server transaction identifier resulting from 3D Secure authentication.
   """
   threeDSecureServerTransactionId: String
 
@@ -6419,6 +6696,12 @@ input ThreeDSecurePassThroughInput {
   The algorithm used to generate the CAVV value. This is only returned for Mastercard SecureCode transactions (3DS 1.0).
   """
   cavvAlgorithm: ThreeDSecureCavvAlgorithm
+
+  """
+  A unique identifier for the 3D Secure 2 interaction with the card brand
+  directory server. This field must be supplied for Mastercard Identity Check.
+  """
+  directoryServerTransactionId: String
 }
 
 """A raw 3D Secure PARes or VARes response code (e.g. 'Y')."""
@@ -6945,7 +7228,9 @@ input TransactionInput {
   channel: String
 
   """
-  If charging a single-use payment method, optional ID of a customer to associate the transaction with.
+  If charging a single-use payment method, optional ID of a customer to
+  associate the transaction with. If vaulting the single-use payment method,
+  this customer will be associated with the resulting multi-use payment method.
   """
   customerId: ID
 
@@ -6991,6 +7276,13 @@ input TransactionInput {
   for you in our standard 3D Secure integration.
   """
   threeDSecurePassThrough: ThreeDSecurePassThroughInput
+
+  """
+  When a single-use payment method is used to create this transaction, it can be
+  automatically stored in the vault after transacting. If this field is left
+  blank, the single-use payment method will not be vaulted.
+  """
+  vaultPaymentMethodAfterTransacting: VaultPaymentMethodAfterTransactingInput
 }
 
 """
@@ -7765,7 +8057,7 @@ input VaultCreditCardInput {
   vaulting. By default, a verification will be performed. If the verification
   fails, the credit card will not be vaulted.
   """
-  verification: PaymentMethodVerificationOptionsInput
+  verification: VaultCreditCardVerificationOptionsInput
 
   """Options used to indicate when a credit card is externally vaulted."""
   externalVault: VaultCreditCardExternalVaultOptionsInput
@@ -7786,9 +8078,36 @@ input VaultCreditCardInput {
   billingAddress: AddressInput
 
   """
+  Results of a merchant-performed 3D Secure authentication. You will only need
+  to use these fields if you've performed your own integration with a 3D Secure
+  MPI provider (e.g. Cardinal Centinel). Otherwise, Braintree's SDKs handle this
+  for you in our standard 3D Secure integration.
+  """
+  threeDSecurePassThrough: ThreeDSecurePassThroughInput
+
+  """
   Customer device information, which is sent directly to supported processors for fraud analysis.
   """
   riskData: RiskDataInput
+}
+
+"""Input fields that specify options for verifying the vaulted credit card."""
+input VaultCreditCardVerificationOptionsInput {
+  """
+  ID of the merchant account to use when verifying the credit card. The
+  verification will use the default merchant account if this field is left blank.
+  """
+  merchantAccountId: ID
+
+  """
+  Whether to opt out of verifying the credit card. Defaults to `false` for
+  credit cards that support verification. Clients should only pass `true` in the
+  uncommon scenario that the credit card has been verified externally to Braintree.
+  """
+  skip: Boolean
+
+  """The amount to use to verify the credit card."""
+  amount: Amount
 }
 
 """Top-level input field for vaulting a limited use PayPal account."""
@@ -7838,6 +8157,29 @@ input VaultLimitedUsePayPalAccountOptionsInput {
 
   """Shipping destination address information."""
   shippingAddress: AddressInput
+}
+
+"""
+ Specifies behavior for vaulting a single-use payment method after transacting with it.
+"""
+input VaultPaymentMethodAfterTransactingInput {
+  """Specifies the criteria which must be met to vault this payment method."""
+  when: VaultPaymentMethodCriteria!
+}
+
+"""
+Defines criteria for vaulting a single-use payment method after transacting with it.
+"""
+enum VaultPaymentMethodCriteria {
+  """
+  Always store the single-use payment method after transacting, regardless of the status of the transaction.
+  """
+  ALWAYS
+
+  """
+  Only store the single-use payment method if it was successfully authorized.
+  """
+  ON_SUCCESSFUL_TRANSACTION
 }
 
 """
