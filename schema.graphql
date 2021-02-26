@@ -84,6 +84,14 @@ enum ACHStandardEntryClassCode {
   WEB
 }
 
+"""
+The authentication context class reference that indcates how a universal access token can be used.
+"""
+enum ACRType {
+  CLIENT
+  SERVER
+}
+
 """Representation of an address."""
 type Address {
   """Company name."""
@@ -820,7 +828,8 @@ input CaptureTransactionOptionsInput {
 
   """
   Discount amount that was included in the total transaction amount. Does not
-  add to the total amount the payment method will be charged. This value can't be negative.
+  add to the total amount the payment method will be charged. This value can't
+  be negative. Please note that this field is not used on PayPal transactions.
   
   *Required for Level 3 processing*.
   """
@@ -1356,6 +1365,29 @@ input CreateMerchantAccountApplicationInput {
   achConfiguration: ACHConfigurationInput
 }
 
+"""Top-level input field for generating a PayPal access token."""
+input CreateUniversalAccessTokenInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  The ID of an existing customer. Including this will allow the access token to interact with this customer's data.
+  """
+  customerId: ID
+
+  """Authentication context class reference for the universal access token."""
+  type: ACRType!
+}
+
+"""Top-level fields returned when creating a universal access token."""
+type CreateUniversalAccessTokenPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The created universal access token."""
+  accessToken: AccessToken
+}
+
 """A code identifying the card brand."""
 enum CreditCardBrandCode {
   AMERICAN_EXPRESS
@@ -1597,9 +1629,7 @@ type CreditCardVerificationDetails {
   amount: MonetaryAmount
 }
 
-"""
-Input fields for creating a transaction by authorizing or charging a credit card.
-"""
+"""Input fields that specify options for verifying the credit card."""
 input CreditCardVerificationOptionsInput {
   """The type of account to be used when verifying a combo card."""
   accountType: CardAccountType
@@ -2775,6 +2805,36 @@ type GenerateInStoreReaderPairingCodePayload {
   expiresIn: Int
 }
 
+"""Coordinates describing a geographic position."""
+type GeoCoordinates {
+  """
+  The angular distance of a place north or south of the earth's equator.
+  A positive value is north of the equator, a negative value is south of the equator.
+  """
+  latitude: Float
+
+  """
+  The angular distance of a place east or west of the meridian at Greenwich, England.
+  A positive value is east of the prime meridian, a negative value is west of the prime meridian.
+  """
+  longitude: Float
+}
+
+"""Coordinates describing a geographic position."""
+input GeoCoordinatesInput {
+  """
+  The angular distance of a place north or south of the earth's equator.
+  A positive value is north of the equator, a negative value is south of the equator.
+  """
+  latitude: Float!
+
+  """
+  The angular distance of a place east or west of the meridian at Greenwich, England.
+  A positive value is east of the prime meridian, a negative value is west of the prime meridian.
+  """
+  longitude: Float!
+}
+
 """Configuration for Google Pay on Android and the web."""
 type GooglePayConfiguration {
   """A string used to identify the merchant to the customer."""
@@ -2890,8 +2950,22 @@ type InStoreLocation {
   """Name of the in-store location."""
   name: String
 
+  """
+  A merchant-assigned internal name of this location, unique to this merchant.
+  """
+  internalName: String
+
   """The address of the in-store location."""
   address: InStoreLocationAddress
+
+  """The coordinates of this location."""
+  geoCoordinates: GeoCoordinates
+
+  """The PayPal account ID to which this location was added."""
+  payerId: ID
+
+  """Whether QR code payments will be enabled for this location."""
+  qrCodePaymentsEnabled: Boolean
 }
 
 """Input fields for an in-store location address."""
@@ -2942,11 +3016,23 @@ input InStoreLocationAddressInput {
 
 """Fields required for an instore location."""
 input InStoreLocationInput {
-  """Name of the Location."""
+  """The publicly visible label of this Location."""
   name: String!
+
+  """Name assigned by the merchant to uniquely identify this Location."""
+  internalName: String!
 
   """The address of the in-store Location."""
   address: InStoreLocationAddressInput!
+
+  """The coordinates of this location."""
+  geoCoordinates: GeoCoordinatesInput!
+
+  """The PayPal account ID to which this Location will be added."""
+  payerId: ID
+
+  """Whether QR code payments will be enabled for this location."""
+  enableQRCodePayments: Boolean!
 }
 
 """An in-store payment card reader."""
@@ -3468,6 +3554,11 @@ type Mutation {
   createClientToken(input: CreateClientTokenInput): CreateClientTokenPayload
 
   """
+  Create a PayPal access token that can be used to make additional API calls or initialize a client.
+  """
+  createUniversalAccessToken(input: CreateUniversalAccessTokenInput!): CreateUniversalAccessTokenPayload
+
+  """
   Partially capture funds from a transaction that was successfully authorized
   and return a payload that includes a new transaction with information about
   the capture. This is only available for PayPal transactions and certain use
@@ -3612,6 +3703,36 @@ enum MVVUtilityType {
   GAS
   TRASH
   WATER
+}
+
+"""The name of the party."""
+input NameInput {
+  """The prefix, or title, to the party name."""
+  prefix: String
+
+  """The party's given, or first, name. Required if the party is a person."""
+  givenName: String!
+
+  """
+  The party's surname or family name. Also known as the last name. Required if
+  the party is a person. Use also to store multiple surnames including the
+  matronymic, or mother's, surname.
+  """
+  surname: String!
+
+  """
+  The party's middle name. Use also to store multiple middle names including the patronymic, or father's, middle name.
+  """
+  middleName: String
+
+  """The suffix for the party's name."""
+  suffix: String
+
+  """
+  The party's alternate name. Can be a business name, nickname, or any other
+  name that cannot be split into first, last name. Required for a business party name.
+  """
+  alternateFullName: String
 }
 
 """Input fields for a network tokenized card."""
@@ -3836,7 +3957,8 @@ input PartialCaptureTransactionOptionsInput {
 
   """
   Discount amount that was included in the total transaction amount. Does not
-  add to the total amount the payment method will be charged. This value can't be negative.
+  add to the total amount the payment method will be charged. This value can't
+  be negative. Please note that this field is not on PayPal transactions.
   
   *Required for Level 3 processing*.
   """
@@ -3983,9 +4105,24 @@ interface PaymentContext {
 The initiator of the payment. Payment can either be merchant-initiated or customer-initiated.
 """
 enum PaymentInitiator {
+  """
+  Transactions that are initiated by the customer via the merchant by mail or telephone.
+  """
   MOTO
+
+  """
+  Transactions for subsequent recurring payments (e.g. subscriptions with a fixed amount on a predefined schedule).
+  """
   RECURRING
+
+  """
+  Transactions that represent the first in a series of recurring payments or subscription.
+  """
   RECURRING_FIRST
+
+  """
+  Transactions for unscheduled payments that are not recurring on a predefined schedule or amount (e.g. balance top-up).
+  """
   UNSCHEDULED
 }
 
@@ -4812,6 +4949,31 @@ type PerformThreeDSecureLookupPayload {
 }
 
 """
+The phone number in its international [E.164 numbering plan format](https://www.itu.int/rec/T-REC-E.164/en).
+"""
+input PhoneInput {
+  """
+  The country calling code (CC), in its canonical international [E.164 numbering
+  plan format](https://www.itu.int/rec/T-REC-E.164/en). The combined length of
+  the CC and the national number must not be greater than 15 digits. The
+  national number consists of a national destination code (NDC) and subscriber number (SN).
+  """
+  countryPhoneCode: String!
+
+  """
+  The phone number, in its canonical international [E.164 numbering plan
+  format](https://www.itu.int/rec/T-REC-E.164/en). The combined length of the
+  country calling code (CC) and the national number must not be greater than 15
+  digits. The national number consists of a national destination code (NDC) and
+  subscriber number (SN).
+  """
+  phoneNumber: String!
+
+  """The extension number."""
+  extensionNumber: String
+}
+
+"""
 Top-level fields returned when fetching a customer's preferred payment methods.
 """
 type PreferredPaymentMethodsPayload {
@@ -5073,6 +5235,11 @@ input RefundInput {
   The refund's order ID. Defaults to the order ID of the original transaction.
   """
   orderId: String
+
+  """
+  ID of the merchant account that will be used when performing the refund.
+  """
+  merchantAccountId: ID
 
   """
   Line items for this refund. Up to 249 line items may be specified.
@@ -6304,8 +6471,7 @@ type ThreeDSecureDetails {
   transactionStatusReason: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.transactionStatusReason instead.")
 }
 
-"""
-The billing address of the cardholder sent with 3D Secure Lookup requests.
+""" The billing address of the cardholder sent with 3D Secure Lookup requests.
 """
 input ThreeDSecureLookupBillingAddressInput {
   """
@@ -6406,8 +6572,7 @@ type ThreeDSecureLookupData {
   termUrl: String
 }
 
-"""
-The shipping address of the transaction to be sent with 3D Secure Lookup requests.
+""" The shipping address of the transaction to be sent with 3D Secure Lookup requests.
 """
 input ThreeDSecureLookupShippingAddressInput {
   """
@@ -7250,7 +7415,8 @@ input TransactionInput {
 
   """
   Discount amount that was included in the total transaction amount. Does not
-  add to the total amount the payment method will be charged. This value can't be negative.
+  add to the total amount the payment method will be charged. This value can't
+  be negative. Please note that this field is not used on PayPal transactions.
   
   *Required for Level 3 processing*.
   """
@@ -7403,7 +7569,8 @@ input TransactionLineItemInput {
   taxAmount: String
 
   """
-  Amount of discount for the line item. Can include up to 2 decimal places. This value can't be negative.
+  Amount of discount for the line item. Can include up to 2 decimal places. This
+  value can't be negative. Please note that this field is not used on PayPal transactions.
   
   *Required for Level 3 processing*.
   """
@@ -8091,7 +8258,9 @@ input VaultCreditCardInput {
   riskData: RiskDataInput
 }
 
-"""Input fields that specify options for verifying the vaulted credit card."""
+"""
+Input fields that specify options for verifying the vaulted credit card.
+"""
 input VaultCreditCardVerificationOptionsInput {
   """
   ID of the merchant account to use when verifying the credit card. The
@@ -8159,8 +8328,7 @@ input VaultLimitedUsePayPalAccountOptionsInput {
   shippingAddress: AddressInput
 }
 
-"""
- Specifies behavior for vaulting a single-use payment method after transacting with it.
+""" Specifies behavior for vaulting a single-use payment method after transacting with it.
 """
 input VaultPaymentMethodAfterTransactingInput {
   """Specifies the criteria which must be met to vault this payment method."""
@@ -8577,6 +8745,9 @@ type Viewer {
 
   """Details about the authenticated merchant."""
   merchant: Merchant
+
+  """Associated rights based on authentication."""
+  rights: [String!]
 }
 
 """Configuration for Visa Checkout."""

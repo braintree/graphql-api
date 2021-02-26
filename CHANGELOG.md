@@ -1,3 +1,11 @@
+# 2021-02-26
+
+* Add `createUniversalAccessToken` mutation.
+* Add `internalName`, `geoCoordinates`, `payerId` and `qrCodePaymentsEnabled` to `InStoreLocation`.
+* Add `internalName`, `geoCoordinates`, `payerId` and `enableQRCodePayments` to `InStoreLocationInput`.
+* Add `merchantAccountId` to `RefundInput`.
+* Add `rights` to `Viewer`.
+
 # 2021-02-11
 
 * Use `CountryCode` instead of `CountryCodeAlpha3` to expand accepted ISO formats.
