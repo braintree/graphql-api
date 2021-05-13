@@ -1,3 +1,30 @@
+# 2021-05-13
+
+* Add `createDisputeFileEvidence`, `requestVaultFromInStoreReader`, `requestTextDisplayFromInStoreReader`, `requestItemDisplayFromInStoreReader`, `createKlarnaEUSession`, `updateKlarnaEUSession`, `updateKlarnaEUOrderShippingInfo`, and `createAfterpayAUNZCheckout` mutations.
+* Add `pingInStoreReader` query.
+* Add `installmentCount` to `CreditCardTransactionOptionsInput`.
+* Add `taxIdentifiers` to `CustomerInput`.
+* Add `chargebackProtectionLevel` to `Dispute`.
+* Add `chargebackProtectionLevel` to `DisputeSearchInput`.
+* Add `CHARGEBACK_PROTECTION`, `EFFORTLESS_CHARGEBACK_PROTECTION`, and `FRAUD_PROTECTION_ADVANCED` to `FraudServiceProvider` enum.
+* Add `countryCode` to `GooglePayConfiguration`.
+* Add `InStoreContextResult` interface.
+* Add `id`, `reader`, and `status` to `InStoreContextPayload`.
+* Add `payerId` and `enableQRCodePayments` to `InStoreLocationInput`.
+* Add `merchantAccounts` to `Merchant`.
+* Add `bankAccount`, `paypalAccount`, `threeDSecure` to `MerchantAccount`.
+* Make `eCommerceIndicator` nullable on `NetworkTokenInput`.
+* Add non-nullable `originDetails` to `NetworkTokenInput`.
+* Add `MANUAL_KEY_ENTRY` to `PaymentReaderInputMode` enum.
+* Add `storeId` to `PaymentSearchInput`, `RefundSearchInput`, and `TransactionSearchInput`
+* Add `dataOnlyRequested` to `PerformThreeDSecureLookupInput`.
+* Add `decisionReasons` and `score` to `RiskData`.
+* Add `DATA_ONLY_SUCCESSFUL` and `UNSUPPORTED_ACCOUNT_TYPE` to `ThreeDSecureAuthenticationStatus` enum.
+* Add `installmentDetails` to `Transaction`.
+* Change `rights` on `Viewer` to return `[Right!]`.
+* Deprecate all fields on `InStoreContext`.
+* Deprecate `inStoreContext` on `InStoreContextPayload`, use top-level fields instead.
+
 # 2021-02-26
 
 * Add `createUniversalAccessToken` mutation.

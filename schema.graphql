@@ -1,3 +1,9 @@
+"""Exposes a URL that specifies the behaviour of this scalar."""
+directive @specifiedBy(
+  """The URL that specifies the behaviour of this scalar."""
+  url: String!
+) on SCALAR
+
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
   """An identifier used to reconcile requests and responses."""
@@ -29,42 +35,6 @@ type AccessToken {
 
   """Expiration in ISO time format."""
   expiresAt: String
-}
-
-"""Top-level fields returned when obtaining an OAuth access token."""
-type AccessTokenPayload {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """The access token."""
-  accessToken: AccessToken
-}
-
-"""Information about the business's ACH configuration."""
-input ACHConfigurationInput {
-  """
-  The ACH/NACHA company name. Included in the NACHA file to help identify the company.
-  """
-  companyName: String
-
-  """
-  This is included in the NACHA file to help identify the company's business
-  type and will appear in the description section of a customer's bank
-  statement. Examples: "Bill Pay", "Utility", etc.
-  """
-  entry: String!
-
-  """
-  Should ACH initiation be enabled? If true, any failed transaction will be retried.
-  """
-  reinitiation: Boolean!
-
-  """
-  Additional information that you would like to include on the customer's bank
-  statement (e.g. phone number) for ACH transactions. Note: this is up to the
-  customer's bank to display, as not all banks support this field.
-  """
-  softDescriptor: String
 }
 
 """
@@ -236,10 +206,125 @@ input AddressInput {
   countryName: String
 }
 
-"""Information about the business's relationship with American Express."""
-input AmericanExpressRelationshipInput {
-  """The business's American Express SE number."""
-  serviceEstablishmentNumber: String!
+"""Afterpay address."""
+input AfterpayAUNZAddressInput {
+  """Full name of contact. Max 255 characters."""
+  name: String!
+
+  """First line of the address. Max 128 characters."""
+  line1: String!
+
+  """Second line of the address. Max 128 characters."""
+  line2: String
+
+  """Australian suburb or New Zealand town. Max 128 characters."""
+  area1: String
+
+  """New Zealand suburb or local area. Max 128 characters."""
+  area2: String
+
+  """Australian state, New Zealand region. Max 128 characters."""
+  region: String!
+
+  """ZIP or postal code. Max 128 characters."""
+  postcode: String!
+
+  """Country code."""
+  countryCode: CountryCode!
+
+  """
+  The phone number, in [E.123](https://en.wikipedia.org/wiki/E.123) format. Max 32 characters.
+  """
+  phoneNumber: String
+}
+
+"""Afterpay consumer config."""
+input AfterpayAUNZConsumerInput {
+  """The consumer's phone number. Max 32 characters."""
+  phoneNumber: String
+
+  """The consumer's first name and any middle names. Max 128 characters."""
+  givenNames: String!
+
+  """The consumer's last name. Max 128 characters."""
+  surname: String!
+
+  """The consumer's email address."""
+  email: EmailAddress!
+}
+
+"""Configuration for Afterpay courier data."""
+input AfterpayAUNZCourierInput {
+  """The time at which the order was shipped."""
+  shippedAt: Timestamp
+
+  """The name of the courier. Max 128 characters."""
+  name: String
+
+  """The tracking number provided by the courier. Max 128 characters."""
+  tracking: String
+
+  """The shipping priority."""
+  priority: AfterpayAUNZShippingPriority
+}
+
+"""Afterpay discount configuration."""
+input AfterpayAUNZDiscountInput {
+  """A display name for the discount. Max 128 characters."""
+  displayName: String!
+
+  """The discount amount."""
+  amount: MonetaryAmountInput
+}
+
+"""A line item for an Afterpay order."""
+input AfterpayAUNZOrderItemInput {
+  """Product name. Max 255 characters."""
+  name: String!
+
+  """Product SKU. Max 128 characters."""
+  sku: String
+
+  """The quantity of the item, stored as a signed 32-bit integer."""
+  quantity: Int!
+
+  """
+  The canonical URL for the item's Product Detail Page. Max 2048 characters.
+  """
+  pageUrl: String
+
+  """
+  A URL for a web-optimised photo of the item, suitable for use directly as the
+  src attribute of an img tag. Max 2048 characters.
+  """
+  imageUrl: String
+
+  """The unit price of the individual item. Must be a positive value."""
+  price: MonetaryAmountInput
+
+  """
+  A list of lists of strings to accommodate multiple categories that apply to
+  the item. Each inner-list represents a hierarchical path to a category, with
+  the left-most category being the top-level parent category.
+  """
+  categories: [[String!]!]
+}
+
+"""Redirect URLs for Afterpay checkout."""
+input AfterpayAUNZRedirectUrlsInput {
+  """The consumer is redirected to this URL on confirmation."""
+  redirectConfirmUrl: String!
+
+  """
+  The consumer to redirected to this URL if the payment process is canceled.
+  """
+  redirectCancelUrl: String!
+}
+
+"""The shipping priority."""
+enum AfterpayAUNZShippingPriority {
+  EXPRESS
+  STANDARD
 }
 
 """
@@ -252,7 +337,9 @@ type ApplePayConfiguration {
   """The environment being used for Apple Pay."""
   status: ApplePayStatus
 
-  """The merchant's Apple Pay country code."""
+  """
+  The country code of the acquiring bank where the transaction is likely to be processed.
+  """
   countryCode: CountryCodeAlpha2
 
   """The merchant's Apple Pay currency code."""
@@ -311,21 +398,6 @@ type ApplePayWebConfiguration {
   supportedCardBrands: [CreditCardBrandCode!]
 }
 
-"""Input fields for a Merchant Account Application bank account object."""
-input ApplicationBankAccountInput {
-  """The routing number of the bank that holds the account."""
-  routingNumber: UsBankRoutingNumber!
-
-  """The account number of the bank account."""
-  accountNumber: UsBankAccountNumber!
-
-  """The type of transfer setup on the account."""
-  transferType: ApplicationTransferType!
-
-  """The purpose of account."""
-  accountPurpose: ApplicationBankAccountPurpose!
-}
-
 """The purpose of the merchant application bank account."""
 enum ApplicationBankAccountPurpose {
   CHECKING
@@ -337,12 +409,6 @@ enum ApplicationStatus {
   APPROVED
   PROCESSING
   REJECTED
-}
-
-"""The type of transfer used for the bank account."""
-enum ApplicationTransferType {
-  BANK_ACCOUNT_USA
-  BANK_ACCOUNT_WIRE_USA
 }
 
 """
@@ -533,14 +599,6 @@ input AuthorizePayPalAccountOptionsInput {
   """
   description: String
 
-  """
-  Input fields setting the PayPal transaction context for risk assessment
-  purposes. In order to use this field, your PayPal account must be set up to
-  use the SetTransactionContext feature. This data will only be passed through
-  to PayPal, and won't be stored on the transaction itself.
-  """
-  riskContext: PayPalTransactionRiskContextInput
-
   """Deprecated: This field is no longer supported."""
   payee: PayPalPayeeOptionsInput
 }
@@ -643,127 +701,6 @@ type BraintreeApiConfiguration {
 
   """The authentication for tokenizing payment methods."""
   accessToken: String
-}
-
-"""The biller's ID type."""
-enum BusinessIDType {
-  EMPLOYER_IDENTIFICATION_NUMBER
-}
-
-"""General information about the business associated with the account."""
-input BusinessInput {
-  """The biller's business type."""
-  type: BusinessType!
-
-  """The DBA (Doing Business As) name of the business."""
-  dbaName: String!
-
-  """
-  The business's legal name. Max 100 characters. Valid characters: letters, numbers, spaces, ! & ' ( ) + , - / : .
-  """
-  legalName: String!
-
-  """The business's federal tax ID (EIN)."""
-  federalTaxId: USTaxIdentificationNumber!
-
-  """The biller's ID type."""
-  idType: BusinessIDType
-
-  """The country that issued the business's ID."""
-  idIssuer: CountryCode
-
-  """The business's U.S. state of registration."""
-  stateOfRegistration: UsStateCode!
-
-  """The business's merchant category code."""
-  merchantCategoryCode: MerchantCategoryCode!
-
-  """The business's start date. Must be after 1700."""
-  startDate: Date!
-
-  """A URL to an logo image. Required for Venmo onboarding."""
-  logoUrl: String
-
-  """The business's email address."""
-  email: String!
-
-  """The business's address. No P.O. Boxes."""
-  address: AddressInput!
-
-  """The country code for the business's phone number."""
-  phoneCountryCode: Int!
-
-  """The business's phone number. 9 digits. No extensions. Numbers only."""
-  phoneNumber: String!
-
-  """The type of phone number for the business."""
-  phoneType: BusinessPhoneType!
-
-  """The business's website. Must be a valid URL."""
-  website: String!
-
-  """
-  The business's annual processing volume. Must be less than 1 billion USD.
-  """
-  annualVolume: Int!
-
-  """
-  The business's average transaction size. Must be less than 1 billion USD.
-  """
-  averageTransactionSize: Int!
-
-  """
-  The business's largest transaction size. Must be less than 1 billion USD.
-  """
-  largestTransactionSize: Int!
-
-  """
-  Whether payment is collected in arrears (after goods have been delivered).
-  """
-  arrears: Boolean
-
-  """
-  Percentage of the business's transactions are billed in arrears. Must be between 0 and 100.
-  """
-  percentageOneTime: Int
-
-  """
-  If the biller delivers goods, the number of days after charge they are delivered.
-  """
-  deliveryDays: Int
-
-  """The business's refund policy."""
-  refundPolicy: RefundPolicy!
-
-  """
-  If applicable, the breakdown of monthly, quarterly, semi-annual, and annual subscriptions offered by the business.
-  """
-  subscriptions: BusinessSubscriptionInput
-}
-
-"""The type of phone number for the business."""
-enum BusinessPhoneType {
-  BUSINESS
-  CUSTOMER_SERVICE
-  MOBILE
-  WORK
-}
-
-"""
-A breakdown of the business's subscription frequency. All percentages provided must add up to 100.
-"""
-input BusinessSubscriptionInput {
-  """The percentage of the business's subscriptions that are monthly."""
-  percentMonthly: Int!
-
-  """The percentage of the business's subscriptions that are quarterly."""
-  percentQuarterly: Int!
-
-  """The percentage of the business's subscriptions that are semi-annual."""
-  percentSemiAnnual: Int!
-
-  """The percentage of the business's subscriptions that are annual."""
-  percentAnnual: Int!
 }
 
 """The type of the business."""
@@ -910,6 +847,27 @@ enum Challenge {
 }
 
 """
+The chargeback protection level indicates the transaction or dispute's protection status.
+"""
+enum ChargebackProtectionLevel {
+  """
+  The transaction or dispute is protected by the effortless chargeback protection product.
+  """
+  EFFORTLESS
+
+  """
+  The merchant has not enrolled any chargeback protection products, or the
+  merchant is registered, but the transaction or dispute is not protected.
+  """
+  NOT_PROTECTED
+
+  """
+  The transaction or dispute is protected by the standard chargeback protection product.
+  """
+  STANDARD
+}
+
+"""
 Top-level input fields for creating a transaction by charging a credit card.
 """
 input ChargeCreditCardInput {
@@ -974,14 +932,6 @@ input ChargePayPalAccountOptionsInput {
   Description of the transaction that is displayed to customers in PayPal email receipts.
   """
   description: String
-
-  """
-  Input fields setting the PayPal transaction context for risk assessment
-  purposes. In order to use this field, your PayPal account must be set up to
-  use the SetTransactionContext feature. This data will only be passed through
-  to PayPal, and won't be stored on the transaction itself.
-  """
-  riskContext: PayPalTransactionRiskContextInput
 
   """Deprecated: This field is no longer supported."""
   payee: PayPalPayeeOptionsInput
@@ -1212,29 +1162,62 @@ country code. Braintree only accepts [specific alpha-2 values](https://developer
 """
 scalar CountryCodeAlpha2
 
-"""
-Input fields for obtaining an OAuth access token for an in-store reader.
-"""
-input CreateAccessTokenForReaderInput {
+"""Input to create an Afterpay checkout session."""
+input CreateAfterpayAUNZCheckoutInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """A reader specific identification code."""
-  deviceCode: String!
+  """Total amount for order to be charged to consumer."""
+  amount: MonetaryAmountInput!
 
-  """A globally unique reader device id generated by the reader."""
-  deviceId: ID!
+  """The consumer requesting the order."""
+  consumer: AfterpayAUNZConsumerInput!
+
+  """Billing address."""
+  billing: AfterpayAUNZAddressInput
+
+  """Shipping address."""
+  shipping: AfterpayAUNZAddressInput!
+
+  """Shipping courier details."""
+  courier: AfterpayAUNZCourierInput
+
+  """An array of order items."""
+  items: [AfterpayAUNZOrderItemInput!]
+
+  """An array of discounts."""
+  discounts: [AfterpayAUNZDiscountInput!]
+
+  """A merchant's redirect URLs."""
+  merchant: AfterpayAUNZRedirectUrlsInput!
+
+  """The merchant's id/reference that this order corresponds to."""
+  merchantReference: String
+
+  """The included tax amount after applying all discounts."""
+  taxAmount: MonetaryAmountInput
+
+  """The shipping amount."""
+  shippingAmount: MonetaryAmountInput
 }
 
-"""
-Input fields for obtaining an OAuth access token using an authorization grant.
-"""
-input CreateAccessTokenFromAuthorizationCodeInput {
+"""The Afterpay checkout payload for use on the client."""
+type CreateAfterpayAUNZCheckoutPayload {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """A authorization code."""
-  authorizationCode: String!
+  """Checkout token to be used to complete payment."""
+  token: ID!
+
+  """The timestamp of when the checkout token will expire."""
+  expires: Timestamp!
+
+  """
+  A URL that can be used to redirect the consumer to the Afterpay screenflow
+  directly from the merchant backend. This can be used as an alternative to
+  implementing the JavaScript afterpay.js.
+  """
+  redirectCheckoutUrl: String!
 }
 
 """Top-level input field for generating a client token."""
@@ -1253,22 +1236,6 @@ type CreateClientTokenPayload {
 
   """A Base64 encoded string used to initialize client SDKs."""
   clientToken: String
-}
-
-"""
-Fields that are provided when creating a custom action payment context.
-"""
-input CreateCustomActionsPaymentContextInput {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """The action you wish to invoke when creating the payment context."""
-  actionName: String!
-
-  """
-  A list of fields used to create a PaymentContext during execution of a Custom Actions handler (Five (5) entries maximum).
-  """
-  customFields: [CustomActionsPaymentContextFieldInput!]
 }
 
 """Top-level field for creating a customer."""
@@ -1290,6 +1257,30 @@ type CreateCustomerPayload {
   payment methods or creating transactions to associate those objects.
   """
   customer: Customer
+}
+
+"""Top-level input fields for adding file evidence to a dispute."""
+input CreateDisputeFileEvidenceInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The ID of the dispute to be accepted."""
+  disputeId: ID!
+
+  """The category for the evidence file."""
+  category: DisputeFileEvidenceCategory
+}
+
+"""Top-level field returned when creating file evidence for a dispute."""
+type CreateDisputeFileEvidencePayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The evidence object created."""
+  evidence: DisputeFileEvidence
+
+  """Information about the dispute the evidence is attached to."""
+  dispute: Dispute
 }
 
 """Top-level input fields for creating text evidence for a dispute."""
@@ -1334,35 +1325,92 @@ type CreateInStoreLocationPayload {
   location: InStoreLocation
 }
 
-"""Input fields for applying for a merchant account."""
-input CreateMerchantAccountApplicationInput {
+"""
+Input fields to create a new Klarna session. For more information, see the
+[Klarna create session documentation](https://developers.klarna.com/api/#payments-api-create-a-new-credit-session).
+"""
+input CreateKlarnaEUSessionInput {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """A unique identifier to track the progress of individual applications."""
-  uniqueIdentifier: String!
+  """The acquiring channel where the session takes place."""
+  channel: String
 
-  """General information about the business associated with the account."""
-  business: BusinessInput!
+  """Details of the customer making the payment."""
+  customer: KlarnaEUCustomerInput
 
-  """
-  A minimum of one and a maximum of five owners can be submitted. One owner must be the authorized signer on the account.
-  """
-  owners: [OwnerInput!]!
-
-  """Information about the business's relationship with American Express."""
-  americanExpressRelationship: AmericanExpressRelationshipInput
-
-  """The bank account to be used for sales."""
-  salesAccount: ApplicationBankAccountInput!
+  """Design package to use in the session."""
+  design: String
 
   """
-  Configuration for businesses registered with various discount programs (MVV, VPP, Loans).
+  Locale for the session.
+  
+  As per [Klarna's requirements](https://developers.klarna.com/api/#data-types):
+  
+  > Locales should be formatted as a language tag consisting of a two-letter
+  language code combined with a two-letter country code according to RFC 1766.
+  Examples are en-us for US English, en-gb for British English and sv-se for
+  Swedish (in Sweden).
   """
-  discountProgramRegistration: DiscountProgramRegistrationInput
+  locale: Language!
 
-  """Configuration for processing via ACH."""
-  achConfiguration: ACHConfigurationInput
+  """
+  Used for storing the merchant's internal order number or other reference. If
+  set, will be shown on the confirmation page as 'order number' and send to the
+  customer in the confirmation email after a successful direct bank transfer
+  payment. It will also be included in the payments description in the
+  customer's bank account and settlement files to the merchant. Max 255 characters.
+  """
+  orderId: String
+
+  """Merchant URLs that Klarna needs at different stages of the process."""
+  merchantUrls: KlarnaEUMerchantUrlsInput
+
+  """Design customization options for the Klarna Payments iframe."""
+  designOptions: KlarnaEUDesignOptionsInput
+
+  """
+  Total amount of the order including tax and any available discounts.
+  
+  **Example:** 25 Euros and 50 cents should be 25.50.
+  """
+  amount: String!
+
+  """
+  The array containing the list of items that are part of this order. Maximum of 1000 items.
+  """
+  lineItems: [KlarnaEULineItemInput!]!
+
+  """
+  Total tax amount of the order.
+  
+  **Example:** 25 Euros and 50 cents should be 25.50.
+  """
+  taxAmount: String
+
+  """
+  The purchase country of the customer. The billing country always overrides the
+  purchase country if the values are different.
+  """
+  purchaseCountry: CountryCode!
+
+  """The purchase currency of the order."""
+  purchaseCurrency: CurrencyCodeAlpha!
+}
+
+"""The result from a call to create session."""
+type CreateKlarnaEUSessionPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The ID of the Klarna session that was created."""
+  sessionId: ID
+
+  """Client token to be passed to the Klarna JS client while initializing."""
+  clientToken: String
+
+  """Available payment method categories for this session."""
+  paymentMethodCategories: [KlarnaEUPaymentMethodCategory!]
 }
 
 """Top-level input field for generating a PayPal access token."""
@@ -1621,6 +1669,9 @@ input CreditCardTransactionOptionsInput {
 
   """The type of Strong Customer Authentication Exemption requested."""
   scaExemption: ScaExemptionType
+
+  """Number of monthly installments (can be anywhere between 2 and 12)."""
+  installmentCount: Int
 }
 
 """Information specific to verifications of credit card payment methods."""
@@ -1698,17 +1749,6 @@ input CustomActionsPaymentContextFieldInput {
   An alphanumeric string used to store a CustomField value (7168 characters maximum).
   """
   value: String!
-}
-
-"""
-Top-level fields returned from a created custom actions payment context.
-"""
-type CustomActionsPaymentContextPayload {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """The payment context data."""
-  customActionsPaymentContext: CustomActionsPaymentContext
 }
 
 """Details about a custom actions payment method."""
@@ -1883,6 +1923,17 @@ input CustomerInput {
 
   """The customer's phone number."""
   phoneNumber: String
+
+  """
+  A set of country code ID pairs, analogous to Social Security numbers in the United States.
+  
+  A customer may have multiple tax identifiers, but only one per tax
+  jurisdiction. The values provided for an update will be stored and previous
+  entries will be updated.
+  
+  **Note:** You will only need to use these fields for processing in certain countries.
+  """
+  taxIdentifiers: [CustomerTaxIdentifierInput!]
 }
 
 """Input fields for searching for customers."""
@@ -1907,6 +1958,17 @@ input CustomerSearchInput {
 
   """Find customers with a given phone number."""
   phoneNumber: SearchTextInput
+}
+
+"""The customer's tax identifer for a given tax jurisdiction."""
+input CustomerTaxIdentifierInput {
+  """
+  The identifier provided in the format required for the given tax jurisdiction.
+  """
+  identifier: String!
+
+  """The country code of the tax jurisdiction for this tax identifier."""
+  countryCode: CountryCode!
 }
 
 """A merchant-defined custom field to store additional information."""
@@ -2042,6 +2104,15 @@ input DetachedRefundInput {
   descriptor: TransactionDescriptorInput
 }
 
+"""Details about the disbursement bank account."""
+type DisbursementBankAccount {
+  """The last four digits of the bank account number."""
+  last4: String
+
+  """The routing number of the bank."""
+  routingNumber: String
+}
+
 """
 Disbursement details contain information about how and when the transaction was
 disbursed, including timing and currency information. This field is only
@@ -2072,42 +2143,12 @@ type DisbursementDetails {
   fundsHeld: Boolean
 }
 
-"""
-Information about the business's particpation in various discount programs.
-"""
-input DiscountProgramRegistrationInput {
-  """The business's MVV (Merchant Verification Value) registration type."""
-  registrationType: MVVRegistrationType!
-
-  """
-  The business's existing MVV (Merchant Verification Value) registration number, if they have one.
-  """
-  registrationIdentifier: String
-
-  """
-  The number of customers the business has. Required if `registrationType` is `UTIL_RATE` or `LOAN_VPP`.
-  """
-  numberOfCustomers: Int
-
-  """
-  The means by which customers pay their bills. Required if  `registrationType` is `UTIL_RATE` or `LOAN_VPP`.
-  """
-  acceptanceChannel: [MVVAcceptanceChannel]
-
-  """
-  The business's MVV utility type. Required if `registrationType` is `UTIL_RATE`.
-  """
-  utilityType: [MVVUtilityType]
-
-  """
-  Does the business accept payday loans? Required if `registrationType` is `LOAN_VPP`.
-  """
-  loanPayday: Boolean
-
-  """
-  Does the business charge fees for debt repayment? Required if `registrationType` is `LOAN_VPP`.
-  """
-  loanFee: Boolean
+"""The display item type to be displayed on the in-store reader."""
+enum DisplayItemType {
+  CHARGE
+  DISCOUNT
+  LINE_BREAK
+  TEXT
 }
 
 """
@@ -2181,6 +2222,9 @@ type Dispute implements Node {
   The disputed transaction which the customer is either requesting further information on or challenging.
   """
   transaction: Transaction
+
+  """The chargeback protection status of the dispute."""
+  chargebackProtectionLevel: ChargebackProtectionLevel
 }
 
 """A paginated list of disputes."""
@@ -2287,6 +2331,24 @@ type DisputeFileEvidence implements DisputeEvidence {
   category: DisputeEvidenceCategory
 }
 
+"""
+For file evidence: the evidence category that specifies which requirement it satisfies.
+"""
+enum DisputeFileEvidenceCategory {
+  GENERAL
+  LEGIT_PAYMENTS_FOR_SAME_MERCHANDISE
+  MERCHANT_WEBSITE_OR_APP_ACCESS
+  PROFILE_SETUP_OR_APP_ACCESS
+  PROOF_OF_3D_SECURE
+  PROOF_OF_AUTHORIZED_SIGNER
+  PROOF_OF_DELIVERY
+  PROOF_OF_DELIVERY_EMP_ADDRESS
+  PROOF_OF_POSSESSION_OR_USAGE
+  SIGNED_DELIVERY_FORM
+  SIGNED_ORDER_FORM
+  TICKET_PROOF
+}
+
 """Information about the dispute provided by the processor."""
 type DisputeProcessorResponse {
   """Additional comments forwarded by the processor."""
@@ -2364,6 +2426,9 @@ input DisputeSearchInput {
 
   """Find disputes based on a set of transaction criteria."""
   transaction: DisputeTransactionSearchInput
+
+  """Find disputes with a given computed chargeback protection level."""
+  chargebackProtectionLevel: SearchChargebackProtectionLevelInput
 }
 
 """The status of the dispute."""
@@ -2709,7 +2774,10 @@ type FraudProviderConfiguration {
 
 """The fraud service provider used to generate the risk decision."""
 enum FraudServiceProvider {
+  CHARGEBACK_PROTECTION
+  EFFORTLESS_CHARGEBACK_PROTECTION
   FRAUD_PROTECTION
+  FRAUD_PROTECTION_ADVANCED
   FRAUD_PROTECTION_ENTERPRISE
   KOUNT
 }
@@ -2773,38 +2841,6 @@ enum GatewayRejectionReason {
   UNION_PAY_ENROLLMENT_REQUIRED
 }
 
-"""Input fields for generating a pairing code to pair an in store reader."""
-input GenerateInStoreReaderPairingCodeInput {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """A globally unique reader device id generated by the reader."""
-  deviceId: ID!
-
-  """Authentication information for identifying the reader."""
-  deviceJWT: String
-}
-
-"""
-Top-level fields returned when generating a pairing code for an in-store reader.
-"""
-type GenerateInStoreReaderPairingCodePayload {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """Reader specific identification code."""
-  deviceCode: String
-
-  """Generated code used to pair this reader with a merchant."""
-  userCode: String
-
-  """Redirect URI used for verification of the reader."""
-  verificationUri: String
-
-  """Time to expiration of the generated user and device codes."""
-  expiresIn: Int
-}
-
 """Coordinates describing a geographic position."""
 type GeoCoordinates {
   """
@@ -2837,6 +2873,11 @@ input GeoCoordinatesInput {
 
 """Configuration for Google Pay on Android and the web."""
 type GooglePayConfiguration {
+  """
+  The country code of the acquiring bank where the transaction is likely to be processed.
+  """
+  countryCode: CountryCodeAlpha2
+
   """A string used to identify the merchant to the customer."""
   displayName: String
 
@@ -2887,24 +2928,21 @@ type IDealConfiguration {
 }
 
 """Reference object for an in-store charge request."""
-type InStoreContext implements Node {
+type InStoreContext implements Node & InStoreContextResult {
   """A unique ID for this charge request."""
-  id: ID!
+  id: ID! @deprecated(reason: "Use the id field from the InStoreContextPayload")
 
   """The transaction representing the charge on the payment method."""
-  transaction: Transaction
+  transaction: Transaction @deprecated(reason: "Use a Node query for a RequestTransactionInStoreContext")
 
   """The refund representing the refund on the payment method."""
-  refund: Refund
+  refund: Refund @deprecated(reason: "Use a Node query for a RequestRefundInStoreContext")
 
-  """The reader requested to be charged."""
-  reader: InStoreReader
+  """The reader requested for the in-store flow."""
+  reader: InStoreReader @deprecated(reason: "Use the reader field from the InStoreContextPayload")
 
-  """
-  The status of the context created when the charge was requested. A status of
-  COMPLETE does not indicate a successful payment.
-  """
-  status: InStoreContextStatus!
+  """The status of the context created."""
+  status: InStoreContextStatus! @deprecated(reason: "Use the status field from the InStoreContextPayload")
 }
 
 """
@@ -2914,8 +2952,26 @@ type InStoreContextPayload {
   """An identifier used to reconcile requests and responses."""
   clientMutationId: String
 
-  """The in-store context created when the charge flow is initiated."""
-  inStoreContext: InStoreContext
+  """The in-store context created when an in-store flow is initiated."""
+  inStoreContext: InStoreContext @deprecated(reason: "Use top-level fields")
+
+  """A unique ID for this in-store context request."""
+  id: ID!
+
+  """The reader requested for the in-store flow."""
+  reader: InStoreReader
+
+  """The status of the context created."""
+  status: InStoreContextStatus!
+}
+
+"""Reference object for an in-store charge request."""
+interface InStoreContextResult {
+  """A unique ID for this charge request."""
+  id: ID!
+
+  """The reader requested to be charged."""
+  reader: InStoreReader
 }
 
 """
@@ -2940,6 +2996,25 @@ enum InStoreContextStatus {
   Payment flow in-progress. Customer payment method submitted for transaction processing.
   """
   PROCESSING
+}
+
+"""Input fields for an individual display item on an in-store reader."""
+input InStoreDisplayItemInput {
+  """The display item type to be displayed on the in-store reader."""
+  kind: DisplayItemType!
+
+  """
+  The display item text to be displayed on the in-store reader. 35 character maximum.
+  """
+  description: String
+
+  """
+  The number of units for a CHARGE or DISCOUNT item. Must be greater than 0.
+  """
+  quantity: Float
+
+  """The total amount of a CHARGE or DISCOUNT item."""
+  amount: Amount
 }
 
 """An in-store location."""
@@ -3051,6 +3126,18 @@ type InStoreReader {
 
   """Current status of the reader."""
   status: ReaderStatus
+
+  """Date and time when the reader was paired."""
+  pairedAt: Timestamp
+
+  """Date and time when the reader last established a connection."""
+  lastSeenAt: Timestamp
+
+  """Date and time when the reader last disconnected."""
+  offlineSince: Timestamp
+
+  """The version of the payment application running on the Reader."""
+  softwareVersion: String
 }
 
 """The authorization mode used to perform the transaction."""
@@ -3171,6 +3258,320 @@ input InStoreTransactionInput {
   Fields used to define what will appear on a customer's bank statement for a specific purchase.
   """
   descriptor: TransactionDescriptorInput
+
+  """
+  If charging a single-use payment method, optional ID of a customer to
+  associate the transaction with. If vaulting the single-use payment method,
+  this customer will be associated with the resulting multi-use payment method.
+  """
+  customerId: ID
+
+  """
+  When a single-use payment method is used to create this transaction, it can be
+  automatically stored in the vault after transacting. If this field is left
+  blank, the single-use payment method will not be vaulted.
+  """
+  vaultPaymentMethodAfterTransacting: VaultPaymentMethodAfterTransactingInput
+}
+
+"""The address fields."""
+input KlarnaEUAddressInput {
+  """An optional parameter, 'Attn'."""
+  attention: String
+
+  """Customer's locality/city."""
+  locality: String
+
+  """Customer's country."""
+  countryCode: CountryCode
+
+  """Customer's email address."""
+  email: EmailAddress
+
+  """Customer's last name."""
+  lastName: String
+
+  """Customer's first name."""
+  firstName: String
+
+  """Company name. Used for B2B customers."""
+  company: String
+
+  """Phone number, preferrably mobile."""
+  phone: String
+
+  """Customer's postal code."""
+  postalCode: String
+
+  """
+  Customer's region or state. Validates according to ISO 3166-2 format, e.g. OH,
+  NJ etc. For more information, see:
+  https://developers.klarna.com/api/#data-types.
+  """
+  region: String
+
+  """Customer's street address."""
+  streetAddress: String
+
+  """Customer's street address, second line."""
+  extendedAddress: String
+
+  """Customer's title."""
+  title: String
+}
+
+"""Asset URLs fields."""
+type KlarnaEUAssetUrls {
+  """URL of the descriptive asset."""
+  descriptive: String
+
+  """URL of the standard asset."""
+  standard: String
+}
+
+"""Extra merchant data required for additional risk checks."""
+input KlarnaEUAttachmentInput {
+  """The content of the extra merchant data."""
+  body: String!
+
+  """The content type of the body."""
+  contentType: String!
+}
+
+"""Customer fields."""
+input KlarnaEUCustomerInput {
+  """Customer's date of birth."""
+  dateOfBirth: Date
+
+  """Customer's gender - 'male', 'female'."""
+  gender: String
+
+  """
+  Last four digits of customer's social security number. Available for US customers.
+  """
+  lastFourSSN: String
+
+  """
+  The customer's national identification number. This value is available for EU
+  customers utilizing national identification numbers.
+  """
+  nationalIdentificationNumber: String
+
+  """Organization entity type. Only applicable for B2B customers."""
+  organizationEntityType: KlarnaEUOrganizationEntityType
+
+  """Organization registration ID. Only applicable for B2B customers."""
+  organizationRegistrationId: ID
+
+  """Customer's title."""
+  title: String
+
+  """
+  Type of customer in the session. If nothing is added, a B2C session will be
+  used as default. If it is a B2B session, enter 'organization' to trigger a B2B session.
+  """
+  type: String
+
+  """VAT ID. Only applicable for B2B customers."""
+  vatId: ID
+}
+
+"""Design customization options for the Klarna Payments iframe."""
+input KlarnaEUDesignOptionsInput {
+  """
+  Color for the border of elements within the iframe. Value should be a CSS hex color.
+  """
+  colorBorder: String
+
+  """
+  Color for the border of elements within the iframe when selected by customer. Value should be a CSS hex color.
+  """
+  colorBorderSelected: String
+
+  """
+  Color for the bullet points withing the iframe. Value should be a CSS hex color.
+  """
+  colorDetails: String
+
+  """
+  Color for the texts within the iframe. Value should be a CSS hex color.
+  """
+  colorText: String
+
+  """Radius for the border of elements within the iframe."""
+  radiusBorder: String
+}
+
+"""Line items information."""
+input KlarnaEULineItemInput {
+  """Descriptive name of the item. Max 35 characters."""
+  name: String!
+
+  """Indicates whether the item is a credit or debit."""
+  kind: TransactionLineItemType!
+
+  """
+  Number of units of the item purchased. Can include up to 4 decimal places. Must be non-negative number.
+  """
+  quantity: String!
+
+  """
+  Price for a single unit of the item. Maximum 4 decimal places. Non-negative. Includes tax, excludes discount.
+  """
+  unitAmount: String!
+
+  """
+  Total amount of the item. Can include up to 2 decimal places. Includes tax and
+  discount. Value = quantity x unitPrice - totalDiscountAmount.
+  """
+  totalAmount: String!
+
+  """
+  Per-unit tax price of the item. Can include up to 2 decimal places. Can't be negative or zero.
+  """
+  unitTaxAmount: String
+
+  """
+  Total tax amount of the item. Can include up to 2 decimal places. Can't be negative.
+  """
+  taxAmount: String
+
+  """Amount of discount for the item. Can include up to 2 decimal places."""
+  discountAmount: String
+
+  """
+  Unit used to describe the quantity, e.g. kg, pcs, etc. Maximum 8 characters.
+  """
+  unitOfMeasure: String
+
+  """
+  Client facing article number, UPC, SKU or similar. Maximum 12 characters.
+  """
+  productCode: String
+
+  """
+  Code used to classify items purchased and track the total amount spent accross
+  various categories of products and services. Max 12 characters.
+  """
+  commodityCode: String
+
+  """
+  URL to the product in the merchant's webshop that can be later used in
+  communications between Klarna and the customer. Max 1024 characters.
+  """
+  url: String
+
+  """Type of the item."""
+  itemType: KlarnaEULineItemType
+
+  """URL to an image that represents the product. Max 1024 characters."""
+  imageUrl: String
+}
+
+"""The line item type."""
+enum KlarnaEULineItemType {
+  DIGITAL
+  DISCOUNT
+  GIFT_CARD
+  PHYSICAL
+  SALES_TAX
+  SHIPPING_FEE
+  STORE_CREDIT
+  SURCHARGE
+}
+
+"""Merchant URLs information."""
+input KlarnaEUMerchantUrlsInput {
+  """URL of the merchant confirmation page."""
+  confirmation: String!
+
+  """URL for notifications on pending orders."""
+  notification: String
+
+  """URL that will be requested when an order is completed."""
+  push: String
+}
+
+"""The organization entity type."""
+enum KlarnaEUOrganizationEntityType {
+  CIVIL_LAW_PARTNERSHIP
+  ENTREPRENEURIAL_COMPANY
+  LIMITED_COMPANY
+  LIMITED_PARTNERSHIP
+  LIMITED_PARTNERSHIP_LIMITED_COMPANY
+  OTHER
+  PUBLIC_INSTITUTION
+  PUBLIC_LIMITED_COMPANY
+  REGISTERED_SOLE_TRADER
+  SOLE_TRADER
+}
+
+"""Payment method category fields."""
+type KlarnaEUPaymentMethodCategory {
+  """
+  Asset URLs for the payment method. Using this dynamic asset will make sure
+  that any design update of Klarna will be propagated automatically.
+  """
+  assetUrls: KlarnaEUAssetUrls
+
+  """
+  ID of the payment method category to be used while loading the widget later.
+  The possible values are: Pay_later, Pay_now, Pay_over_time,
+  Direct_bank_transfer, Direct_debit.
+  """
+  identifier: ID
+
+  """Name of the payment method category."""
+  name: String
+}
+
+"""Details about the shipping information."""
+input KlarnaEUShippingInfoInput {
+  """
+  Name of the company to be used for the shipment. Max 100 characters.
+  
+  **Note:** It is helpful to be as specific as possible.
+  
+  Examples include `"DHL US"`, `"FedEx"`, etc.
+  """
+  shippingCompany: String
+
+  """The shipping method."""
+  shippingMethod: KlarnaEUShippingMethod
+
+  """Tracking number for the shipment. Max 100 characters."""
+  trackingNumber: String
+
+  """URI for tracking the shipment. Max 1024 characters."""
+  trackingUri: String
+
+  """
+  Name of the company to be used for the return shipment. Max 100 characters.
+  
+  **Note:** It is helpful to be as specific as possible.
+  
+  Examples include `"DHL US"`, `"FedEx"`, etc.
+  """
+  returnShippingCompany: String
+
+  """Tracking number for the return shipment. Max 100 characters."""
+  returnTrackingNumber: String
+
+  """URI for tracking the return shipment. Max 1024 characters."""
+  returnTrackingUri: String
+}
+
+"""The shipping method."""
+enum KlarnaEUShippingMethod {
+  BOX_REG
+  BOX_UNREG
+  DHL_PACKSTATION
+  DIGITAL
+  HOME
+  OWN
+  PICK_UP_POINT
+  PICK_UP_STORE
+  POSTAL
 }
 
 """Configuration for Kount fraud tools."""
@@ -3180,6 +3581,20 @@ type KountConfiguration {
   """
   merchantId: String
 }
+
+"""
+The [language tag](https://tools.ietf.org/html/bcp47#section-2) for the language
+in which to localize the error-related strings, such as messages, issues, and
+suggested actions.
+The tag is made up of the [ISO 639-2 language
+code](https://www.loc.gov/standards/iso639-2/php/code_list.php), the optional
+[ISO-15924 script tag](http://www.unicode.org/iso15924/codelists.html), and the
+[ISO-3166 alpha-2 country code](/docs/integration/direct/rest/country-codes/).
+maxLength: 10
+minLength: 2
+pattern: <code>^[a-z]{2}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}))?$</code>
+"""
+scalar Language
 
 """
 The type of object the legacy ID represents when converting it to a global ID.
@@ -3269,8 +3684,10 @@ type Merchant {
   """The timezone that the merchant operates in."""
   timezone: String
 
-  """A paginated list of merchant accounts that belongs to this merchant."""
-  merchantAccounts(first: Int, after: String): MerchantAccountConnection
+  """
+  A paginated list of merchant accounts that belong to this merchant. Filtered by search criteria, if provided.
+  """
+  merchantAccounts(input: MerchantAccountSearchInput, first: Int, after: String): MerchantAccountConnection
 }
 
 """Information about a merchant account associated with a merchant."""
@@ -3280,6 +3697,9 @@ type MerchantAccount {
   account processed or will process a given Payment.
   """
   id: ID!
+
+  """The disbursement bank account linked with the merchant account."""
+  bankAccount: DisbursementBankAccount
 
   """The ISO code for the currency the merchant account uses."""
   currencyCode: CurrencyCodeAlpha
@@ -3295,6 +3715,12 @@ type MerchantAccount {
   is not specified.
   """
   isDefault: Boolean
+
+  """The PayPal account linked with the merchant account."""
+  paypalAccount: PayPalAccountDetails
+
+  """The 3D Secure configuration for the merchant account."""
+  threeDSecure: MerchantAccountThreeDSecureConfiguration
 }
 
 """A record of a merchant account application."""
@@ -3309,17 +3735,6 @@ type MerchantAccountApplication {
 
   """The status of the application."""
   status: ApplicationStatus
-}
-
-"""
-Top-level fields returned when submitting an application for a merchant account.
-"""
-type MerchantAccountApplicationPayload {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """The Merchant Account Application."""
-  merchantAccountApplication: MerchantAccountApplication
 }
 
 """A paginated list of merchant accounts."""
@@ -3342,6 +3757,15 @@ type MerchantAccountConnectionEdge {
   node: MerchantAccount
 }
 
+"""Input fields for searching for merchant accounts."""
+input MerchantAccountSearchInput {
+  """Find merchant accounts with an id or ids."""
+  id: SearchValueInput
+
+  """Find merchant accounts associated with a given PayPal account ID."""
+  paypalAccountId: SearchValueInput
+}
+
 """
 The status of a merchant account. This determines whether the merchant account
 can be used to create a Payment, and whether funds can continue to flow to the
@@ -3362,10 +3786,22 @@ enum MerchantAccountStatus {
   SUSPENDED
 }
 
+"""Details about the 3D Secure configuration of the merchant account."""
+type MerchantAccountThreeDSecureConfiguration {
+  """Configuration for 3D Secure v1."""
+  v1: MerchantAccountThreeDSecureVersionConfiguration
+
+  """Configuration for 3D Secure v2."""
+  v2: MerchantAccountThreeDSecureVersionConfiguration
+}
+
 """
-An [ISO 18245](https://en.wikipedia.org/wiki/ISO_18245) Merchant Category Code. Four digits.
+Details about the configuration of a version of 3D Secure for the merchant account.
 """
-scalar MerchantCategoryCode
+type MerchantAccountThreeDSecureVersionConfiguration {
+  """Card types enabled for this 3D Secure version."""
+  supportedCardBrands: [CreditCardBrandCode!]
+}
 
 """A monetary amount with currency."""
 type MonetaryAmount {
@@ -3561,8 +3997,7 @@ type Mutation {
   """
   Partially capture funds from a transaction that was successfully authorized
   and return a payload that includes a new transaction with information about
-  the capture. This is only available for PayPal transactions and certain use
-  cases. For more information about if this mutation fits your use case [see our docs](https://articles.braintreepayments.com/guides/payment-methods/paypal/processing#multiple-partial-settlements).
+  the capture. This is available for [Venmo](https://developers.braintreepayments.com/guides/venmo/submit-for-partial-settlement) and [PayPal](https://articles.braintreepayments.com/guides/payment-methods/paypal/processing#multiple-partial-settlements) transactions.
   """
   partialCaptureTransaction(input: PartialCaptureTransactionInput!): PartialCaptureTransactionPayload
 
@@ -3653,6 +4088,9 @@ type Mutation {
   """Deletes evidence from a dispute."""
   deleteDisputeEvidence(input: DeleteDisputeEvidenceInput!): DeleteDisputeEvidencePayload
 
+  """Uploads a file and associates it with a dispute."""
+  createDisputeFileEvidence(input: CreateDisputeFileEvidenceInput!): CreateDisputeFileEvidencePayload
+
   """
   Vault an existing PayPal Billing Agreement that was not created through
   Braintree. Only use this mutation if you need to import PayPal Billing
@@ -3679,6 +4117,29 @@ type Mutation {
 
   """Request an in-store reader to start an unreferenced refund flow."""
   requestRefundFromInStoreReader(input: RequestRefundFromInStoreReaderInput!): InStoreContextPayload
+
+  """Request an in-store reader to vault a payment method."""
+  requestVaultFromInStoreReader(input: RequestVaultFromInStoreReaderInput!): InStoreContextPayload
+
+  """Request an in-store reader to display text."""
+  requestTextDisplayFromInStoreReader(input: RequestTextDisplayFromInStoreReaderInput!): InStoreContextPayload
+
+  """Request an in-store reader to display line items."""
+  requestItemDisplayFromInStoreReader(input: RequestItemDisplayFromInStoreReaderInput!): InStoreContextPayload
+
+  """
+  Creates a session within Klarna and returns a payload which includes the available payment method categories.
+  """
+  createKlarnaEUSession(input: CreateKlarnaEUSessionInput!): CreateKlarnaEUSessionPayload
+
+  """Updates a session within Klarna."""
+  updateKlarnaEUSession(input: UpdateKlarnaEUSessionInput!): UpdateKlarnaEUSessionPayload
+
+  """Adds shipping information to a Klarna order."""
+  updateKlarnaEUOrderShippingInfo(input: UpdateKlarnaEUOrderShippingInfoInput!): UpdateKlarnaEUOrderShippingInfoPayload
+
+  """Creates a checkout that is used to initialize Afterpay."""
+  createAfterpayAUNZCheckout(input: CreateAfterpayAUNZCheckoutInput!): CreateAfterpayAUNZCheckoutPayload
 }
 
 """Means by which customers by their bills."""
@@ -3745,7 +4206,7 @@ input NetworkTokenInput {
   """
   A two-digit string that should be passed along in the authorization message.
   """
-  eCommerceIndicator: ECommerceIndicator!
+  eCommerceIndicator: ECommerceIndicator
 
   """A two-digit string representing the expiration month of the DPAN."""
   expirationMonth: Month!
@@ -3757,6 +4218,16 @@ input NetworkTokenInput {
   The card number used in processing. This is a device PAN (DPAN), not the backing card number (FPAN).
   """
   number: CreditCardNumber!
+
+  """Additional information about a network token."""
+  originDetails: NetworkTokenOriginDetailsInput!
+}
+
+"""The source of the network token."""
+enum NetworkTokenOrigin {
+  APPLE_PAY
+  GOOGLE_PAY
+  NETWORK_TOKEN
 }
 
 """
@@ -3768,6 +4239,32 @@ type NetworkTokenOriginDetails {
   Number. This BIN may differ from the BIN of the customer's actual card.
   """
   bin: String
+}
+
+"""
+Information about the network token, such as the origin of the network token,
+source card details, and other token requestor data.
+"""
+input NetworkTokenOriginDetailsInput {
+  """The origin of the network token."""
+  origin: NetworkTokenOrigin!
+
+  """A string, suitable for display, that describes the backing card."""
+  sourceCardDescription: String
+
+  """The last 4 digits of the backing card number (FPAN)."""
+  sourceCardLast4: CreditCardLast4
+
+  """The card type of the backing card."""
+  sourceCardType: CreditCardBrandCode
+
+  """
+  The token requestor ID of the entity that generated this network token.
+  """
+  tokenRequestorId: String
+
+  """The transaction ID for this network token."""
+  transactionId: String
 }
 
 """Relay compatible Node interface."""
@@ -3799,57 +4296,6 @@ enum OwnerAddressType {
 """The type of identity number provided for the owner."""
 enum OwnerIDType {
   SOCIAL_SECURITY_NUMBER
-}
-
-"""
-An owner of the business. A minimum of one and a maximum of five owners can be
-submitted. One owner must be the authorized signer on the account.
-"""
-input OwnerInput {
-  """The role that the owner holds."""
-  role: OwnerRole!
-
-  """The position that the owner holds."""
-  position: OwnerPosition!
-
-  """The % of the business that the owner owns. Must be between 0 and 100."""
-  ownershipPercentage: Int!
-
-  """The owner's first name."""
-  firstName: String!
-
-  """The owner's last name."""
-  lastName: String!
-
-  """The owner's email address."""
-  email: String!
-
-  """The owner's address."""
-  address: AddressInput!
-
-  """The owner's address type."""
-  addressType: OwnerAddressType!
-
-  """The owner's date of birth. Format: YYYY-MM-DD."""
-  dateOfBirth: Date
-
-  """The country code for the owner's phone number."""
-  phoneCountryCode: Int!
-
-  """The owner's phone number. No extensions, numbers only."""
-  phoneNumber: String!
-
-  """The phone number type for the owner's phone number."""
-  phoneType: OwnerPhoneType!
-
-  """The owner's ID type. Required for authorized signer."""
-  idType: OwnerIDType
-
-  """The owner's ID number. Must be a valid US SSN or TIN."""
-  idNumber: USTaxIdentificationNumber
-
-  """The country that issued the owner's ID."""
-  idIssuer: CountryCode
 }
 
 """The owner's phone type."""
@@ -4299,6 +4745,7 @@ enum PaymentReaderInputMode {
   CONTACTLESS
   MAGSTRIPE
   MAGSTRIPE_FALLBACK
+  MANUAL_KEY_ENTRY
 }
 
 """Input fields for searching for any type of Payment."""
@@ -4361,6 +4808,11 @@ input PaymentSearchInput {
 
   """Find payments with a user ID or IDs."""
   userId: SearchValueInput
+
+  """
+  Find payments by the ID of the store that the transaction was processed in.
+  """
+  storeId: SearchValueInput
 }
 
 """The type of a Payment, based primarily on implementing type."""
@@ -4863,27 +5315,6 @@ type PayPalTransactionPayload {
   billingAgreementWithPurchasePaymentMethod: PaymentMethod
 }
 
-"""A key-value pair for a PayPal SetTransactionContext field."""
-input PayPalTransactionRiskContextDataFieldInput {
-  """
-  The name of the field. Must correspond exactly to the PayPal key/field name.
-  """
-  name: String
-
-  """The value of the field. Maximum 4000 characters."""
-  value: String
-}
-
-"""
-Input fields setting the PayPal transaction context for risk assessment. In
-order to use this, your PayPal account must be set up to use the PayPal
-SetTransactionContext feature.
-"""
-input PayPalTransactionRiskContextInput {
-  """Provide a maximum of 100 fields."""
-  fields: [PayPalTransactionRiskContextDataFieldInput!]
-}
-
 """
 The percentage, as a fixed-point, signed decimal number. For example, define a 19.99% interest rate as `19.99`.
 """
@@ -4905,7 +5336,7 @@ input PerformThreeDSecureLookupInput {
   """
   dfReferenceId: String
 
-  """The ID of a single-use payment method to perform the lookup on."""
+  """ID of a payment method to perform the lookup on."""
   paymentMethodId: ID!
 
   """
@@ -4932,6 +5363,12 @@ input PerformThreeDSecureLookupInput {
 
   """Information about the client-side lookup process."""
   clientInformation: ThreeDSecureLookupClientInformationInput
+
+  """
+  When set to true, the data-only 3D Secure call will be created. The status of [DATA_ONLY_SUCCESSFUL](https://developers.braintreepayments.com/guides/3d-secure/advanced-options#using-data-only-3d-secure)
+  will be returned as `ThreeDSecureAuthenticationStatus` for a successful response.
+  """
+  dataOnlyRequested: Boolean
 }
 
 """Top-level fields returned when performing a 3D Secure Lookup."""
@@ -4971,24 +5408,6 @@ input PhoneInput {
 
   """The extension number."""
   extensionNumber: String
-}
-
-"""
-Top-level fields returned when fetching a customer's preferred payment methods.
-"""
-type PreferredPaymentMethodsPayload {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String @deprecated(reason: "clientMutationId is not applicable to queries.")
-
-  """
-  Probabilistic determination of whether Venmo is a preferred payment method.
-  """
-  venmoPreferred: Boolean
-
-  """
-  Probabilistic determination of whether PayPal is a preferred payment method.
-  """
-  paypalPreferred: Boolean
 }
 
 """Accompanying information for a processor declined transaction."""
@@ -5046,6 +5465,11 @@ enum ProcessorDeclineType {
 type Query {
   """Returns the literal string 'pong'."""
   ping: String!
+
+  """
+  Triggers a beep on a connected Reader and returns the Reader information or an error if unable to ping the device.
+  """
+  pingInStoreReader(readerId: ID!): InStoreReader
 
   """The currently authenticated viewer."""
   viewer: Viewer
@@ -5317,6 +5741,11 @@ input RefundSearchInput {
 
   """Find refunds with a user ID or IDs."""
   userId: SearchValueInput
+
+  """
+  Find refunds by the ID of the store that the transaction was processed in.
+  """
+  storeId: SearchValueInput
 }
 
 """Top-level input fields for refunding a transaction."""
@@ -5368,30 +5797,6 @@ type RefundUsBankAccountPayload {
   refund: Refund
 }
 
-"""Input fields for removing credit cards from Account Updater."""
-input RemoveCreditCardFromAccountUpdaterInput {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """A list of IDs of credit cards to be removed from Account Updater."""
-  paymentMethodIds: [ID!]!
-}
-
-"""
-Top-level fields returned when removing credit cards from Account Updater.
-"""
-type RemoveCreditCardFromAccountUpdaterPayload {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """
-  The credit cards that were submitted to be removed from Account Updater. Cards
-  that were unsuccessfully submitted will have a null entry in the list in the
-  same position as they were submitted and an associated error.
-  """
-  paymentMethods: [PaymentMethod]
-}
-
 """Top-level fields returned for a report query."""
 type Report {
   """Top-level fields returned in the transaction-level fee report query."""
@@ -5422,6 +5827,61 @@ input RequestChargeFromInStoreReaderInput {
   transaction: InStoreTransactionInput!
 }
 
+"""Reference object for an in-store charge request."""
+type RequestChargeInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this charge request."""
+  id: ID!
+
+  """The reader from which the charge was requested."""
+  reader: InStoreReader
+
+  """
+  The status of the context created when the charge was requested. A status of
+  COMPLETE does not indicate a successful payment.
+  """
+  status: InStoreContextStatus!
+
+  """The transaction representing the charge on the payment method."""
+  transaction: Transaction
+}
+
+"""Reference object for an in-store display request."""
+type RequestDisplayInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this display request."""
+  id: ID!
+
+  """The reader from which the display was requested."""
+  reader: InStoreReader
+
+  """The status of the context created when the display was requested."""
+  status: InStoreContextStatus!
+}
+
+"""Input fields for beginning the in-store display line items flow."""
+input RequestItemDisplayFromInStoreReaderInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of the Reader to display items on."""
+  readerId: ID!
+
+  """
+  Items to be displayed on the in-store reader. Up to 249 items may be specified.
+  """
+  displayItems: [InStoreDisplayItemInput!]
+
+  """
+  The total tax amount for the entire transaction, including all display line items.
+  """
+  tax: Amount!
+
+  """The total amount for the entire transaction, including tax."""
+  amount: Amount!
+
+  """The total discount amount for the entire transaction."""
+  discountAmount: Amount
+}
+
 """Input fields for beginning the in-store refund flow."""
 input RequestRefundFromInStoreReaderInput {
   """An identifier used to reconcile requests and responses."""
@@ -5432,6 +5892,80 @@ input RequestRefundFromInStoreReaderInput {
 
   """Information about the requested in-store refund."""
   refund: InStoreRefundInput!
+}
+
+"""Reference object for an in-store refund request."""
+type RequestRefundInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this refund request."""
+  id: ID!
+
+  """The reader from which the refund was requested."""
+  reader: InStoreReader
+
+  """
+  The status of the context created when the refund was requested. A status of
+  COMPLETE does not indicate a successful payment.
+  """
+  status: InStoreContextStatus!
+
+  """The refund representing the refund on the payment method."""
+  refund: Refund
+}
+
+"""Input fields for beginning the in-store display text flow."""
+input RequestTextDisplayFromInStoreReaderInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of the Reader to request a text display from."""
+  readerId: ID!
+
+  """
+  Text to be displayed on the in-store reader. 255 character maximum. '\n' line breaks will be respected.
+  """
+  text: String!
+}
+
+"""Input fields for beginning the in-store charge flow."""
+input RequestVaultFromInStoreReaderInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of the Reader to request a vault from."""
+  readerId: ID!
+
+  """
+  Input fields that specify options for verifying the payment method before
+  vaulting. Only applicable if the payment method is of a type that supports
+  verification. For supported types, verification is performed by default. If
+  the verification fails, the payment method will not be vaulted.
+  """
+  verification: PaymentMethodVerificationOptionsInput
+
+  """
+  ID of the customer to associate the resulting multi-use payment method with.
+  """
+  customerId: ID
+}
+
+"""Reference object for an in-store vault request."""
+type RequestVaultInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this vault request."""
+  id: ID!
+
+  """The reader from which the vault was requested."""
+  reader: InStoreReader
+
+  """The status of the context created when the vault was requested."""
+  status: InStoreContextStatus!
+
+  """
+  A payment method that has been stored in a merchant's vault and can be reused.
+  """
+  paymentMethod: PaymentMethod
+
+  """The verification that was run on the payment method prior to vaulting."""
+  verification: Verification
 }
 
 """Input fields for reversing a refund."""
@@ -5480,6 +6014,9 @@ type RiskData {
   """The risk decision on whether the transaction should be permitted."""
   decision: RiskDecision
 
+  """The reasons for the decision from the fraud service provider."""
+  decisionReasons: [String!]
+
   """
   Whether data associated with the customer's device was captured and used in the decision process.
   """
@@ -5487,6 +6024,9 @@ type RiskData {
 
   """The fraud service provider used to generate the risk decision."""
   fraudServiceProvider: FraudServiceProvider
+
+  """The numeric risk score assigned by the fraud service provider."""
+  score: Int
 }
 
 """Input fields for a risk data object."""
@@ -5668,6 +6208,17 @@ type Search {
 
   """A paginated list of customers that match the CustomerSearchInput."""
   customers(input: CustomerSearchInput!, first: Int, after: String): CustomerConnection
+}
+
+"""
+Input fields for searching for a dispute with a given chargeback protection level.
+"""
+input SearchChargebackProtectionLevelInput {
+  """The dispute's chargeback protection level is exactly this value."""
+  is: ChargebackProtectionLevel
+
+  """Dispute's chargeback protection level is one of these values."""
+  in: [ChargebackProtectionLevel!]
 }
 
 """Input fields for searching for payments by credit card brand."""
@@ -6117,39 +6668,6 @@ type SettlingEvent implements PaymentStatusEvent {
   terminal: Boolean
 }
 
-"""Input fields for submitting a credit card for Account Updater."""
-input SubmitCreditCardForAccountUpdaterInput {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """
-  Deprecated: Please use `paymentMethodIds` instead.
-  ID of the credit card to submit for Account Updater.
-  """
-  paymentMethodId: ID
-
-  """A list of IDs of credit cards to be submitted for Account Updater."""
-  paymentMethodIds: [ID!]
-}
-
-"""
-Top-level fields returned when submitting credit cards for Account Updater.
-"""
-type SubmitCreditCardForAccountUpdaterPayload {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """The credit card that was submitted to Account Updater."""
-  paymentMethod: PaymentMethod @deprecated(reason: "Use `paymentMethods` instead.")
-
-  """
-  The credit cards that were submitted to Account Updater. Cards that were
-  unsuccessfully submitted will have a null entry in the list in the same
-  position as they were submitted and an associated error.
-  """
-  paymentMethods: [PaymentMethod]
-}
-
 """
 Accompanying information for a transaction that is submitted for settlement.
 This status indicates that the transaction is scheduled to be settled.
@@ -6323,11 +6841,13 @@ enum ThreeDSecureAuthenticationStatus {
   AUTHENTICATION_BYPASSED
   AUTHENTICATION_UNAVAILABLE
   CHALLENGE_REQUIRED
+  DATA_ONLY_SUCCESSFUL
   LOOKUP_BYPASSED
   LOOKUP_ENROLLED
   LOOKUP_ERROR
   LOOKUP_FAILED_ACS_ERROR
   LOOKUP_NOT_ENROLLED
+  UNSUPPORTED_ACCOUNT_TYPE
   UNSUPPORTED_CARD
   UNSUPPORTED_THREE_D_SECURE_VERSION
 }
@@ -7197,6 +7717,9 @@ type Transaction implements Node & Payment {
   A collection of AuthorizationAdjustments associated with the transaction.
   """
   authorizationAdjustments: [AuthorizationAdjustment!]
+
+  """Installment details associated with the transaction."""
+  installmentDetails: TransactionInstallmentDetails
 }
 
 """
@@ -7449,6 +7972,69 @@ input TransactionInput {
   blank, the single-use payment method will not be vaulted.
   """
   vaultPaymentMethodAfterTransacting: VaultPaymentMethodAfterTransactingInput
+}
+
+"""Transaction Installment information."""
+type TransactionInstallment {
+  """Installment ID."""
+  id: ID!
+
+  """
+  The projected date for the funds associated with this installment to be disbursed.
+  """
+  projectedDisbursementDate: Date
+
+  """
+  The date that the funds associated with this installment were actually disbursed.
+  """
+  actualDisbursementDate: Date
+
+  """
+  Installment amount.The total transaction amount is split equally into each installment.
+  """
+  amount: Amount
+
+  """List of adjustments associated with the installment."""
+  adjustments: [TransactionInstallmentAdjustment!]
+}
+
+"""Adjustment information."""
+type TransactionInstallmentAdjustment {
+  """
+  The projected date for the funds associated with the adjustements to be disbursed.
+  """
+  projectedDisbursementDate: Date
+
+  """
+  The date that the funds associated with this adjustments were actually disbursed.
+  """
+  actualDisbursementDate: Date
+
+  """Adjustment amount for the installment."""
+  amount: Amount
+
+  """Transaction Installment Adjustment type."""
+  type: TransactionInstallmentAdjustmentType!
+}
+
+"""
+Transaction Installment Adjustment type to indicate the reason for the adjustment.
+"""
+enum TransactionInstallmentAdjustmentType {
+  """Dispute."""
+  DISPUTE
+
+  """Refund."""
+  REFUND
+}
+
+"""Installment details for the transaction."""
+type TransactionInstallmentDetails {
+  """The installment count associated with the transaction."""
+  count: String
+
+  """List of installments associated with the transaction."""
+  installments: [TransactionInstallment!]
 }
 
 """
@@ -7706,6 +8292,11 @@ input TransactionSearchInput {
 
   """Find transactions with a user ID or IDs."""
   userId: SearchValueInput
+
+  """
+  Find transactions by the ID of the store that the transaction was processed in.
+  """
+  storeId: SearchValueInput
 }
 
 """
@@ -7865,6 +8456,123 @@ type UpdateCustomerPayload {
 
   """Information about the customer that was updated."""
   customer: Customer
+}
+
+"""Input fields to update a Klarna order with shipping info."""
+input UpdateKlarnaEUOrderShippingInfoInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  The ID of the Order, which can be retrieved when authorizing a transaction.
+  """
+  orderId: ID!
+
+  """Shipping info about Klarna."""
+  shippingInfo: KlarnaEUShippingInfoInput!
+}
+
+"""The result from a call to update the order and add shipping info."""
+type UpdateKlarnaEUOrderShippingInfoPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+}
+
+"""
+Input fields to update a Klarna session. For more information, see [the Klarna docs](https://developers.klarna.com/api/#payments-api-update-an-existing-credit-session).
+"""
+input UpdateKlarnaEUSessionInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The Klarna ID of the session to be updated."""
+  sessionId: ID!
+
+  """The acquiring channel which the session takes place."""
+  channel: String
+
+  """Extra merchant data required for additional risk check."""
+  attachment: KlarnaEUAttachmentInput
+
+  """The customer billing address."""
+  billingAddress: KlarnaEUAddressInput
+
+  """Details of the customer making the payment."""
+  customer: KlarnaEUCustomerInput
+
+  """Design package to use in the session."""
+  design: String
+
+  """
+  Defines the language and region of the customer following the [RFC
+  1766](https://en.wikipedia.org/wiki/IETF_language_tag) format.
+  
+  As per [Klarna's requirements](https://developers.klarna.com/api/#data-types):
+  
+  > Locales should be formatted as a language tag consisting of a two-letter
+  language code combined with a two-letter country code according to RFC 1766.
+  Examples are en-us for US English, en-gb for British English and sv-se for
+  Swedish (in Sweden).
+  """
+  locale: Language!
+
+  """Pass through field to send extra information. Max of 1024 characters."""
+  merchantData: String
+
+  """
+  Used for storing the merchant's internal order number or other reference. If
+  set, will be shown on the confirmation page as 'order number' and send to the
+  customer in the confirmation email after a successful direct bank transfer
+  payment. It will also be included in the payments description in the
+  customer's bank account and settlement files to the merchant. Max 255 characters.
+  """
+  orderId: String
+
+  """Merchant URLs that Klarna needs at different stages of the process."""
+  merchantUrls: KlarnaEUMerchantUrlsInput
+
+  """Design customization options for the Klarna Payments iframe."""
+  designOptions: KlarnaEUDesignOptionsInput
+
+  """
+  Total amount of the order including tax and any available discounts.
+  
+  **Example:** 25 Euros and 50 cents should be 25.50.
+  """
+  amount: Amount!
+
+  """
+  The array containing the list of items that are part of this order. Maximum of 1000 items.
+  """
+  lineItems: [KlarnaEULineItemInput!]!
+
+  """
+  Total tax amount of the order.
+  
+  **Example:** 25 Euros and 50 cents should be 25.50.
+  """
+  taxAmount: Amount
+
+  """
+  The purchase country of the customer. The billing country always overrides the
+  purchase country if the values are different.
+  """
+  purchaseCountry: CountryCode!
+
+  """The purchase currency of the order."""
+  purchaseCurrency: CurrencyCodeAlpha!
+
+  """The shipping address of the customer."""
+  shippingAddress: KlarnaEUAddressInput
+}
+
+"""The result from a call to update session."""
+type UpdateKlarnaEUSessionPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The Klarna ID of the session that was updated."""
+  sessionId: ID
 }
 
 """Input for creating or updating custom fields on a transaction."""
@@ -8193,9 +8901,6 @@ enum UsStateCode {
   WY
 }
 
-"""A nine-digit Employer Identification Number or Social Security Number."""
-scalar USTaxIdentificationNumber
-
 """A US ZIP code. Supports DDDDD and DDDDD-DDDD formats."""
 scalar UsZipCode
 
@@ -8277,25 +8982,6 @@ input VaultCreditCardVerificationOptionsInput {
 
   """The amount to use to verify the credit card."""
   amount: Amount
-}
-
-"""Top-level input field for vaulting a limited use PayPal account."""
-input VaultLimitedUsePayPalAccountInput {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """
-  ID of an existing single-use PayPal account generated using the order flow.
-  """
-  paymentMethodId: ID!
-
-  """ID of the customer to associate the resulting payment method with."""
-  customerId: ID
-
-  """
-  Input fields that provide information about the resulting PayPal account.
-  """
-  options: VaultLimitedUsePayPalAccountOptionsInput
 }
 
 """
@@ -8747,7 +9433,7 @@ type Viewer {
   merchant: Merchant
 
   """Associated rights based on authentication."""
-  rights: [String!]
+  rights: [Right!]
 }
 
 """Configuration for Visa Checkout."""
