@@ -4140,6 +4140,9 @@ type Mutation {
 
   """Creates a checkout that is used to initialize Afterpay."""
   createAfterpayAUNZCheckout(input: CreateAfterpayAUNZCheckoutInput!): CreateAfterpayAUNZCheckoutPayload
+
+  """Updates the authorization amount of the transaction."""
+  updateTransactionAmount(input: UpdateTransactionAmountInput!): TransactionPayload
 }
 
 """Means by which customers by their bills."""
@@ -8573,6 +8576,22 @@ type UpdateKlarnaEUSessionPayload {
 
   """The Klarna ID of the session that was updated."""
   sessionId: ID
+}
+
+"""Top-level input fields for a updating a transaction's amount."""
+input UpdateTransactionAmountInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of the transaction on which to perform the adjustment."""
+  transactionId: ID!
+
+  """
+  The new total amount to be authorized on a transaction. This value must be
+  greater than 0, and must match the currency format of the merchant account,
+  and cannot be greater than the maximum allowed by the processor.
+  """
+  amount: Amount!
 }
 
 """Input for creating or updating custom fields on a transaction."""

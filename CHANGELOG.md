@@ -1,3 +1,7 @@
+# 2021-05-28
+
+* Add `updateTransactionAmount` mutation.
+
 # 2021-05-13
 
 * Add `createDisputeFileEvidence`, `requestVaultFromInStoreReader`, `requestTextDisplayFromInStoreReader`, `requestItemDisplayFromInStoreReader`, `createKlarnaEUSession`, `updateKlarnaEUSession`, `updateKlarnaEUOrderShippingInfo`, and `createAfterpayAUNZCheckout` mutations.
