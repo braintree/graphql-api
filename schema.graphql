@@ -37,6 +37,15 @@ type AccessToken {
   expiresAt: String
 }
 
+"""The status of the business account creation request."""
+enum AccountCreationStatus {
+  COMPLETED
+  DECLINED
+  IN_SETUP
+  IN_VETTING
+  SUBMITTED
+}
+
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
 """
@@ -1682,6 +1691,13 @@ type CreditCardVerificationDetails {
 
 """Input fields that specify options for verifying the credit card."""
 input CreditCardVerificationOptionsInput {
+  """
+  Deprecated: Please use `merchantAccountId` in the base input instead.
+  
+  ID of the merchant account to use when verifying the credit card.
+  """
+  merchantAccountId: ID
+
   """The type of account to be used when verifying a combo card."""
   accountType: CardAccountType
 
@@ -1691,12 +1707,25 @@ input CreditCardVerificationOptionsInput {
   riskData: RiskDataInput
 
   """
+  Control which fraud tools will be applied to this verification. Fraud tools
+  cannot be retroactively applied to a verification if skipped.
+  """
+  fraudTools: CreditCardFraudToolsOptionsInput
+
+  """
   The CVV for the credit card to be used when verifying the credit card, securely tokenized with the `tokenizeCvv` mutation.
   """
   tokenizedCvv: ID
 
   """The amount to use to verify the credit card."""
   amount: Amount
+
+  """
+  Whether to opt out of verifying the credit card. Defaults to `false`. Clients
+  should only pass `true` in the uncommon scenario that the credit card has been
+  verified externally to Braintree.
+  """
+  skip: Boolean
 }
 
 """
@@ -2918,6 +2947,12 @@ type GooglePayOriginDetails {
   bin: String
 }
 
+"""Details about a Hyperwallet account."""
+type HyperwalletAccountDetails {
+  """The ID of the Hyperwallet account."""
+  userId: String
+}
+
 """Configuration for iDEAL."""
 type IDealConfiguration {
   """The route ID used to process an iDEAL payment."""
@@ -2927,9 +2962,9 @@ type IDealConfiguration {
   assetsUrl: String
 }
 
-"""Reference object for an in-store charge request."""
+"""Reference object for an in-store request."""
 type InStoreContext implements Node & InStoreContextResult {
-  """A unique ID for this charge request."""
+  """A unique ID for this in-store request."""
   id: ID! @deprecated(reason: "Use the id field from the InStoreContextPayload")
 
   """The transaction representing the charge on the payment method."""
@@ -2938,7 +2973,7 @@ type InStoreContext implements Node & InStoreContextResult {
   """The refund representing the refund on the payment method."""
   refund: Refund @deprecated(reason: "Use a Node query for a RequestRefundInStoreContext")
 
-  """The reader requested for the in-store flow."""
+  """The reader associated with the in-store request."""
   reader: InStoreReader @deprecated(reason: "Use the reader field from the InStoreContextPayload")
 
   """The status of the context created."""
@@ -2958,38 +2993,36 @@ type InStoreContextPayload {
   """A unique ID for this in-store context request."""
   id: ID!
 
-  """The reader requested for the in-store flow."""
+  """The reader associated with the in-store request."""
   reader: InStoreReader
 
   """The status of the context created."""
   status: InStoreContextStatus!
 }
 
-"""Reference object for an in-store charge request."""
+"""Reference object for an in-store request."""
 interface InStoreContextResult {
-  """A unique ID for this charge request."""
+  """A unique ID for this in-store request."""
   id: ID!
 
-  """The reader requested to be charged."""
+  """The reader associated with the in-store request."""
   reader: InStoreReader
 }
 
 """
-Potential statuses of a context created when an in-store charge is requested.
+Potential statuses of a context created as part of an in-store request.
 """
 enum InStoreContextStatus {
   """The context was successfully canceled."""
   CANCELLED
 
-  """Payment was successful. The context was ended."""
+  """Successful. The context was ended."""
   COMPLETE
 
-  """Payment was not successful. The context was ended."""
+  """Not successful. The context was ended."""
   FAILED
 
-  """
-  Payment flow in-progress. Waiting for Customer to provide payment method.
-  """
+  """Flow in-progress. Waiting for reader or point of sale interaction."""
   PENDING
 
   """
@@ -3089,6 +3122,29 @@ input InStoreLocationAddressInput {
   countryCode: CountryCode!
 }
 
+"""Input fields for an in-store Location Address update."""
+input InStoreLocationAddressUpdateInput {
+  """The street address."""
+  streetAddress: String
+
+  """Extended address information, such as an apartment or suite number."""
+  extendedAddress: String
+
+  """Locality/city."""
+  locality: String
+
+  """State or province."""
+  region: String
+
+  """
+  Postal code in any country's format, otherwise known as CAP, CEP, Eircode, NPA, PIN, PLZ, or ZIP code.
+  """
+  postalCode: String
+
+  """Country code for the address."""
+  countryCode: CountryCode
+}
+
 """Fields required for an instore location."""
 input InStoreLocationInput {
   """The publicly visible label of this Location."""
@@ -3108,6 +3164,27 @@ input InStoreLocationInput {
 
   """Whether QR code payments will be enabled for this location."""
   enableQRCodePayments: Boolean!
+}
+
+"""Fields required to update an in-store location."""
+input InStoreLocationUpdateInput {
+  """The publicly visible label of this location."""
+  name: String
+
+  """Name assigned by the merchant to uniquely identify this location."""
+  internalName: String
+
+  """The address of the location."""
+  address: InStoreLocationAddressUpdateInput
+
+  """The coordinates of this location."""
+  geoCoordinates: GeoCoordinatesInput
+
+  """The PayPal account ID to which this location will be added."""
+  payerId: ID
+
+  """Whether QR code payments will be enabled for this location."""
+  enableQRCodePayments: Boolean
 }
 
 """An in-store payment card reader."""
@@ -3704,6 +3781,12 @@ type MerchantAccount {
   """The ISO code for the currency the merchant account uses."""
   currencyCode: CurrencyCodeAlpha
 
+  """Business name of the account."""
+  dbaName: String
+
+  """A unique identifier for this account in external systems."""
+  externalId: String
+
   """
   The status of a merchant account. This determines whether the merchant account can be used to create a Payment.
   """
@@ -3718,6 +3801,12 @@ type MerchantAccount {
 
   """The PayPal account linked with the merchant account."""
   paypalAccount: PayPalAccountDetails
+
+  """The Hyperwallet account linked with the merchant account."""
+  hyperwalletAccount: HyperwalletAccountDetails
+
+  """The Venmo account linked with the merchant account."""
+  venmoAccount: VenmoAccountDetails
 
   """The 3D Secure configuration for the merchant account."""
   threeDSecure: MerchantAccountThreeDSecureConfiguration
@@ -4105,6 +4194,9 @@ type Mutation {
 
   """Creates a new In-Store Location to associate Readers."""
   createInStoreLocation(input: CreateInStoreLocationInput!): CreateInStoreLocationPayload
+
+  """Updates an In-Store Location."""
+  updateInStoreLocation(input: UpdateInStoreLocationInput!): UpdateInStoreLocationPayload
 
   """Pairs a Reader to an account and In-Store Location."""
   pairInStoreReader(input: PairInStoreReaderInput!): InStoreReaderPayload
@@ -5237,6 +5329,12 @@ type PayPalRefundDetails {
   refundedFee: MonetaryAmount
 }
 
+"""The app used to scan an in-store QR code."""
+enum PayPalRetailAppUsedForScanning {
+  PAYPAL
+  VENMO
+}
+
 """PayPal-specific details on a transaction."""
 type PayPalTransactionDetails {
   """
@@ -5299,6 +5397,9 @@ type PayPalTransactionDetails {
 
   """Buyer selected financing option at the time of creating a transaction."""
   selectedFinancingOption: SelectedPayPalFinancingOptionDetails
+
+  """The application used by the payer to scan the QR code."""
+  appUsedForScanning: PayPalRetailAppUsedForScanning
 }
 
 """Top-level output field from creating a PayPal transaction."""
@@ -7723,6 +7824,11 @@ type Transaction implements Node & Payment {
 
   """Installment details associated with the transaction."""
   installmentDetails: TransactionInstallmentDetails
+
+  """
+  The transaction date and time as reported by the in-store payment terminal.
+  """
+  paymentInitiatedAt: Timestamp
 }
 
 """
@@ -8415,11 +8521,16 @@ input UpdateCreditCardBillingAddressInput {
   billingAddress: AddressInput
 
   """
+  ID of the merchant account that will be used when verifying the credit card with the new billing address.
+  """
+  merchantAccountId: ID
+
+  """
   Input fields that specify options for verifying the credit card with the new
   billing address. By default, a verification will be performed. If the
   verification fails, the update will not be performed.
   """
-  verification: PaymentMethodVerificationOptionsInput
+  verification: CreditCardVerificationOptionsInput
 }
 
 """
@@ -8459,6 +8570,27 @@ type UpdateCustomerPayload {
 
   """Information about the customer that was updated."""
   customer: Customer
+}
+
+"""Input fields for updating an in-store location."""
+input UpdateInStoreLocationInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """ID of the location to be updated."""
+  locationId: ID!
+
+  """Input fields to update an in-store location."""
+  location: InStoreLocationUpdateInput!
+}
+
+"""Top-level fields returned when creating an in-store location."""
+type UpdateInStoreLocationPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The in-store location."""
+  location: InStoreLocation
 }
 
 """Input fields to update a Klarna order with shipping info."""
@@ -9001,6 +9133,12 @@ input VaultCreditCardVerificationOptionsInput {
 
   """The amount to use to verify the credit card."""
   amount: Amount
+
+  """
+  Control which fraud tools will be applied to this transaction. Fraud tools
+  cannot be retroactively applied to a transaction if skipped.
+  """
+  fraudTools: CreditCardFraudToolsOptionsInput
 }
 
 """
@@ -9076,7 +9214,9 @@ input VaultPaymentMethodInput {
   Input fields that specify options for verifying the payment method before
   vaulting. Only applicable if the payment method is of a type that supports
   verification. For supported types, verification is performed by default. If
-  the verification fails, the payment method will not be vaulted.
+  the verification fails, the payment method will not be vaulted. For
+  additional, payment method-specific verification options, please see other
+  verification mutations such as `verifyCreditCard` or `verifyUsBankAccount`.
   """
   verification: PaymentMethodVerificationOptionsInput
 

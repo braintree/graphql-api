@@ -1,3 +1,14 @@
+# 2021-06-17
+
+* Add `updateInStoreLocation` mutation.
+* Add `dbaName`, `externalId`, `hyperwalletAccount`, and `venmoAccount` to `MerchantAccount`.
+* Add `appUsedForScanning` to `PayPalTransactionDetails`.
+* Add `paymentInitiatedAt` to `Transaction`.
+* Add `merchantAccountId` input to `UpdateCreditCardBillingAddressInput`.
+* Change `verification` on `UpdateCreditCardBillingAddressInput` to `CreditCardVerificationOptionsInput` and add additional inputs.
+* Add `skip` and `fraudTools` inputs to `CreditCardVerificationOptionsInput`.
+* Add `fraudTools` input to `VaultCreditCardVerificationOptionsInput`.
+
 # 2021-05-28
 
 * Add `updateTransactionAmount` mutation.
