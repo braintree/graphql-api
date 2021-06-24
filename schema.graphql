@@ -1555,6 +1555,9 @@ type CreditCardDetails {
 
   """The display name of the card brand, e.g. "Visa" or "American Express"."""
   brand: String @deprecated(reason: "Use `brandCode` instead.")
+
+  """Indicates whether the card on file is network tokenized."""
+  cardOnFileNetworkTokenized: Boolean
 }
 
 """
@@ -1636,6 +1639,11 @@ type CreditCardTransactionDetails {
   Reference value assigned to a card transaction once it has been processed.
   """
   acquirerReferenceNumber: String
+
+  """
+  Indicates whether the transaction was processed with a card on file network token.
+  """
+  processedWithCardOnFileNetworkToken: Boolean
 }
 
 """
@@ -4220,6 +4228,11 @@ type Mutation {
   requestItemDisplayFromInStoreReader(input: RequestItemDisplayFromInStoreReaderInput!): InStoreContextPayload
 
   """
+  Request an in-store reader to update to the latest version of software.
+  """
+  requestFirmwareUpdateFromInStoreReader(input: RequestFirmwareUpdateFromInStoreReaderInput!): InStoreContextPayload
+
+  """
   Creates a session within Klarna and returns a payload which includes the available payment method categories.
   """
   createKlarnaEUSession(input: CreateKlarnaEUSessionInput!): CreateKlarnaEUSessionPayload
@@ -5958,6 +5971,29 @@ type RequestDisplayInStoreContext implements Node & InStoreContextResult {
   reader: InStoreReader
 
   """The status of the context created when the display was requested."""
+  status: InStoreContextStatus!
+}
+
+"""Input fields for requesting a firmware update for an in-store reader."""
+input RequestFirmwareUpdateFromInStoreReaderInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The in-store reader to receive the firmware update."""
+  readerId: ID!
+}
+
+"""Reference object for an in-store reader firmware update."""
+type RequestFirmwareUpdateInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this firmware update request."""
+  id: ID!
+
+  """The reader for which the firmware update was requested."""
+  reader: InStoreReader
+
+  """
+  The status of the context created when the firmware update was requested.
+  """
   status: InStoreContextStatus!
 }
 

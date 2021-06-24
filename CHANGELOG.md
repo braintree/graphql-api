@@ -1,3 +1,9 @@
+# 2021-06-24
+
+* Add `requestFirmwareUpdateFromInStoreReader` mutation.
+* Add `cardOnFileNetworkTokenized` to `CreditCardDetails`.
+* Add `processedWithCardOnFileNetworkToken` to `CreditCardTransactionDetails`.
+
 # 2021-06-17
 
 * Add `updateInStoreLocation` mutation.
