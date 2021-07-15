@@ -1,3 +1,10 @@
+# 2021-07-15
+
+* Add `generateExchangeRateQuote` mutation.
+* Add `disbursementDetails` to `Refund`.
+* Add `transactionId` to `ThreeDSecureLookupData`.
+* Add `exchangeRateQuoteId` to `TransactionInput`.
+
 # 2021-06-24
 
 * Add `requestFirmwareUpdateFromInStoreReader` mutation.

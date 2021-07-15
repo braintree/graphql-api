@@ -2725,6 +2725,85 @@ type EmvCardOriginDetails implements InStoreReaderOriginDetails {
   issuerActionCodeOnline: String
 }
 
+"""
+A value with more than one decimal place, representing an exchange rate between currencies. For example, `0.93014065558374`.
+minLength: 3
+pattern: <code>^\\d+[.]\\d+$</code>
+"""
+scalar ExchangeRate
+
+"""Details of the generated exchange rate quote."""
+type ExchangeRateQuote {
+  """
+  Unique identifier, which must be passed in the payment request in order to honor the exchange rate during settlement.
+  """
+  id: ID!
+
+  """
+  The amount in the `baseCurrency` to be converted to the `quoteCurrency`. If no
+  amount was provided, then this amount is 1 unit of `baseCurrency`.
+  """
+  baseAmount: MonetaryAmount
+
+  """
+  The amount in the `quoteCurrency` converted from the `baseCurrency`.
+  If no amount was provided, then this amount is converted from 1 unit of
+  `baseCurrency`, which will be the same as `exchangeRate` after rounding-off.
+  """
+  quoteAmount: MonetaryAmount
+
+  """
+  This much of `quoteCurrency` is required to buy 1 unit of `baseCurrency`. This
+  includes merchant `markupPercentage` if any.
+  If a `markupPercentage` is specified, this field will be the sum of that percentage and the `tradeRate`.
+  """
+  exchangeRate: ExchangeRate
+
+  """This is the rate at which PayPal will settle with the merchant."""
+  tradeRate: ExchangeRate
+
+  """When the exchange rate quote represents expires."""
+  expiresAt: Timestamp
+
+  """When the exchange rate quote represents will be refreshed."""
+  refreshesAt: Timestamp
+}
+
+"""Input to generate the exchange rate quote."""
+input ExchangeRateQuoteInput {
+  """
+  The currency code from which the exchange rate will be used to convert to the `quoteCurrency`.
+  """
+  baseCurrency: CurrencyCodeAlpha!
+
+  """
+  The currency code to which the exchange rate will be used to convert from `baseCurrency`.
+  """
+  quoteCurrency: CurrencyCodeAlpha!
+
+  """
+  The amount in the `baseCurrency` to be converted to the `quoteCurrency`. If
+  this is provided, the result will include the converted amount properly rounded.
+  """
+  baseAmount: Amount
+
+  """
+  A percentage added into the exchange rate. This allows the merchant to settle for more than the quoted `tradeRate`.
+  """
+  markup: Percentage
+}
+
+"""Exchange rate quotes for a specific customer."""
+type ExchangeRateQuotePayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  Exchange rate quote details for each base and quote currency combination.
+  """
+  quotes: [ExchangeRateQuote!]
+}
+
 """A credit card's assocation with an external vault."""
 enum ExternalVaultStatus {
   """
@@ -2876,6 +2955,17 @@ enum GatewayRejectionReason {
   TOKEN_ISSUANCE
   TOO_MANY_CONFIRMATION_ATTEMPTS
   UNION_PAY_ENROLLMENT_REQUIRED
+}
+
+"""Input to generate a list of exchange rate quotes."""
+input GenerateExchangeRateQuoteInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  Base and quote currency combinations for which the quote will be generated.
+  """
+  quotes: [ExchangeRateQuoteInput!]!
 }
 
 """Coordinates describing a geographic position."""
@@ -4248,6 +4338,13 @@ type Mutation {
 
   """Updates the authorization amount of the transaction."""
   updateTransactionAmount(input: UpdateTransactionAmountInput!): TransactionPayload
+
+  """
+  Generate a customized currency exchange rate quote for items on a merchant's
+  page. This allows merchants to advertise products in their customer's
+  currency. Your account must be enabled to use this feature.
+  """
+  generateExchangeRateQuote(input: GenerateExchangeRateQuoteInput!): ExchangeRateQuotePayload
 }
 
 """Means by which customers by their bills."""
@@ -5717,6 +5814,12 @@ type Refund implements Node & Payment {
   match the descriptor from the refunded transaction (if present).
   """
   descriptor: TransactionDescriptor
+
+  """
+  The disbursement details associated with this refund. This field is only
+  available after the refund is SETTLED and if you have an eligible merchant account.
+  """
+  disbursementDetails: DisbursementDetails
 }
 
 """A paginated list of refunds."""
@@ -7207,9 +7310,9 @@ type ThreeDSecureLookupData {
   acsUrl: String
 
   """
-  A unique identifier used by the MPI provider to identify the 3D Secure
-  interaction. The MPI provider provides the framework for determining if a card
-  is enrolled in a 3D Secure program and for facilitating interactions with the issuer.
+  Braintree unique ID of the 3D Secure authentication performed for this
+  transaction. You will only need to use this field if you are charging or
+  authorizing a vaulted payment method ID.
   """
   authenticationId: String
 
@@ -7230,6 +7333,13 @@ type ThreeDSecureLookupData {
   A fully qualified URL that the customer will be redirected to once the authentication completes.
   """
   termUrl: String
+
+  """
+  A unique identifier used by the MPI provider to identify the 3D Secure
+  interaction. The MPI provider provides the framework for determining if a card
+  is enrolled in a 3D Secure program and for facilitating interactions with the issuer.
+  """
+  transactionId: String
 }
 
 """ The shipping address of the transaction to be sent with 3D Secure Lookup requests.
@@ -8019,6 +8129,9 @@ input TransactionInput {
   in your PayPal business account. Maximum 255 characters or 127 for PayPal transactions.
   """
   orderId: String
+
+  """ID of exchange rate quote to be used for the transaction."""
+  exchangeRateQuoteId: ID
 
   """
   A purchase order identification value you associate with this transaction.
