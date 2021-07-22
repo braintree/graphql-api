@@ -3785,6 +3785,45 @@ enum LegacyIdType {
   VERIFICATION
 }
 
+"""The LocalPayment object."""
+type LocalPaymentContext implements Node & PaymentContext {
+  """Unique identifier for the payment context."""
+  id: ID!
+
+  """The type of the local payment."""
+  type: String
+
+  """
+  The URL to which a customer should be redirected to approve the local payment.
+  """
+  approvalUrl: String!
+
+  """The amount charged in this local payment."""
+  amount: MonetaryAmount
+
+  """The merchant account used to create the payment context."""
+  merchantAccountId: String
+
+  """
+  Date and time when the local payment context was used to create a transaction.
+  """
+  transactedAt: Timestamp
+
+  """
+  Date and time when the local payment context was approved by the customer.
+  """
+  approvedAt: Timestamp
+
+  """Date and time when the local payment context was created."""
+  createdAt: Timestamp!
+
+  """Date and time when the local payment context was updated."""
+  updatedAt: Timestamp!
+
+  """Unique identifier for the local payment."""
+  paymentId: String
+}
+
 """Local payment specific details on a transaction."""
 type LocalPaymentDetails {
   """
@@ -3805,10 +3844,12 @@ enum LocalPaymentMethodType {
   ALIPAY
   BANCONTACT
   BLIK
+  BOLETOBANCARIO
   EPS
   GIROPAY
   IDEAL
   MYBANK
+  OXXO
   P24
   PAYU
   SEPA

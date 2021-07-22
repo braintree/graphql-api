@@ -1,3 +1,7 @@
+# 2021-07-22
+
+* Add `BOLETOBANCARIO` and `OXXO` to `LocalPaymentMethodType`.
+
 # 2021-07-15
 
 * Add `generateExchangeRateQuote` mutation.
