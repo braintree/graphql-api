@@ -1,3 +1,8 @@
+# 2021-08-05
+
+* Add `inStoreLocations` query.
+* Add `businessAccountCreationRequests` to `Search`.
+
 # 2021-07-22
 
 * Add `BOLETOBANCARIO` and `OXXO` to `LocalPaymentMethodType`.
