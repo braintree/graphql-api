@@ -1706,6 +1706,12 @@ type CreditCardTransactionDetails {
   Indicates whether the transaction was processed with a card on file network token.
   """
   processedWithCardOnFileNetworkToken: Boolean
+
+  """
+  The remaining balance in the account after this transaction. This field is
+  only returned for payment methods such as prepaid cards.
+  """
+  accountBalance: MonetaryAmount
 }
 
 """
@@ -3873,7 +3879,7 @@ type LocalPaymentContext implements Node & PaymentContext {
   id: ID!
 
   """The type of the local payment."""
-  type: String
+  type: LocalPaymentMethodType
 
   """
   The URL to which a customer should be redirected to approve the local payment.
@@ -3902,8 +3908,14 @@ type LocalPaymentContext implements Node & PaymentContext {
   """Date and time when the local payment context was updated."""
   updatedAt: Timestamp!
 
+  """Date and time when the local payment context was expired."""
+  expiredAt: Timestamp
+
   """Unique identifier for the local payment."""
   paymentId: String
+
+  """The PayPal Invoice ID."""
+  orderId: String
 }
 
 """Local payment specific details on a transaction."""
@@ -5012,6 +5024,10 @@ certain payment methods such as credit cards, this value also encodes the origin
 from which a customer provided that payment method.
 """
 enum PaymentMethodSnapshotSearchType {
+  ALIPAY_VIA_PAYPAL
+  BANCONTACT_VIA_PAYPAL
+  BLIK_VIA_PAYPAL
+  BOLETOBANCARIO_VIA_PAYPAL
   CREDIT_CARD
   CREDIT_CARD_VIA_APPLE_PAY
   CREDIT_CARD_VIA_GOOGLE_PAY
@@ -5019,10 +5035,24 @@ enum PaymentMethodSnapshotSearchType {
   CREDIT_CARD_VIA_NETWORK_TOKEN
   CREDIT_CARD_VIA_SAMSUNG_PAY
   CREDIT_CARD_VIA_VISA_CHECKOUT
+  EPS_VIA_PAYPAL
+  GIROPAY_VIA_PAYPAL
+  IDEAL_VIA_PAYPAL
   LOCAL_PAYMENT
+  MYBANK_VIA_PAYPAL
+  OXXO_VIA_PAYPAL
+  P24_VIA_PAYPAL
   PAYPAL
+  PAYU_VIA_PAYPAL
+  SEPA_VIA_PAYPAL
+  SOFORT_VIA_PAYPAL
+  SWISH_VIA_PAYPAL
+  TRUSTLY_VIA_PAYPAL
   US_BANK_ACCOUNT
   VENMO_ACCOUNT
+  VERKKOPANKKI_VIA_PAYPAL
+  VIPPS_VIA_PAYPAL
+  WECHAT_PAY_VIA_PAYPAL
 }
 
 """Possible usages for payment methods."""
@@ -5706,6 +5736,13 @@ input PerformThreeDSecureLookupInput {
   will be returned as `ThreeDSecureAuthenticationStatus` for a successful response.
   """
   dataOnlyRequested: Boolean
+
+  """
+  If set to true, a card-add challenge will be requested from the issuer to
+  confirm adding new card to the merchant's vault. This flag should only be used
+  when adding a card to a merchant’s vault and not for creating transactions.
+  """
+  cardAdd: Boolean
 }
 
 """Top-level fields returned when performing a 3D Secure Lookup."""
@@ -7980,9 +8017,14 @@ type Transaction implements Node & Payment {
 
   """
   The amount charged in this transaction. For transactions that are partially
-  captured, this amount will be the cummulative amount captured on this transaction.
+  captured, this amount will be the cummulative amount captured on this
+  transaction. For transactions that are partially authorized, the amount will
+  be less than the `initialRequestedAuthorizationAmount`.
   """
   amount: MonetaryAmount
+
+  """The initial requested authorization amount for this transaction."""
+  initialRequestedAuthorizationAmount: MonetaryAmount
 
   """
   Collection of custom field/value pairs. Custom fields are [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
@@ -9879,6 +9921,9 @@ type Viewer {
 type VisaCheckoutConfiguration {
   """The Visa Checkout API key."""
   apiKey: String
+
+  """The Visa Checkout encryption key."""
+  encryptionKey: String
 
   """The Visa Checkout external client ID."""
   externalClientId: String

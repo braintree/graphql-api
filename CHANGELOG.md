@@ -1,3 +1,13 @@
+# 2021-08-12
+
+* Add `accountBalance` to `CreditCardTransactionDetails`.
+* Add `expiredAt` and `orderId` to `LocalPaymentContext`.
+* Add new payment method types to `PaymentMethodSnapshotSearchType`.
+* Add `cardAdd` to `PerformThreeDSecureLookupInput`.
+* Add `initialRequestedAuthorizationAmount` to `Transaction`.
+* Add `encryptionKey` to `VisaCheckoutConfiguration`.
+* Update `LocalPaymentContext.type` to `LocalPaymentMethodType` enum.
+
 # 2021-08-05
 
 * Add `inStoreLocations` query.
