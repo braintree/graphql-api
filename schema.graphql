@@ -3535,6 +3535,13 @@ input InStoreTransactionInput {
   blank, the single-use payment method will not be vaulted.
   """
   vaultPaymentMethodAfterTransacting: VaultPaymentMethodAfterTransactingInput
+
+  """
+  For partners and shopping carts only. If you are a shopping cart provider or
+  other Braintree partner, pass a string identifier for your service. For PayPal
+  transactions, this maps to paypal.bn_code.
+  """
+  channel: String
 }
 
 """The address fields."""

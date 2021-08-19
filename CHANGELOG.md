@@ -1,3 +1,7 @@
+# 2021-08-19
+
+* Add `channel` to `InStoreTransactionInput`.
+
 # 2021-08-12
 
 * Add `accountBalance` to `CreditCardTransactionDetails`.
