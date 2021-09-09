@@ -1,3 +1,12 @@
+# 2021-09-09
+
+* Add `VenmoPayerInfoInput` to `ApproveVenmoPaymentContextInput`.
+* Add `VenmoPayerInfo` type.  
+* Add `NonInstantLocalPaymentType` enum.
+* Add `MULTIBANCO` to `LocalPaymentMethodType` enum. 
+* Update `createDisputeFileEvidence` docstring.
+
+
 # 2021-08-19
 
 * Add `channel` to `InStoreTransactionInput`.

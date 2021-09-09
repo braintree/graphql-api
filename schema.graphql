@@ -3891,7 +3891,7 @@ type LocalPaymentContext implements Node & PaymentContext {
   """
   The URL to which a customer should be redirected to approve the local payment.
   """
-  approvalUrl: String!
+  approvalUrl: String
 
   """The amount charged in this local payment."""
   amount: MonetaryAmount
@@ -3919,7 +3919,7 @@ type LocalPaymentContext implements Node & PaymentContext {
   expiredAt: Timestamp
 
   """Unique identifier for the local payment."""
-  paymentId: String
+  paymentId: String!
 
   """The PayPal Invoice ID."""
   orderId: String
@@ -3949,6 +3949,7 @@ enum LocalPaymentMethodType {
   EPS
   GIROPAY
   IDEAL
+  MULTIBANCO
   MYBANK
   OXXO
   P24
@@ -4417,7 +4418,11 @@ type Mutation {
   """Deletes evidence from a dispute."""
   deleteDisputeEvidence(input: DeleteDisputeEvidenceInput!): DeleteDisputeEvidencePayload
 
-  """Uploads a file and associates it with a dispute."""
+  """
+  Uploads an evidence file and associates it with a dispute. **Note:**: file
+  upload requires a special request format. See the ['Uploading Files' integration guide](https://graphql.braintreepayments.com/integration_guides/uploading_files)
+  for instructions on how to perform this mutation.
+  """
   createDisputeFileEvidence(input: CreateDisputeFileEvidenceInput!): CreateDisputeFileEvidencePayload
 
   """
@@ -4618,6 +4623,13 @@ input NetworkTokenOriginDetailsInput {
 interface Node {
   """Global ID for a given object."""
   id: ID!
+}
+
+"""A value identifying the type of non-instant regional payment method."""
+enum NonInstantLocalPaymentMethodType {
+  BOLETOBANCARIO
+  MULTIBANCO
+  OXXO
 }
 
 """Information about an OAuth Application."""
@@ -5046,6 +5058,7 @@ enum PaymentMethodSnapshotSearchType {
   GIROPAY_VIA_PAYPAL
   IDEAL_VIA_PAYPAL
   LOCAL_PAYMENT
+  MULTIBANCO_VIA_PAYPAL
   MYBANK_VIA_PAYPAL
   OXXO_VIA_PAYPAL
   P24_VIA_PAYPAL
@@ -9676,6 +9689,60 @@ enum VenmoEnvironment {
   SANDBOX
   production
   sandbox
+}
+
+"""Information about a payer's Venmo account."""
+type VenmoPayerInfo {
+  """The payer's first name."""
+  firstName: String
+
+  """The payer's last name."""
+  lastName: String
+
+  """The payer's phone number."""
+  phoneNumber: String
+
+  """The payer's email address."""
+  email: EmailAddress
+
+  """The external ID of the payer's Venmo account."""
+  externalId: String
+
+  """The username of the payer's Venmo account."""
+  userName: String
+
+  """The payer's billing address."""
+  billingAddress: Address
+
+  """The payer's shipping address."""
+  shippingAddress: Address
+}
+
+"""Information about a payer's Venmo account."""
+input VenmoPayerInfoInput {
+  """The payer's first name."""
+  firstName: String
+
+  """The payer's last name."""
+  lastName: String
+
+  """The payer's phone number."""
+  phoneNumber: String
+
+  """The payer's email address."""
+  email: EmailAddress
+
+  """The external ID of the payer's Venmo account."""
+  externalId: String
+
+  """The username of the payer's Venmo account."""
+  userName: String
+
+  """The payer's billing address."""
+  billingAddress: AddressInput
+
+  """The payer's shipping address."""
+  shippingAddress: AddressInput
 }
 
 """
