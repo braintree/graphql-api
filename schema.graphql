@@ -1484,6 +1484,26 @@ type CreateKlarnaEUSessionPayload {
   paymentMethodCategories: [KlarnaEUPaymentMethodCategory!]
 }
 
+"""
+Top-level input fields for creating a non-instant local payment context.
+"""
+input CreateNonInstantLocalPaymentContextInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Input fields for creating a non-instant local payment context."""
+  paymentContext: NonInstantLocalPaymentContextInput!
+}
+
+"""The result of a request to make a local payment context."""
+type CreateNonInstantLocalPaymentContextPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Details about the local payment context."""
+  paymentContext: LocalPaymentContext
+}
+
 """Top-level input field for generating a PayPal access token."""
 input CreateUniversalAccessTokenInput {
   """An identifier used to reconcile requests and responses."""
@@ -3880,6 +3900,29 @@ enum LegacyIdType {
   VERIFICATION
 }
 
+"""Input fields for local payment addresses."""
+input LocalPaymentAddressInput {
+  """The street address."""
+  streetAddress: String
+
+  """Extended address information, such as an apartment or suite number."""
+  extendedAddress: String
+
+  """Locality/city."""
+  locality: String
+
+  """State or province."""
+  region: String
+
+  """
+  Postal code in any country's format, otherwise known as CAP, CEP, Eircode, NPA, PIN, PLZ, or ZIP code.
+  """
+  postalCode: String
+
+  """Country code for the address."""
+  countryCode: CountryCode
+}
+
 """The LocalPayment object."""
 type LocalPaymentContext implements Node & PaymentContext {
   """Unique identifier for the payment context."""
@@ -3961,6 +4004,32 @@ enum LocalPaymentMethodType {
   VERKKOPANKKI
   VIPPS
   WECHAT_PAY
+}
+
+"""Input fields for the payer of a local payment."""
+input LocalPaymentPayerInfoInput {
+  """The payer's given (first) name."""
+  givenName: String!
+
+  """The payer's surname (last name)."""
+  surname: String!
+
+  """The payer's email."""
+  email: EmailAddress
+
+  """The payer's phone number."""
+  phoneNumber: String
+
+  """The payer's shipping address."""
+  shippingAddress: LocalPaymentAddressInput
+
+  """The payer's billing address."""
+  billingAddress: LocalPaymentAddressInput
+
+  """
+  The payer's tax information. This is only required for Boleto Bancário payments.
+  """
+  taxInfo: TaxInfoInput
 }
 
 """Configuration for Masterpass."""
@@ -4492,6 +4561,11 @@ type Mutation {
   currency. Your account must be enabled to use this feature.
   """
   generateExchangeRateQuote(input: GenerateExchangeRateQuoteInput!): ExchangeRateQuotePayload
+
+  """
+  Creates a non-instant local payment context. Your account must be enabled to use this feature.
+  """
+  createNonInstantLocalPaymentContext(input: CreateNonInstantLocalPaymentContextInput!): CreateNonInstantLocalPaymentContextPayload
 }
 
 """Means by which customers by their bills."""
@@ -4623,6 +4697,55 @@ input NetworkTokenOriginDetailsInput {
 interface Node {
   """Global ID for a given object."""
   id: ID!
+}
+
+"""Input fields for non-instant local payment context."""
+input NonInstantLocalPaymentContextInput {
+  """
+  The order id of the eventual Braintree transaction and the invoice number of
+  the local payment context. Maximum 127 characters.
+  """
+  orderId: String
+
+  """The amount of the local payment."""
+  amount: MonetaryAmountInput!
+
+  """The type of the non-instant local payment."""
+  type: NonInstantLocalPaymentMethodType!
+
+  """
+  The country code of the local payment. For local payments supported in
+  multiple countries, this value may determine which banks are presented to the customer.
+  """
+  countryCode: CountryCode
+
+  """
+  The language tag for the language in which to localize the error-related strings.
+  """
+  locale: Language
+
+  """
+  The URL where the customer is redirected after the customer approves the payment.
+  """
+  returnUrl: String!
+
+  """
+  The URL where the customer is redirected after the customer cancels the payment.
+  """
+  cancelUrl: String!
+
+  """
+  ID of the PayPal merchant account that will be used when charging this payment method.
+  """
+  merchantAccountId: ID
+
+  """The payer's information."""
+  payerInfo: LocalPaymentPayerInfoInput!
+
+  """
+  The date at which the local payment context will expire. Only valid for non-instant payment methods.
+  """
+  expiryDate: Date
 }
 
 """A value identifying the type of non-instant regional payment method."""
@@ -7122,6 +7245,21 @@ type SubmittedForSettlementEvent implements PaymentStatusEvent {
   terminal: Boolean
 }
 
+"""Input fields for local payment tax information."""
+input TaxInfoInput {
+  """The payer's tax identifier value."""
+  identifier: String!
+
+  """The payer's tax identifier type."""
+  type: TaxInfoType!
+}
+
+"""The type of tax identifier."""
+enum TaxInfoType {
+  BR_CNPJ
+  BR_CPF
+}
+
 """Information about the 3D Secure authentication for a payment method."""
 type ThreeDSecureAuthentication {
   """
@@ -9225,6 +9363,7 @@ enum UsBankAccountOwnershipType {
 enum UsBankAccountType {
   CHECKING
   SAVINGS
+  UNKNOWN
 }
 
 """

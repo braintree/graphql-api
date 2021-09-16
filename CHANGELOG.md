@@ -1,3 +1,8 @@
+# 2021-09-16
+
+* Add `createNonInstantLocalPaymentContext` mutation.
+* Add `UNKNOWN` to `UsBankAccountType`.
+
 # 2021-09-09
 
 * Add `VenmoPayerInfoInput` to `ApproveVenmoPaymentContextInput`.
