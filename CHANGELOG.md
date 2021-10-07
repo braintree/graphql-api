@@ -1,3 +1,7 @@
+# 2021-10-07
+
+* Update `expiryDate` docstring in `NonInstantLocalPaymentContextInput`.`
+
 # 2021-09-16
 
 * Add `createNonInstantLocalPaymentContext` mutation.

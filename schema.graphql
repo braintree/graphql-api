@@ -4743,7 +4743,7 @@ input NonInstantLocalPaymentContextInput {
   payerInfo: LocalPaymentPayerInfoInput!
 
   """
-  The date at which the local payment context will expire. Only valid for non-instant payment methods.
+  Overrides the default date at which the local payment context will expire. MULTIBANCO is not overridable.
   """
   expiryDate: Date
 }
