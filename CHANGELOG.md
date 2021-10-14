@@ -1,3 +1,7 @@
+# 2021-10-14
+
+* Add new enums to `ThreeDSecureAuthenticationStatus`
+
 # 2021-10-07
 
 * Update `expiryDate` docstring in `NonInstantLocalPaymentContextInput`.`
