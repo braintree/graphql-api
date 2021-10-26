@@ -1,10 +1,10 @@
 # 2021-10-14
 
-* Add new enums to `ThreeDSecureAuthenticationStatus`
+* Add `LOOKUP_CARD_ERROR` and `LOOKUP_SERVER_ERROR` to `ThreeDSecureAuthenticationStatus`.
 
 # 2021-10-07
 
-* Update `expiryDate` docstring in `NonInstantLocalPaymentContextInput`.`
+* Update `expiryDate` docstring in `NonInstantLocalPaymentContextInput`.
 
 # 2021-09-16
 
@@ -18,7 +18,6 @@
 * Add `NonInstantLocalPaymentType` enum.
 * Add `MULTIBANCO` to `LocalPaymentMethodType` enum. 
 * Update `createDisputeFileEvidence` docstring.
-
 
 # 2021-08-19
 
