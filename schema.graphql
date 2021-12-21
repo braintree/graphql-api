@@ -1504,6 +1504,67 @@ type CreateNonInstantLocalPaymentContextPayload {
   paymentContext: LocalPaymentContext
 }
 
+"""Top-level input field for creating a PayPal Billing Agreement Token."""
+input CreatePayPalBillingAgreementInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """
+  Braintree merchant account ID associated with the PayPal account to be used for the Billing Agreement creation.
+  """
+  merchantAccountId: ID
+
+  """
+  URL for redirect back to merchant app on the client indicating successful approval.
+  """
+  returnUrl: URL!
+
+  """
+  URL for redirect back to merchant app on the client indicating unsuccessful approval.
+  """
+  cancelUrl: URL!
+
+  """
+  Description of the PayPal Billing Agreement, displayed to the PayPal user on paypal.com and other PayPal user experiences.
+  """
+  description: String
+
+  """
+  Email of the payer (if known). This will prepopulate the input field in the PayPal approval page.
+  """
+  email: EmailAddress
+
+  """
+  Indicates whether PayPal Credit should be offered in the PayPal approval flow.
+  """
+  offerPayPalCredit: Boolean
+
+  """PayPal Risk correlation ID (also known as the Client Metadata ID)."""
+  paypalRiskCorrelationId: ID
+
+  """Defines the experience profile used to render the approval flow."""
+  paypalExperienceProfile: PayPalExperienceProfileInput
+
+  """
+  Merchant-provided shipping address. Fields addressLine1, adminArea2, and countryCode are required for Billing Agreements.
+  """
+  shippingAddress: AddressInput
+}
+
+"""
+Top-level fields returned from setting up a PayPal Billing Agreement Token.
+"""
+type CreatePayPalBillingAgreementPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The Billing Agreement token."""
+  billingAgreementToken: ID
+
+  """The URL for getting user approval of the PayPal Billing Agreement."""
+  approvalUrl: URL
+}
+
 """Top-level input field for generating a PayPal access token."""
 input CreateUniversalAccessTokenInput {
   """An identifier used to reconcile requests and responses."""
@@ -3340,7 +3401,7 @@ type InStoreLocationConnection {
   pageInfo: PageInfo!
 }
 
-"""An in-store location within a TransactionConnection."""
+"""An in-store location within an InStoreLocationConnection."""
 type InStoreLocationConnectionEdge {
   """
   The in-store locations's location within the InStoreLocationConnection. Used for requesting additional pages.
@@ -3429,6 +3490,26 @@ enum InStoreReaderAuthorizationMode {
   ISSUER
 }
 
+"""A paginated list of in-store readers."""
+type InStoreReaderConnection {
+  """A list of in-store readers."""
+  edges: [InStoreReaderConnectionEdge]
+
+  """Information about the page of in-store readers contained in `edges`."""
+  pageInfo: PageInfo!
+}
+
+"""An in-store reader within an InStoreReaderConnection."""
+type InStoreReaderConnectionEdge {
+  """
+  The in-store reader's location within the InStoreReaderConnection. Used for requesting additional pages.
+  """
+  cursor: String
+
+  """The in-store reader."""
+  node: InStoreReader
+}
+
 """
 Additional information about the payment method supplied by an in-store payment reader.
 """
@@ -3457,6 +3538,12 @@ type InStoreReaderPayload {
 
   """The reader."""
   reader: InStoreReader
+}
+
+"""Input fields for searching for in-store readers."""
+input InStoreReaderSearchInput {
+  """Find in-store readers with location ID or IDs."""
+  locationId: SearchValueInput
 }
 
 """Fields that are reader specific for pairing a reader."""
@@ -3893,6 +3980,7 @@ enum LegacyIdType {
   CUSTOMER
   DISPUTE
   MERCHANT_ACCOUNT_APPLICATION
+  PAYMENT_CONTEXT
   PAYMENT_METHOD
   REFUND
   TRANSACTION
@@ -3927,6 +4015,9 @@ input LocalPaymentAddressInput {
 type LocalPaymentContext implements Node & PaymentContext {
   """Unique identifier for the payment context."""
   id: ID!
+
+  """Legacy unique identifier."""
+  legacyId: ID!
 
   """The type of the local payment."""
   type: LocalPaymentMethodType
@@ -4436,6 +4527,14 @@ type Mutation {
   tokenizeUsBankLogin(input: TokenizeUsBankLoginInput!): TokenizeUsBankAccountPayload
 
   """
+  Tokenize PayPal account and return a payload that includes a single-use payment method.
+  """
+  tokenizePayPalBillingAgreement(input: TokenizePayPalBillingAgreementInput!): TokenizePayPalBillingAgreementPayload
+
+  """Set up a PayPal Billing Agreement Token for approval by a PayPal user."""
+  createPayPalBillingAgreement(input: CreatePayPalBillingAgreementInput!): CreatePayPalBillingAgreementPayload
+
+  """
   Create a customer for storing individual customer information and/or grouping transactions and multi-use payment methods.
   """
   createCustomer(input: CreateCustomerInput): CreateCustomerPayload
@@ -4514,6 +4613,9 @@ type Mutation {
 
   """Pairs a Reader to an account and In-Store Location."""
   pairInStoreReader(input: PairInStoreReaderInput!): InStoreReaderPayload
+
+  """Updates an In-Store Reader."""
+  updateInStoreReader(input: UpdateInStoreReaderInput!): InStoreReaderPayload
 
   """Request an in-store reader to begin the charge flow."""
   requestChargeFromInStoreReader(input: RequestChargeFromInStoreReaderInput!): InStoreContextPayload
@@ -5505,6 +5607,12 @@ input PayPalAccountInput {
   payerId: ID
 }
 
+"""Input fields for a PayPal account to be vaulted."""
+input PayPalBillingAgreementInput {
+  """The Billing Agreement token."""
+  billingAgreementToken: ID!
+}
+
 """Configuration for PayPal."""
 type PayPalConfiguration {
   """
@@ -5568,6 +5676,31 @@ enum PayPalEnvironment {
   custom
   live
   offline
+}
+
+"""Controls the experience in a PayPal approval flow."""
+input PayPalExperienceProfileInput {
+  """Merchant brand name to be displayed on the PayPal approval pages."""
+  brandName: String
+
+  """
+  Indicates whether a shipping address will be collected from the customer during the agreement approval flow.
+  """
+  collectShippingAddress: Boolean
+
+  """
+  Specifies the PayPal page to display when a user lands on the PayPal site to complete the payment.
+  """
+  landingPageType: PayPalLandingPageType
+
+  """Locale of the PayPal payment approval experience."""
+  locale: Language
+
+  """
+  Indicates whether to enable user editing of the shipping address. Only applies
+  when shipping address is provided by merchant.
+  """
+  shippingAddressEditable: Boolean
 }
 
 """Possible identifiers for credit products provided via PayPal."""
@@ -5640,6 +5773,15 @@ input PayPalFinancingOptionsInput {
 type PayPalFinancingOptionsPayload {
   """PayPal financing options."""
   financingOptions: [PayPalFinancingOption!]
+}
+
+"""
+The type of landing page to display on the PayPal site for user checkout.
+"""
+enum PayPalLandingPageType {
+  BILLING
+  DEFAULT
+  LOGIN
 }
 
 """
@@ -6578,7 +6720,7 @@ type RiskData {
   score: Int
 }
 
-"""Input fields for a risk data object."""
+"""Input fields for data used by processors for risk analysis."""
 input RiskDataInput {
   """
   The User-Agent header provided by the customer's browser, which gives
@@ -6762,6 +6904,11 @@ type Search {
   A paginated list of business account creation requests that match the BusinessAccountCreationRequestSearchInput.
   """
   businessAccountCreationRequests(input: BusinessAccountCreationRequestSearchInput!, first: Int, after: String): BusinessAccountCreationRequestConnection
+
+  """
+  A paginated list of in-store readers that match the InStoreReaderSearchInput.
+  """
+  inStoreReaders(input: InStoreReaderSearchInput!, first: Int, after: String): InStoreReaderConnection
 }
 
 """
@@ -8101,6 +8248,24 @@ type TokenizeNetworkTokenPayload {
   paymentMethod: PaymentMethod
 }
 
+"""Top-level input fields for tokenizing a PayPal account."""
+input TokenizePayPalBillingAgreementInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """Input fields for a PayPal Billing Agreement."""
+  billingAgreement: PayPalBillingAgreementInput!
+}
+
+"""Top-level fields returned from a tokenized PayPal account."""
+type TokenizePayPalBillingAgreementPayload {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """A single-use payment method."""
+  paymentMethod: PaymentMethod
+}
+
 """Top-level input field for tokenizing a Samsung Pay card."""
 input TokenizeSamsungPayCardInput {
   """An identifier used to reconcile requests and responses."""
@@ -8392,6 +8557,18 @@ type TransactionConnectionEdge {
 }
 
 """
+Customer details to be stored on the transaction itself, if the transaction is
+not associated with a customer. Used for fraud detection purposes.
+"""
+input TransactionCustomerDetailsInput {
+  """Email address for the customer."""
+  email: String
+
+  """Phone number for the customer."""
+  phoneNumber: String
+}
+
+"""
 Fields used to define what will appear on a customer's bank statement for a specific purchase.
 """
 type TransactionDescriptor {
@@ -8563,6 +8740,20 @@ input TransactionInput {
   blank, the single-use payment method will not be vaulted.
   """
   vaultPaymentMethodAfterTransacting: VaultPaymentMethodAfterTransactingInput
+
+  """
+  Customer information to be stored on the transaction and used for fraud
+  protection. Use this if you wish to pass customer information on a transaction
+  without creating an independent stored customer record in the vault.
+  
+  This parameter can only be used if you do not pass `customerId`, and if you
+  are not using a vaulted/multi-use payment method. In other words, this field
+  is only valid when the transaction will not be associated with an existing customer.
+  
+  If `vaultPaymentMethodAfterTransacting` is also passed, these values will be
+  used when creating a new customer for the newly-vaulted payment method.
+  """
+  customerDetails: TransactionCustomerDetailsInput
 }
 
 """Transaction Installment information."""
@@ -9075,6 +9266,21 @@ type UpdateInStoreLocationPayload {
   location: InStoreLocation
 }
 
+"""Input fields for updating an in-store reader."""
+input UpdateInStoreReaderInput {
+  """An identifier used to reconcile requests and responses."""
+  clientMutationId: String
+
+  """The ID of the in-store reader to update."""
+  readerId: ID!
+
+  """The new name for the in-store reader."""
+  name: String
+
+  """The new location ID for the in-store reader."""
+  locationId: ID
+}
+
 """Input fields to update a Klarna order with shipping info."""
 input UpdateKlarnaEUOrderShippingInfoInput {
   """An identifier used to reconcile requests and responses."""
@@ -9236,6 +9442,12 @@ type UpdateTransactionCustomFieldsPayload {
   """
   customFields: [CustomField!]
 }
+
+"""
+An http based URL string
+pattern: <code>https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,4}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)</code>
+"""
+scalar URL
 
 """Details about the customer's acceptance of ACH terms."""
 type UsBankAccountAchMandate {

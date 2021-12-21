@@ -1,3 +1,11 @@
+# 2021-12-21
+
+* Add `PAYMENT_CONTEXT` to `LegacyIdType` enum.
+* Add `legacyId` to `LocalPaymentContext`.
+* Add `tokenizePayPalBillingAgreement`, `createPayPalBillingAgreement`, and `updateInStoreReader` mutations.
+* Add `inStoreReaders` search query.
+* Add `customerDetails` on `TransactionInput`.
+
 # 2021-10-14
 
 * Add `LOOKUP_CARD_ERROR` and `LOOKUP_SERVER_ERROR` to `ThreeDSecureAuthenticationStatus`.
