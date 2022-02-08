@@ -1,3 +1,9 @@
+# 2022-02-08
+
+* Add `PARTIALLY_COMPLETE` to `InStoreContextStatus` enum.
+* Add `VAULT` to `PaymentReaderInputMode` enum.
+* Add `PAYMENT_READER` to `PaymentSource` enum to allow searching for payments originated at a reader.
+
 # 2021-12-21
 
 * Add `PAYMENT_CONTEXT` to `LegacyIdType` enum.

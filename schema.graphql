@@ -3269,6 +3269,11 @@ enum InStoreContextStatus {
   """Not successful. The context was ended."""
   FAILED
 
+  """
+  Partially successful. The context was ended but only partially authorized.
+  """
+  PARTIALLY_COMPLETE
+
   """Flow in-progress. Waiting for reader or point of sale interaction."""
   PENDING
 
@@ -5349,6 +5354,7 @@ enum PaymentReaderInputMode {
   MAGSTRIPE
   MAGSTRIPE_FALLBACK
   MANUAL_KEY_ENTRY
+  VAULT
 }
 
 """Input fields for searching for any type of Payment."""
@@ -5444,6 +5450,7 @@ The origin of a request that created or changed a transaction or refund.
 enum PaymentSource {
   API
   CONTROL_PANEL
+  PAYMENT_READER
   RECURRING
   UNKNOWN
 }
