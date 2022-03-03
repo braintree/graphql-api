@@ -3549,6 +3549,12 @@ type InStoreReaderPayload {
 input InStoreReaderSearchInput {
   """Find in-store readers with location ID or IDs."""
   locationId: SearchValueInput
+
+  """Find in-store readers with software version."""
+  softwareVersion: SearchSoftwareVersionInput
+
+  """Find in-store readers with reader status."""
+  readerStatus: ReaderStatus
 }
 
 """Fields that are reader specific for pairing a reader."""
@@ -5510,7 +5516,13 @@ enum PaymentStatus {
   customer has begun.
   """
   SETTLED
-  SETTLEMENT_CONFIRMED @deprecated(reason: "No longer applicable to any supported payment method types.")
+
+  """
+  The transaction was captured partially and will not be submitted to processor
+  for settling. Its child transaction(s) has been successfully captured and will
+  be included in the next settlement batch.
+  """
+  SETTLEMENT_CONFIRMED
 
   """
   The processor declined the payment while attempting to capture it. See the
@@ -7157,6 +7169,21 @@ input SearchRangeInput {
   lessThanOrEqualTo: String
 }
 
+"""Input fields for searching for a version number."""
+input SearchSoftwareVersionInput {
+  """Field is exactly this value."""
+  is: String
+
+  """Field is not this value."""
+  isNot: String
+
+  """Field starts with this value."""
+  startsWith: String
+
+  """Field contains this value."""
+  contains: String
+}
+
 """Input fields for searching text fields."""
 input SearchTextInput {
   """Field is exactly this value."""
@@ -7303,6 +7330,29 @@ type SettledEvent implements PaymentStatusEvent {
 
   """The ID of the settlement batch in which the transaction was processed."""
   settlementBatchId: String
+}
+
+"""Accompanying information for a settlement confirmed transaction."""
+type SettlementConfirmedEvent implements PaymentStatusEvent {
+  """The new status of the transaction."""
+  status: PaymentStatus
+
+  """Date and time when the transaction became settlement confirmed."""
+  timestamp: Timestamp
+
+  """The amount of the transaction for this status event."""
+  amount: MonetaryAmount
+
+  """The source for the transaction change to the new status."""
+  source: PaymentSource
+
+  """
+  Fields describing the payment processor response to the settlement request.
+  """
+  processorResponse: TransactionSettlementProcessorResponse
+
+  """Whether or not this is the final state for the transaction."""
+  terminal: Boolean
 }
 
 """Accompanying information for a settlement declined transaction."""
@@ -10271,6 +10321,9 @@ type VerifoneVendor {
 
   """Current OS version running on the reader."""
   osVersion: String
+
+  """Vendor-specific device serial number."""
+  serialNumber: String
 }
 
 """Top-level input field for verifying a multi-use credit card."""

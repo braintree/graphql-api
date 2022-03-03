@@ -1,3 +1,10 @@
+# 2022-03-02
+
+* Add `softwareVersion` and `readerStatus` to `InStoreReaderSearchInput`.
+* Undeprecate `SETTLEMENT_CONFIRMED` in `PaymentStatus`, it will be present on partially captured transactions.
+* Add `SettlementConfirmedEvent` as an implementation of the `PaymentStatusEvent` interface.
+* Add `serialNumber` to `VerifoneVendor`.
+
 # 2022-02-08
 
 * Add `PARTIALLY_COMPLETE` to `InStoreContextStatus` enum.
