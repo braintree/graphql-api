@@ -6,7 +6,9 @@ directive @specifiedBy(
 
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of the dispute to be accepted."""
@@ -15,7 +17,9 @@ input AcceptDisputeInput {
 
 """Top-level field returned when accepting a dispute."""
 type AcceptDisputePayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Information about the dispute that was accepted."""
@@ -226,127 +230,6 @@ input AddressInput {
   countryName: String
 }
 
-"""Afterpay address."""
-input AfterpayAUNZAddressInput {
-  """Full name of contact. Max 255 characters."""
-  name: String!
-
-  """First line of the address. Max 128 characters."""
-  line1: String!
-
-  """Second line of the address. Max 128 characters."""
-  line2: String
-
-  """Australian suburb or New Zealand town. Max 128 characters."""
-  area1: String
-
-  """New Zealand suburb or local area. Max 128 characters."""
-  area2: String
-
-  """Australian state, New Zealand region. Max 128 characters."""
-  region: String!
-
-  """ZIP or postal code. Max 128 characters."""
-  postcode: String!
-
-  """Country code."""
-  countryCode: CountryCode!
-
-  """
-  The phone number, in [E.123](https://en.wikipedia.org/wiki/E.123) format. Max 32 characters.
-  """
-  phoneNumber: String
-}
-
-"""Afterpay consumer config."""
-input AfterpayAUNZConsumerInput {
-  """The consumer's phone number. Max 32 characters."""
-  phoneNumber: String
-
-  """The consumer's first name and any middle names. Max 128 characters."""
-  givenNames: String!
-
-  """The consumer's last name. Max 128 characters."""
-  surname: String!
-
-  """The consumer's email address."""
-  email: EmailAddress!
-}
-
-"""Configuration for Afterpay courier data."""
-input AfterpayAUNZCourierInput {
-  """The time at which the order was shipped."""
-  shippedAt: Timestamp
-
-  """The name of the courier. Max 128 characters."""
-  name: String
-
-  """The tracking number provided by the courier. Max 128 characters."""
-  tracking: String
-
-  """The shipping priority."""
-  priority: AfterpayAUNZShippingPriority
-}
-
-"""Afterpay discount configuration."""
-input AfterpayAUNZDiscountInput {
-  """A display name for the discount. Max 128 characters."""
-  displayName: String!
-
-  """The discount amount."""
-  amount: MonetaryAmountInput
-}
-
-"""A line item for an Afterpay order."""
-input AfterpayAUNZOrderItemInput {
-  """Product name. Max 255 characters."""
-  name: String!
-
-  """Product SKU. Max 128 characters."""
-  sku: String
-
-  """The quantity of the item, stored as a signed 32-bit integer."""
-  quantity: Int!
-
-  """
-  The canonical URL for the item's Product Detail Page. Max 2048 characters.
-  """
-  pageUrl: String
-
-  """
-  A URL for a web-optimised photo of the item, suitable for use directly as the
-  src attribute of an img tag. Max 2048 characters.
-  """
-  imageUrl: String
-
-  """The unit price of the individual item. Must be a positive value."""
-  price: MonetaryAmountInput
-
-  """
-  A list of lists of strings to accommodate multiple categories that apply to
-  the item. Each inner-list represents a hierarchical path to a category, with
-  the left-most category being the top-level parent category.
-  """
-  categories: [[String!]!]
-}
-
-"""Redirect URLs for Afterpay checkout."""
-input AfterpayAUNZRedirectUrlsInput {
-  """The consumer is redirected to this URL on confirmation."""
-  redirectConfirmUrl: String!
-
-  """
-  The consumer to redirected to this URL if the payment process is canceled.
-  """
-  redirectCancelUrl: String!
-}
-
-"""The shipping priority."""
-enum AfterpayAUNZShippingPriority {
-  EXPRESS
-  STANDARD
-}
-
 """
 A monetary amount, either a whole number or a number with exactly two or three decimal places.
 """
@@ -519,7 +402,9 @@ type AuthorizationExpiredEvent implements PaymentStatusEvent {
 Top-level input fields for creating a transaction by authorizing a credit card.
 """
 input AuthorizeCreditCardInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of a credit card payment method to be authorized."""
@@ -576,7 +461,9 @@ type AuthorizedEvent implements PaymentStatusEvent {
 Top-level input fields for creating a transaction by authorizing a payment method.
 """
 input AuthorizePaymentMethodInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of a payment method to be authorized."""
@@ -592,7 +479,9 @@ input AuthorizePaymentMethodInput {
 Top-level input fields for creating a transaction by authorizing a PayPal account.
 """
 input AuthorizePayPalAccountInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of a PayPal payment method to be authorized."""
@@ -627,7 +516,9 @@ input AuthorizePayPalAccountOptionsInput {
 Top-level input fields for creating a transaction by authorizing a Venmo account.
 """
 input AuthorizeVenmoAccountInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of a Venmo payment method to be authorized."""
@@ -789,7 +680,9 @@ enum BusinessType {
 
 """Top-level input fields for capturing an authorized transaction."""
 input CaptureTransactionInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of the transaction to be captured."""
@@ -942,7 +835,9 @@ enum ChargebackProtectionLevel {
 Top-level input fields for creating a transaction by charging a credit card.
 """
 input ChargeCreditCardInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of a credit card payment method to be charged."""
@@ -961,7 +856,9 @@ input ChargeCreditCardInput {
 Top-level input fields for creating a transaction by charging a payment method.
 """
 input ChargePaymentMethodInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of a payment method to be charged."""
@@ -977,7 +874,9 @@ input ChargePaymentMethodInput {
 Top-level input fields for creating a transaction by charging a PayPal account.
 """
 input ChargePayPalAccountInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of an existing PayPal account."""
@@ -1015,7 +914,9 @@ input ChargePayPalAccountOptionsInput {
 Top-level input fields for creating a transaction by charging a US bank account.
 """
 input ChargeUsBankAccountInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of an existing US bank account."""
@@ -1043,7 +944,9 @@ input ChargeUsBankAccountOptionsInput {
 Top-level input fields for creating a transaction by charging a Venmo account.
 """
 input ChargeVenmoAccountInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of an existing Venmo account."""
@@ -1182,9 +1085,19 @@ input ClientTokenInput {
   customerId: ID
 }
 
+"""
+The alignment of the confirmation prompt text when displayed on the in-store reader.
+"""
+enum ConfirmationPromptAlignment {
+  CENTER
+  LEFT
+}
+
 """Top-level input field for confirming micro-transfer values."""
 input ConfirmMicroTransferAmountsInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of the verification from vaulting the bank account."""
@@ -1202,7 +1115,9 @@ input ConfirmMicroTransferAmountsInput {
 Top-level output field from confirming micro-transfer amounts on bank account.
 """
 type ConfirmMicroTransferAmountsPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The verification that was run on the payment method prior to vaulting."""
@@ -1233,67 +1148,11 @@ country code. Braintree only accepts [specific alpha-2 values](https://developer
 """
 scalar CountryCodeAlpha2
 
-"""Input to create an Afterpay checkout session."""
-input CreateAfterpayAUNZCheckoutInput {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """Total amount for order to be charged to consumer."""
-  amount: MonetaryAmountInput!
-
-  """The consumer requesting the order."""
-  consumer: AfterpayAUNZConsumerInput!
-
-  """Billing address."""
-  billing: AfterpayAUNZAddressInput
-
-  """Shipping address."""
-  shipping: AfterpayAUNZAddressInput!
-
-  """Shipping courier details."""
-  courier: AfterpayAUNZCourierInput
-
-  """An array of order items."""
-  items: [AfterpayAUNZOrderItemInput!]
-
-  """An array of discounts."""
-  discounts: [AfterpayAUNZDiscountInput!]
-
-  """A merchant's redirect URLs."""
-  merchant: AfterpayAUNZRedirectUrlsInput!
-
-  """The merchant's id/reference that this order corresponds to."""
-  merchantReference: String
-
-  """The included tax amount after applying all discounts."""
-  taxAmount: MonetaryAmountInput
-
-  """The shipping amount."""
-  shippingAmount: MonetaryAmountInput
-}
-
-"""The Afterpay checkout payload for use on the client."""
-type CreateAfterpayAUNZCheckoutPayload {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """Checkout token to be used to complete payment."""
-  token: ID!
-
-  """The timestamp of when the checkout token will expire."""
-  expires: Timestamp!
-
-  """
-  A URL that can be used to redirect the consumer to the Afterpay screenflow
-  directly from the merchant backend. This can be used as an alternative to
-  implementing the JavaScript afterpay.js.
-  """
-  redirectCheckoutUrl: String!
-}
-
 """Top-level input field for generating a client token."""
 input CreateClientTokenInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Input fields for creating a client token."""
@@ -1302,7 +1161,9 @@ input CreateClientTokenInput {
 
 """Top-level fields returned when creating a client token."""
 type CreateClientTokenPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """A Base64 encoded string used to initialize client SDKs."""
@@ -1311,7 +1172,9 @@ type CreateClientTokenPayload {
 
 """Top-level field for creating a customer."""
 input CreateCustomerInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Input fields for creating a customer."""
@@ -1320,7 +1183,9 @@ input CreateCustomerInput {
 
 """Top-level fields returned when creating a customer."""
 type CreateCustomerPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -1332,7 +1197,9 @@ type CreateCustomerPayload {
 
 """Top-level input fields for adding file evidence to a dispute."""
 input CreateDisputeFileEvidenceInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of the dispute to be accepted."""
@@ -1344,7 +1211,9 @@ input CreateDisputeFileEvidenceInput {
 
 """Top-level field returned when creating file evidence for a dispute."""
 type CreateDisputeFileEvidencePayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The evidence object created."""
@@ -1356,7 +1225,9 @@ type CreateDisputeFileEvidencePayload {
 
 """Top-level input fields for creating text evidence for a dispute."""
 input CreateDisputeTextEvidenceInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of the dispute to create the evidence for."""
@@ -1371,7 +1242,9 @@ input CreateDisputeTextEvidenceInput {
 
 """Top-level field returned when creating text evidence for a dispute."""
 type CreateDisputeTextEvidencePayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The evidence object created."""
@@ -1380,7 +1253,9 @@ type CreateDisputeTextEvidencePayload {
 
 """Input fields for creating an in store location."""
 input CreateInStoreLocationInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Input fields to create an in-store Location."""
@@ -1389,7 +1264,9 @@ input CreateInStoreLocationInput {
 
 """Top-level fields returned when creating an in-store location."""
 type CreateInStoreLocationPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The in-store location."""
@@ -1397,98 +1274,12 @@ type CreateInStoreLocationPayload {
 }
 
 """
-Input fields to create a new Klarna session. For more information, see the
-[Klarna create session documentation](https://developers.klarna.com/api/#payments-api-create-a-new-credit-session).
-"""
-input CreateKlarnaEUSessionInput {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """The acquiring channel where the session takes place."""
-  channel: String
-
-  """Details of the customer making the payment."""
-  customer: KlarnaEUCustomerInput
-
-  """Design package to use in the session."""
-  design: String
-
-  """
-  Locale for the session.
-  
-  As per [Klarna's requirements](https://developers.klarna.com/api/#data-types):
-  
-  > Locales should be formatted as a language tag consisting of a two-letter
-  language code combined with a two-letter country code according to RFC 1766.
-  Examples are en-us for US English, en-gb for British English and sv-se for
-  Swedish (in Sweden).
-  """
-  locale: Language!
-
-  """
-  Used for storing the merchant's internal order number or other reference. If
-  set, will be shown on the confirmation page as 'order number' and send to the
-  customer in the confirmation email after a successful direct bank transfer
-  payment. It will also be included in the payments description in the
-  customer's bank account and settlement files to the merchant. Max 255 characters.
-  """
-  orderId: String
-
-  """Merchant URLs that Klarna needs at different stages of the process."""
-  merchantUrls: KlarnaEUMerchantUrlsInput
-
-  """Design customization options for the Klarna Payments iframe."""
-  designOptions: KlarnaEUDesignOptionsInput
-
-  """
-  Total amount of the order including tax and any available discounts.
-  
-  **Example:** 25 Euros and 50 cents should be 25.50.
-  """
-  amount: String!
-
-  """
-  The array containing the list of items that are part of this order. Maximum of 1000 items.
-  """
-  lineItems: [KlarnaEULineItemInput!]!
-
-  """
-  Total tax amount of the order.
-  
-  **Example:** 25 Euros and 50 cents should be 25.50.
-  """
-  taxAmount: String
-
-  """
-  The purchase country of the customer. The billing country always overrides the
-  purchase country if the values are different.
-  """
-  purchaseCountry: CountryCode!
-
-  """The purchase currency of the order."""
-  purchaseCurrency: CurrencyCodeAlpha!
-}
-
-"""The result from a call to create session."""
-type CreateKlarnaEUSessionPayload {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """The ID of the Klarna session that was created."""
-  sessionId: ID
-
-  """Client token to be passed to the Klarna JS client while initializing."""
-  clientToken: String
-
-  """Available payment method categories for this session."""
-  paymentMethodCategories: [KlarnaEUPaymentMethodCategory!]
-}
-
-"""
 Top-level input fields for creating a non-instant local payment context.
 """
 input CreateNonInstantLocalPaymentContextInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Input fields for creating a non-instant local payment context."""
@@ -1497,7 +1288,9 @@ input CreateNonInstantLocalPaymentContextInput {
 
 """The result of a request to make a local payment context."""
 type CreateNonInstantLocalPaymentContextPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Details about the local payment context."""
@@ -1506,7 +1299,9 @@ type CreateNonInstantLocalPaymentContextPayload {
 
 """Top-level input field for creating a PayPal Billing Agreement Token."""
 input CreatePayPalBillingAgreementInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -1555,7 +1350,9 @@ input CreatePayPalBillingAgreementInput {
 Top-level fields returned from setting up a PayPal Billing Agreement Token.
 """
 type CreatePayPalBillingAgreementPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The Billing Agreement token."""
@@ -1565,9 +1362,99 @@ type CreatePayPalBillingAgreementPayload {
   approvalUrl: URL
 }
 
+"""Top-level input field for creating a PayPal One-Time Payment."""
+input CreatePayPalOneTimePaymentInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  Braintree merchant account ID associated with the PayPal account to be used for the One-Time payment creation.
+  """
+  merchantAccountId: ID
+
+  """Total amount for payment to be charged to consumer."""
+  amount: MonetaryAmountInput!
+
+  """
+  URL for redirect back to merchant app on the client indicating unsuccessful approval.
+  """
+  cancelUrl: URL!
+
+  """
+  Email of the payer. This will prepopulate the input field in the PayPal approval login page.
+  """
+  email: EmailAddress
+
+  """The payment intent."""
+  intent: PayPalIntent!
+
+  """The line items for this transaction. Maximum 249 line items."""
+  lineItems: [PayPalLineItemInput!]
+
+  """
+  Indicates whether PayPal Pay Later should be offered in the PayPal approval flow.
+  """
+  offerPayLater: Boolean
+
+  """PayPal Risk correlation ID (also known as the Client Metadata ID)."""
+  paypalRiskCorrelationId: ID
+
+  """Defines the experience profile used to render the approval flow."""
+  paypalExperienceProfile: PayPalExperienceProfileInput
+
+  """
+  Indicates whether this payment uses the [Billing Agreement with Purchase flow](https://developers.braintreepayments.com/guides/paypal/checkout-with-paypal/javascript/v3#checkout-using-paypal-billing-agreement-with-purchase-flow).
+  This will request Billing Agreement approval from the customer, and a
+  multi-use PayPal payment method will be created alongside the transaction.
+  """
+  requestBillingAgreement: Boolean
+
+  """
+  A description of the Billing Agreement being requested. This is displayed to
+  the customer on paypal.com when `requestBillingAgreement` is true. Maximum 127 characters.
+  """
+  billingAgreementDescription: String
+
+  """
+  URL for redirect back to merchant app on the client indicating successful approval.
+  """
+  returnUrl: URL!
+
+  """
+  Merchant-provided shipping address. If passing a shipping address, fields
+  addressLine1, adminArea2, and countryCode are required.
+  """
+  shippingAddress: AddressInput
+
+  """
+  List of shipping options offered by the payee or merchant to the payer to ship
+  or pick up their items. **Note:** `shippingOptions` may not be passed with
+  intent `ORDER` payments.
+  """
+  shippingOptions: [PayPalShippingOptionInput!]
+}
+
+"""Top-level fields returned from setting up a PayPal One-Time Payment."""
+type CreatePayPalOneTimePaymentPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The URL for getting user approval of the PayPal payment."""
+  approvalUrl: URL
+
+  """The PayPal payment ID. This ID is prefixed with "PAYID-"."""
+  paymentId: String
+}
+
 """Top-level input field for generating a PayPal access token."""
 input CreateUniversalAccessTokenInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -1581,7 +1468,9 @@ input CreateUniversalAccessTokenInput {
 
 """Top-level fields returned when creating a universal access token."""
 type CreateUniversalAccessTokenPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The created universal access token."""
@@ -2196,7 +2085,9 @@ scalar Date
 
 """Top-level input fields for deleting a customer."""
 input DeleteCustomerInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of the customer to be deleted."""
@@ -2205,13 +2096,17 @@ input DeleteCustomerInput {
 
 """Top-level output field from deleting a customer."""
 type DeleteCustomerPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 }
 
 """Input fields for deleting dispute evidence."""
 input DeleteDisputeEvidenceInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of the evidence to be deleted."""
@@ -2223,7 +2118,9 @@ input DeleteDisputeEvidenceInput {
 
 """Top-level field returned when deleting evidence from a dispute."""
 type DeleteDisputeEvidencePayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 }
 
@@ -2231,7 +2128,9 @@ type DeleteDisputeEvidencePayload {
 Top-level input fields for deleting a payment method referenced by a single-use token.
 """
 input DeletePaymentMethodFromSingleUseTokenInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """A single-use token ID referencing a payment method."""
@@ -2242,7 +2141,9 @@ input DeletePaymentMethodFromSingleUseTokenInput {
 Top-level output field from deleting a payment method referenced by a single-use token.
 """
 type DeletePaymentMethodFromSingleUseTokenPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 }
 
@@ -2250,16 +2151,37 @@ type DeletePaymentMethodFromSingleUseTokenPayload {
 Top-level input fields for deleting a multi-use payment method from the vault.
 """
 input DeletePaymentMethodFromVaultInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of the multi-use payment method to be deleted."""
   paymentMethodId: ID!
+
+  """
+  Indicates whether this deletion was initiated by the merchant or the customer (via the merchant site/app).
+  """
+  initiatedBy: PaymentMethodDeletionInitiator
+
+  """
+  Additionally request deletion of all related payment methods (ones that store
+  the same underlying payment instrument as the one specified by
+  `paymentMethodId`) across all customers for current merchant.
+  """
+  deleteRelatedPaymentMethods: Boolean
+
+  """
+  Indicates if this deletion is related to suspected fraud, as determined by the merchant.
+  """
+  fraudRelated: Boolean
 }
 
 """Top-level output field from deleting a multi-use payment method."""
 type DeletePaymentMethodFromVaultPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 }
 
@@ -2410,7 +2332,10 @@ type Dispute implements Node {
   transaction: Transaction
 
   """The chargeback protection status of the dispute."""
-  chargebackProtectionLevel: ChargebackProtectionLevel
+  chargebackProtectionLevel: ChargebackProtectionLevel @deprecated(reason: "Use `protectionLevel` instead.")
+
+  """The protection level of the dispute."""
+  protectionLevel: DisputeProtectionLevel
 }
 
 """A paginated list of disputes."""
@@ -2559,6 +2484,27 @@ type DisputeProcessorResponse {
 }
 
 """
+The Protection level indicates if dispute is eligible for protection through any feature enabled on your account.
+"""
+enum DisputeProtectionLevel {
+  """
+  The dispute is protected by the standard chargeback protection product.
+  """
+  CHARGEBACK_PROTECTION_TOOL
+
+  """
+  The dispute is protected by the effortless chargeback protection product.
+  """
+  EFFORTLESS_CHARGEBACK_PROTECTION_TOOL
+
+  """
+  The merchant has not enrolled in any chargeback protection products, or the
+  merchant is enrolled, but the dispute is not protected.
+  """
+  NO_PROTECTION
+}
+
+"""
 The reason a customer opened a chargeback, pre-arbitration, or retrieval.
 """
 enum DisputeReason {
@@ -2613,8 +2559,15 @@ input DisputeSearchInput {
   """Find disputes based on a set of transaction criteria."""
   transaction: DisputeTransactionSearchInput
 
-  """Find disputes with a given computed chargeback protection level."""
+  """
+  Deprecated: Please use `protectionLevel` instead.
+  
+  Find disputes with a given computed chargeback protection level.
+  """
   chargebackProtectionLevel: SearchChargebackProtectionLevelInput
+
+  """Find disputes with a given protection level."""
+  protectionLevel: SearchDisputeProtectionLevelInput
 }
 
 """The status of the dispute."""
@@ -2944,7 +2897,9 @@ input ExchangeRateQuoteInput {
 
 """Exchange rate quotes for a specific customer."""
 type ExchangeRateQuotePayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -3010,7 +2965,9 @@ type FailedEvent implements PaymentStatusEvent {
 
 """Top-level input fields for finalizing a dispute."""
 input FinalizeDisputeInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of the dispute to be finalized."""
@@ -3019,7 +2976,9 @@ input FinalizeDisputeInput {
 
 """Top-level field returned when finalizing a dispute."""
 type FinalizeDisputePayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Information about the dispute that was finalized."""
@@ -3096,6 +3055,7 @@ enum GatewayRejectionReason {
   AVS_AND_CVV
   CVV
   DUPLICATE
+  EXCESSIVE_RETRY
   FRAUD
   MANUAL_TRANSACTIONS_DISABLED
   PAYMENT_METHOD_BLOCKED
@@ -3108,7 +3068,9 @@ enum GatewayRejectionReason {
 
 """Input to generate a list of exchange rate quotes."""
 input GenerateExchangeRateQuoteInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -3231,7 +3193,9 @@ type InStoreContext implements Node & InStoreContextResult {
 Top-level fields returned when requesting a state change on an in-store reader.
 """
 type InStoreContextPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The in-store context created when an in-store flow is initiated."""
@@ -3268,11 +3232,6 @@ enum InStoreContextStatus {
 
   """Not successful. The context was ended."""
   FAILED
-
-  """
-  Partially successful. The context was ended but only partially authorized.
-  """
-  PARTIALLY_COMPLETE
 
   """Flow in-progress. Waiting for reader or point of sale interaction."""
   PENDING
@@ -3538,7 +3497,9 @@ interface InStoreReaderOriginDetails {
 
 """Top-level fields returned for an in-store reader."""
 type InStoreReaderPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The reader."""
@@ -3652,7 +3613,7 @@ input InStoreTransactionInput {
   automatically stored in the vault after transacting. If this field is left
   blank, the single-use payment method will not be vaulted.
   """
-  vaultPaymentMethodAfterTransacting: VaultPaymentMethodAfterTransactingInput
+  vaultPaymentMethodAfterTransacting: VaultInStorePaymentMethodAfterTransactingInput
 
   """
   For partners and shopping carts only. If you are a shopping cart provider or
@@ -3660,306 +3621,6 @@ input InStoreTransactionInput {
   transactions, this maps to paypal.bn_code.
   """
   channel: String
-}
-
-"""The address fields."""
-input KlarnaEUAddressInput {
-  """An optional parameter, 'Attn'."""
-  attention: String
-
-  """Customer's locality/city."""
-  locality: String
-
-  """Customer's country."""
-  countryCode: CountryCode
-
-  """Customer's email address."""
-  email: EmailAddress
-
-  """Customer's last name."""
-  lastName: String
-
-  """Customer's first name."""
-  firstName: String
-
-  """Company name. Used for B2B customers."""
-  company: String
-
-  """Phone number, preferrably mobile."""
-  phone: String
-
-  """Customer's postal code."""
-  postalCode: String
-
-  """
-  Customer's region or state. Validates according to ISO 3166-2 format, e.g. OH,
-  NJ etc. For more information, see:
-  https://developers.klarna.com/api/#data-types.
-  """
-  region: String
-
-  """Customer's street address."""
-  streetAddress: String
-
-  """Customer's street address, second line."""
-  extendedAddress: String
-
-  """Customer's title."""
-  title: String
-}
-
-"""Asset URLs fields."""
-type KlarnaEUAssetUrls {
-  """URL of the descriptive asset."""
-  descriptive: String
-
-  """URL of the standard asset."""
-  standard: String
-}
-
-"""Extra merchant data required for additional risk checks."""
-input KlarnaEUAttachmentInput {
-  """The content of the extra merchant data."""
-  body: String!
-
-  """The content type of the body."""
-  contentType: String!
-}
-
-"""Customer fields."""
-input KlarnaEUCustomerInput {
-  """Customer's date of birth."""
-  dateOfBirth: Date
-
-  """Customer's gender - 'male', 'female'."""
-  gender: String
-
-  """
-  Last four digits of customer's social security number. Available for US customers.
-  """
-  lastFourSSN: String
-
-  """
-  The customer's national identification number. This value is available for EU
-  customers utilizing national identification numbers.
-  """
-  nationalIdentificationNumber: String
-
-  """Organization entity type. Only applicable for B2B customers."""
-  organizationEntityType: KlarnaEUOrganizationEntityType
-
-  """Organization registration ID. Only applicable for B2B customers."""
-  organizationRegistrationId: ID
-
-  """Customer's title."""
-  title: String
-
-  """
-  Type of customer in the session. If nothing is added, a B2C session will be
-  used as default. If it is a B2B session, enter 'organization' to trigger a B2B session.
-  """
-  type: String
-
-  """VAT ID. Only applicable for B2B customers."""
-  vatId: ID
-}
-
-"""Design customization options for the Klarna Payments iframe."""
-input KlarnaEUDesignOptionsInput {
-  """
-  Color for the border of elements within the iframe. Value should be a CSS hex color.
-  """
-  colorBorder: String
-
-  """
-  Color for the border of elements within the iframe when selected by customer. Value should be a CSS hex color.
-  """
-  colorBorderSelected: String
-
-  """
-  Color for the bullet points withing the iframe. Value should be a CSS hex color.
-  """
-  colorDetails: String
-
-  """
-  Color for the texts within the iframe. Value should be a CSS hex color.
-  """
-  colorText: String
-
-  """Radius for the border of elements within the iframe."""
-  radiusBorder: String
-}
-
-"""Line items information."""
-input KlarnaEULineItemInput {
-  """Descriptive name of the item. Max 35 characters."""
-  name: String!
-
-  """Indicates whether the item is a credit or debit."""
-  kind: TransactionLineItemType!
-
-  """
-  Number of units of the item purchased. Can include up to 4 decimal places. Must be non-negative number.
-  """
-  quantity: String!
-
-  """
-  Price for a single unit of the item. Maximum 4 decimal places. Non-negative. Includes tax, excludes discount.
-  """
-  unitAmount: String!
-
-  """
-  Total amount of the item. Can include up to 2 decimal places. Includes tax and
-  discount. Value = quantity x unitPrice - totalDiscountAmount.
-  """
-  totalAmount: String!
-
-  """
-  Per-unit tax price of the item. Can include up to 2 decimal places. Can't be negative or zero.
-  """
-  unitTaxAmount: String
-
-  """
-  Total tax amount of the item. Can include up to 2 decimal places. Can't be negative.
-  """
-  taxAmount: String
-
-  """Amount of discount for the item. Can include up to 2 decimal places."""
-  discountAmount: String
-
-  """
-  Unit used to describe the quantity, e.g. kg, pcs, etc. Maximum 8 characters.
-  """
-  unitOfMeasure: String
-
-  """
-  Client facing article number, UPC, SKU or similar. Maximum 12 characters.
-  """
-  productCode: String
-
-  """
-  Code used to classify items purchased and track the total amount spent accross
-  various categories of products and services. Max 12 characters.
-  """
-  commodityCode: String
-
-  """
-  URL to the product in the merchant's webshop that can be later used in
-  communications between Klarna and the customer. Max 1024 characters.
-  """
-  url: String
-
-  """Type of the item."""
-  itemType: KlarnaEULineItemType
-
-  """URL to an image that represents the product. Max 1024 characters."""
-  imageUrl: String
-}
-
-"""The line item type."""
-enum KlarnaEULineItemType {
-  DIGITAL
-  DISCOUNT
-  GIFT_CARD
-  PHYSICAL
-  SALES_TAX
-  SHIPPING_FEE
-  STORE_CREDIT
-  SURCHARGE
-}
-
-"""Merchant URLs information."""
-input KlarnaEUMerchantUrlsInput {
-  """URL of the merchant confirmation page."""
-  confirmation: String!
-
-  """URL for notifications on pending orders."""
-  notification: String
-
-  """URL that will be requested when an order is completed."""
-  push: String
-}
-
-"""The organization entity type."""
-enum KlarnaEUOrganizationEntityType {
-  CIVIL_LAW_PARTNERSHIP
-  ENTREPRENEURIAL_COMPANY
-  LIMITED_COMPANY
-  LIMITED_PARTNERSHIP
-  LIMITED_PARTNERSHIP_LIMITED_COMPANY
-  OTHER
-  PUBLIC_INSTITUTION
-  PUBLIC_LIMITED_COMPANY
-  REGISTERED_SOLE_TRADER
-  SOLE_TRADER
-}
-
-"""Payment method category fields."""
-type KlarnaEUPaymentMethodCategory {
-  """
-  Asset URLs for the payment method. Using this dynamic asset will make sure
-  that any design update of Klarna will be propagated automatically.
-  """
-  assetUrls: KlarnaEUAssetUrls
-
-  """
-  ID of the payment method category to be used while loading the widget later.
-  The possible values are: Pay_later, Pay_now, Pay_over_time,
-  Direct_bank_transfer, Direct_debit.
-  """
-  identifier: ID
-
-  """Name of the payment method category."""
-  name: String
-}
-
-"""Details about the shipping information."""
-input KlarnaEUShippingInfoInput {
-  """
-  Name of the company to be used for the shipment. Max 100 characters.
-  
-  **Note:** It is helpful to be as specific as possible.
-  
-  Examples include `"DHL US"`, `"FedEx"`, etc.
-  """
-  shippingCompany: String
-
-  """The shipping method."""
-  shippingMethod: KlarnaEUShippingMethod
-
-  """Tracking number for the shipment. Max 100 characters."""
-  trackingNumber: String
-
-  """URI for tracking the shipment. Max 1024 characters."""
-  trackingUri: String
-
-  """
-  Name of the company to be used for the return shipment. Max 100 characters.
-  
-  **Note:** It is helpful to be as specific as possible.
-  
-  Examples include `"DHL US"`, `"FedEx"`, etc.
-  """
-  returnShippingCompany: String
-
-  """Tracking number for the return shipment. Max 100 characters."""
-  returnTrackingNumber: String
-
-  """URI for tracking the return shipment. Max 1024 characters."""
-  returnTrackingUri: String
-}
-
-"""The shipping method."""
-enum KlarnaEUShippingMethod {
-  BOX_REG
-  BOX_UNREG
-  DHL_PACKSTATION
-  DIGITAL
-  HOME
-  OWN
-  PICK_UP_POINT
-  PICK_UP_STORE
-  POSTAL
 }
 
 """Configuration for Kount fraud tools."""
@@ -3997,6 +3658,38 @@ enum LegacyIdType {
   TRANSACTION
   US_BANK_ACCOUNT_VERIFICATION
   VERIFICATION
+}
+
+"""
+A scenario detailing which party assumes liability for certain conditions in the event of a transaction being disputed.
+"""
+type LiabilityShift {
+  """The party taking responsibility for liability."""
+  responsibleParty: LiabilityShiftResponsibleParty
+
+  """
+  The specific conditions under which the responsible party assumes liability, in the event of a chargeback.
+  """
+  conditions: [LiabilityShiftCondition!]
+}
+
+"""
+If enrolled in Effortless Chargeback Protection, and in the event the
+transaction is disputed, these are the specific conditions under which the
+responsible party assumes liability for that chargeback.
+"""
+enum LiabilityShiftCondition {
+  ITEM_NOT_RECEIVED
+  UNAUTHORIZED
+}
+
+"""
+If enrolled in Effortless Chargeback Protection, and in the event the
+transaction is disputed, these are the possible parties which can assume liability.
+"""
+enum LiabilityShiftResponsibleParty {
+  ISSUER
+  PAYPAL
 }
 
 """Input fields for local payment addresses."""
@@ -4093,12 +3786,14 @@ enum LocalPaymentMethodType {
   BOLETOBANCARIO
   EPS
   GIROPAY
+  GRABPAY
   IDEAL
   MULTIBANCO
   MYBANK
   OXXO
   P24
   PAYU
+  SATISPAY
   SEPA
   SOFORT
   SWISH
@@ -4132,6 +3827,12 @@ input LocalPaymentPayerInfoInput {
   The payer's tax information. This is only required for Boleto Bancário payments.
   """
   taxInfo: TaxInfoInput
+}
+
+"""Mandate type for SEPA Direct Debit Account."""
+enum MandateType {
+  ONE_OFF
+  RECURRENT
 }
 
 """Configuration for Masterpass."""
@@ -4538,6 +4239,17 @@ type Mutation {
   tokenizeUsBankLogin(input: TokenizeUsBankLoginInput!): TokenizeUsBankAccountPayload
 
   """
+  Tokenize PayPal One-Time Payment and return a payload that includes a single-use payment method.
+  """
+  tokenizePayPalOneTimePayment(input: TokenizePayPalOneTimePaymentInput!): TokenizePayPalOneTimePaymentPayload
+
+  """
+  Set up a PayPal One-Time Payment for approval by a PayPal user. See [documentation](https://developer.paypal.com/braintree/docs/guides/paypal/checkout-with-paypal)
+  for more information. Your account must be enabled for this feature.
+  """
+  createPayPalOneTimePayment(input: CreatePayPalOneTimePaymentInput!): CreatePayPalOneTimePaymentPayload
+
+  """
   Tokenize PayPal account and return a payload that includes a single-use payment method.
   """
   tokenizePayPalBillingAgreement(input: TokenizePayPalBillingAgreementInput!): TokenizePayPalBillingAgreementPayload
@@ -4651,19 +4363,11 @@ type Mutation {
   """
   requestFirmwareUpdateFromInStoreReader(input: RequestFirmwareUpdateFromInStoreReaderInput!): InStoreContextPayload
 
-  """
-  Creates a session within Klarna and returns a payload which includes the available payment method categories.
-  """
-  createKlarnaEUSession(input: CreateKlarnaEUSessionInput!): CreateKlarnaEUSessionPayload
+  """Request an in-store reader to display a signature prompt."""
+  requestSignaturePromptFromInStoreReader(input: RequestSignaturePromptFromInStoreReaderInput!): InStoreContextPayload
 
-  """Updates a session within Klarna."""
-  updateKlarnaEUSession(input: UpdateKlarnaEUSessionInput!): UpdateKlarnaEUSessionPayload
-
-  """Adds shipping information to a Klarna order."""
-  updateKlarnaEUOrderShippingInfo(input: UpdateKlarnaEUOrderShippingInfoInput!): UpdateKlarnaEUOrderShippingInfoPayload
-
-  """Creates a checkout that is used to initialize Afterpay."""
-  createAfterpayAUNZCheckout(input: CreateAfterpayAUNZCheckoutInput!): CreateAfterpayAUNZCheckoutPayload
+  """Request an in-store reader to display a confirmation prompt."""
+  requestConfirmationPromptFromInStoreReader(input: RequestConfirmationPromptFromInStoreReaderInput!): InStoreContextPayload
 
   """Updates the authorization amount of the transaction."""
   updateTransactionAmount(input: UpdateTransactionAmountInput!): TransactionPayload
@@ -4934,7 +4638,9 @@ type PageInfo {
 
 """Input fields for pairing an in store reader."""
 input PairInStoreReaderInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Code displayed on Reader during pairing."""
@@ -4969,7 +4675,9 @@ union PartialCaptureDetails = ChildCapture | ParentAuthorization
 Top-level input fields for capturing outstanding funds authorized by a transaction.
 """
 input PartialCaptureTransactionInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of the original authorized transaction to be partially captured."""
@@ -5051,7 +4759,9 @@ input PartialCaptureTransactionOptionsInput {
 
 """Top-level output field from partially capturing a transaction."""
 type PartialCaptureTransactionPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The transaction representing the partial capture."""
@@ -5152,17 +4862,19 @@ enum PaymentInitiator {
   MOTO
 
   """
-  Transactions for subsequent recurring payments (e.g. subscriptions with a fixed amount on a predefined schedule).
+  Transactions that are initiated by the merchant for subsequent recurring
+  payments (e.g. subscriptions with a fixed amount on a predefined schedule).
   """
   RECURRING
 
   """
-  Transactions that represent the first in a series of recurring payments or subscription.
+  Transactions initiated by the customer that represent the first in a series of recurring payments or subscription.
   """
   RECURRING_FIRST
 
   """
-  Transactions for unscheduled payments that are not recurring on a predefined schedule or amount (e.g. balance top-up).
+  Transactions that are initiated by the merchant for unscheduled payments that
+  are not recurring on a predefined schedule or amount (e.g. balance top-up).
   """
   UNSCHEDULED
 }
@@ -5228,11 +4940,17 @@ type PaymentMethodConnectionEdge {
   node: PaymentMethod
 }
 
+"""Initiator of a payment method delete request."""
+enum PaymentMethodDeletionInitiator {
+  CUSTOMER
+  MERCHANT
+}
+
 """
 A union of all possible payment method details. PaymentMethodDetails contain
 information for display purposes, payment method management, and processing.
 """
-union PaymentMethodDetails = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalAccountDetails | SamsungPayCardDetails | VenmoAccountDetails | UsBankAccountDetails
+union PaymentMethodDetails = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalAccountDetails | SamsungPayCardDetails | VenmoAccountDetails | UsBankAccountDetails | SEPADirectDebitAccountDetails
 
 """
 Information about how the customer provided a payment method, such as via a digital wallet.
@@ -5271,7 +4989,7 @@ A union of all possible payment method details as they were used in a
 transaction or verification. PaymentMethodSnapshot preserves values used to
 create a given transaction or verify a payment method at that moment in time.
 """
-union PaymentMethodSnapshot = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalTransactionDetails | VenmoAccountDetails | UsBankAccountDetails | LocalPaymentDetails | CreditCardTransactionDetails
+union PaymentMethodSnapshot = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalTransactionDetails | VenmoAccountDetails | UsBankAccountDetails | LocalPaymentDetails | CreditCardTransactionDetails | SEPADirectDebitTransactionDetails
 
 """
 A value identifying the type of payment method used for a transaction. For
@@ -5292,6 +5010,7 @@ enum PaymentMethodSnapshotSearchType {
   CREDIT_CARD_VIA_VISA_CHECKOUT
   EPS_VIA_PAYPAL
   GIROPAY_VIA_PAYPAL
+  GRABPAY_VIA_PAYPAL
   IDEAL_VIA_PAYPAL
   LOCAL_PAYMENT
   MULTIBANCO_VIA_PAYPAL
@@ -5300,6 +5019,8 @@ enum PaymentMethodSnapshotSearchType {
   P24_VIA_PAYPAL
   PAYPAL
   PAYU_VIA_PAYPAL
+  SATISPAY_VIA_PAYPAL
+  SEPA_DIRECT_DEBIT
   SEPA_VIA_PAYPAL
   SOFORT_VIA_PAYPAL
   SWISH_VIA_PAYPAL
@@ -5592,6 +5313,9 @@ type PayPalAccountDetails {
   """The billing address associated with the PayPal account."""
   billingAddress: Address
 
+  """The shipping address associated with the PayPal account."""
+  shippingAddress: Address
+
   """The email address associated with the PayPal account."""
   email: String
 
@@ -5794,6 +5518,24 @@ type PayPalFinancingOptionsPayload {
   financingOptions: [PayPalFinancingOption!]
 }
 
+"""The intent for PayPal payments."""
+enum PayPalIntent {
+  """
+  Merchant will authorize the payment, but the funds will be captured separately.
+  """
+  AUTHORIZE
+
+  """
+  Merchant will create a PayPal Order. This validates the transaction without an
+  authorization (i.e. without holding funds). Useful for authorizing and
+  capturing funds up to 90 days after the order has been placed.
+  """
+  ORDER
+
+  """Merchant will authorize and captures funds simultaneously."""
+  SALE
+}
+
 """
 The type of landing page to display on the PayPal site for user checkout.
 """
@@ -5801,6 +5543,41 @@ enum PayPalLandingPageType {
   BILLING
   DEFAULT
   LOGIN
+}
+
+"""Line items for a PayPal payment."""
+input PayPalLineItemInput {
+  """Item name. Maximum 127 characters."""
+  name: String!
+
+  """
+  Number of units of the item purchased. This value can't be negative or zero.
+  """
+  quantity: Int!
+
+  """
+  Per-unit price of the item. Can include up to 2 decimal places. This value can't be negative or zero.
+  """
+  unitAmount: Amount!
+
+  """
+  Indicates whether the line item is a debit (sale) or credit (refund or discount) to the customer.
+  """
+  type: TransactionLineItemType!
+
+  """Item description. Maximum 127 characters."""
+  description: String
+
+  """Product or UPC code for the item. Maximum 127 characters."""
+  productCode: String
+
+  """
+  Per-unit tax price of the item. Can include up to 2 decimal places. This value can't be negative or zero.
+  """
+  unitTaxAmount: Amount!
+
+  """The URL to product information."""
+  url: URL
 }
 
 """
@@ -5829,6 +5606,20 @@ type PayPalLocalPaymentRefundDetails {
 
   """Refunded transaction fee charged by PayPal."""
   refundedFee: MonetaryAmount
+}
+
+"""Input fields for a PayPal account for a One-Time payment."""
+input PayPalOneTimePaymentInput {
+  """The PayPal payer ID."""
+  payerId: ID!
+
+  """The PayPal payment ID. This ID is prefixed with "PAYID-"."""
+  paymentId: ID!
+
+  """
+  The PayPal payment token, also known as an Express Checkout token. This token is prefixed with "EC-".
+  """
+  paymentToken: ID!
 }
 
 """Input fields for a PayPal account receiving transaction funds."""
@@ -5894,12 +5685,50 @@ type PayPalRefundDetails {
 
   """Refunded transaction fee charged by PayPal."""
   refundedFee: MonetaryAmount
+
+  """The description of this refund."""
+  description: String
+
+  """The reason this refund was created."""
+  reason: String
 }
 
 """The app used to scan an in-store QR code."""
 enum PayPalRetailAppUsedForScanning {
   PAYPAL
   VENMO
+}
+
+"""A shipping option for a PayPal One-Time payment."""
+input PayPalShippingOptionInput {
+  """The cost for this shipping option."""
+  amount: MonetaryAmountInput!
+
+  """A unique ID that identifies a shipping option."""
+  id: ID!
+
+  """
+  The shipping option description. Localize this description to the payer's
+  locale. For example, `Free Shipping`, `USPS Priority Shipping`, `Expédition
+  prioritaire USPS`, or `USPS yōuxiān fā huò`.
+  """
+  description: String!
+
+  """
+  Indicates which shipping option is selected by default when the payer views
+  the shipping options within the PayPal checkout experience. Only one shipping
+  option can be selected at a time.
+  """
+  selected: Boolean!
+
+  """The method by which the payer wants to receive their items."""
+  type: PayPalShippingOptionType!
+}
+
+"""The method by which the payer wants to receive their items."""
+enum PayPalShippingOptionType {
+  PICKUP
+  SHIPPING
 }
 
 """PayPal-specific details on a transaction."""
@@ -5971,7 +5800,9 @@ type PayPalTransactionDetails {
 
 """Top-level output field from creating a PayPal transaction."""
 type PayPalTransactionPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The transaction representing the charge on the payment method."""
@@ -5993,7 +5824,9 @@ scalar Percentage
 
 """Top-level fields for performing a 3D Secure Lookup."""
 input PerformThreeDSecureLookupInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -6051,7 +5884,9 @@ input PerformThreeDSecureLookupInput {
 
 """Top-level fields returned when performing a 3D Secure Lookup."""
 type PerformThreeDSecureLookupPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -6164,10 +5999,16 @@ type Query {
   """
   idFromLegacyId(legacyId: ID!, type: LegacyIdType!): ID!
 
-  """The available reports."""
+  """
+  A collection of the available reports. Each field on the `Report` type is a
+  different report that can be queried with its own input parameters.
+  """
   report: Report
 
-  """The available searches."""
+  """
+  A collection of the available searches. Each field on the `Search` type is a
+  different search that can be queried with its own input parameters.
+  """
   search: Search
 
   """
@@ -6313,7 +6154,9 @@ type RefundConnectionEdge {
 Top-level input fields for creating a detached refund on a credit card.
 """
 input RefundCreditCardInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of the credit card to be refunded."""
@@ -6327,7 +6170,9 @@ input RefundCreditCardInput {
 Top-level output field from creating a detached refund for a credit card.
 """
 type RefundCreditCardPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The information about the created refund."""
@@ -6353,6 +6198,16 @@ input RefundInput {
   merchantAccountId: ID
 
   """
+  Description of the refund that is displayed to customers in PayPal email receipts.
+  """
+  description: String
+
+  """
+  Reason of the refund transaction. This field maps to the PayPal refund reason.
+  """
+  reason: String
+
+  """
   Line items for this refund. Up to 249 line items may be specified.
   
   Only allowed for Custom Actions transactions.
@@ -6361,7 +6216,7 @@ input RefundInput {
 }
 
 """A union of all possible payment method refund details."""
-union RefundPaymentMethodDetails = PayPalRefundDetails | PayPalLocalPaymentRefundDetails
+union RefundPaymentMethodDetails = PayPalRefundDetails | PayPalLocalPaymentRefundDetails | SEPADirectDebitRefundDetails
 
 """Supported refund policies."""
 enum RefundPolicy {
@@ -6437,7 +6292,9 @@ input RefundSearchInput {
 
 """Top-level input fields for refunding a transaction."""
 input RefundTransactionInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of a transaction to be refunded."""
@@ -6449,7 +6306,9 @@ input RefundTransactionInput {
 
 """Top-level output field from refunding a transaction."""
 type RefundTransactionPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The information about the created refund."""
@@ -6460,7 +6319,9 @@ type RefundTransactionPayload {
 Top-level input fields for creating a detached refund on a US Bank Account.
 """
 input RefundUsBankAccountInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of the US Bank Account to be refunded."""
@@ -6477,7 +6338,9 @@ input RefundUsBankAccountInput {
 Top-level output field from creating a detached refund for a US Bank Account.
 """
 type RefundUsBankAccountPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The information about the created refund."""
@@ -6495,7 +6358,9 @@ type Report {
 
 """Input fields for requesting a cancel during an in-store charge flow."""
 input RequestCancelFromInStoreReaderInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Unique ID for the charge flow."""
@@ -6504,7 +6369,9 @@ input RequestCancelFromInStoreReaderInput {
 
 """Input fields for beginning the in-store charge flow."""
 input RequestChargeFromInStoreReaderInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of the Reader to request a charge from."""
@@ -6532,6 +6399,59 @@ type RequestChargeInStoreContext implements Node & InStoreContextResult {
   transaction: Transaction
 }
 
+"""
+Input fields for requesting a confirmation prompt on an in-store reader.
+"""
+input RequestConfirmationPromptFromInStoreReaderInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of the Reader to request a confirmation prompt from."""
+  readerId: ID!
+
+  """Title to be displayed on the in-store reader. 50 character maximum."""
+  title: String!
+
+  """
+  Text to be displayed on the in-store reader. 65536 character maximum. '\n' line breaks will be respected.
+  """
+  text: String!
+
+  """
+  The way the text is aligned when displayed on an in-store reader. Defaults to CENTER.
+  """
+  alignment: ConfirmationPromptAlignment
+
+  """
+  Text for the cancellation option to be displayed on the in-store reader. 20 character maximum.
+  """
+  cancellationText: String
+
+  """
+  Text for the confirmation option to be displayed on the in-store reader. 20 character maximum.
+  """
+  confirmationText: String
+}
+
+"""Reference object for an in-store reader confirmation prompt."""
+type RequestConfirmationPromptInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this confirmation prompt request."""
+  id: ID!
+
+  """The reader from which the confirmation prompt was requested."""
+  reader: InStoreReader
+
+  """
+  The status of the context created when the confirmation prompt was requested.
+  """
+  status: InStoreContextStatus!
+
+  """The confirmation response collected by the in-store reader."""
+  confirmed: Boolean
+}
+
 """Reference object for an in-store display request."""
 type RequestDisplayInStoreContext implements Node & InStoreContextResult {
   """A unique ID for this display request."""
@@ -6546,7 +6466,9 @@ type RequestDisplayInStoreContext implements Node & InStoreContextResult {
 
 """Input fields for requesting a firmware update for an in-store reader."""
 input RequestFirmwareUpdateFromInStoreReaderInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The in-store reader to receive the firmware update."""
@@ -6569,7 +6491,9 @@ type RequestFirmwareUpdateInStoreContext implements Node & InStoreContextResult 
 
 """Input fields for beginning the in-store display line items flow."""
 input RequestItemDisplayFromInStoreReaderInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of the Reader to display items on."""
@@ -6594,7 +6518,9 @@ input RequestItemDisplayFromInStoreReaderInput {
 
 """Input fields for beginning the in-store refund flow."""
 input RequestRefundFromInStoreReaderInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of the Reader to request a refund from."""
@@ -6622,9 +6548,54 @@ type RequestRefundInStoreContext implements Node & InStoreContextResult {
   refund: Refund
 }
 
+"""Input fields for requesting a signature prompt on an in-store reader."""
+input RequestSignaturePromptFromInStoreReaderInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of the Reader to request a signature prompt from."""
+  readerId: ID!
+
+  """Title to be displayed on the in-store reader. 50 character maximum."""
+  title: String
+
+  """
+  Text for the cancellation option to be displayed on the in-store reader. 20 character maximum.
+  """
+  cancellationText: String
+
+  """
+  Text for the confirmation option to be displayed on the in-store reader. 20 character maximum.
+  """
+  confirmationText: String
+}
+
+"""Reference object for an in-store reader signature prompt."""
+type RequestSignaturePromptInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this signature prompt request."""
+  id: ID!
+
+  """The reader from which the signature prompt was requested."""
+  reader: InStoreReader
+
+  """
+  The status of the context created when the signature prompt was requested.
+  """
+  status: InStoreContextStatus!
+
+  """
+  The signature data collected by the in-store reader. Base64 encoded PNG image.
+  """
+  signatureData: String
+}
+
 """Input fields for beginning the in-store display text flow."""
 input RequestTextDisplayFromInStoreReaderInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of the Reader to request a text display from."""
@@ -6638,7 +6609,9 @@ input RequestTextDisplayFromInStoreReaderInput {
 
 """Input fields for beginning the in-store charge flow."""
 input RequestVaultFromInStoreReaderInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of the Reader to request a vault from."""
@@ -6680,7 +6653,9 @@ type RequestVaultInStoreContext implements Node & InStoreContextResult {
 
 """Input fields for reversing a refund."""
 input ReverseRefundInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of the refund to reverse."""
@@ -6689,7 +6664,9 @@ input ReverseRefundInput {
 
 """Input fields for reversing a transaction."""
 input ReverseTransactionInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of the transaction to reverse."""
@@ -6698,7 +6675,9 @@ input ReverseTransactionInput {
 
 """Top-level output field for reversing a transaction."""
 type ReverseTransactionPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -6734,6 +6713,9 @@ type RiskData {
 
   """The fraud service provider used to generate the risk decision."""
   fraudServiceProvider: FraudServiceProvider
+
+  """Liability Shift information in the event of a chargeback."""
+  liabilityShift: LiabilityShift
 
   """The numeric risk score assigned by the fraud service provider."""
   score: Int
@@ -6875,14 +6857,29 @@ type SamsungPayOriginDetails {
 }
 
 """
+The settlement state when forcing transaction settlement in the sandbox environment.
+"""
+enum SandboxSettlementState {
+  SETTLED
+  SETTLEMENT_DECLINED
+}
+
+"""
 Top-level input fields for settling a transaction in the sandbox environment.
 """
 input SandboxSettleTransactionInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Id of the transaction to force settlement in the sandbox environment."""
   transactionId: ID!
+
+  """
+  The target settlement state for the transaction in the sandbox environment.
+  """
+  settlementState: SandboxSettlementState
 }
 
 """The type of Strong Customer Authentication Exemption."""
@@ -6931,6 +6928,8 @@ type Search {
 }
 
 """
+Deprecated: Please use `SearchDisputeProtectionLevelInput` instead.
+
 Input fields for searching for a dispute with a given chargeback protection level.
 """
 input SearchChargebackProtectionLevelInput {
@@ -6994,6 +6993,17 @@ input SearchDateInput {
 
   """Date is less than or equal to this value."""
   lessThanOrEqualTo: Date
+}
+
+"""
+Input fields for searching for a dispute with a given protection level.
+"""
+input SearchDisputeProtectionLevelInput {
+  """The dispute's protection level is exactly this value."""
+  is: DisputeProtectionLevel
+
+  """The dispute's protection level is one of these values."""
+  in: [DisputeProtectionLevel!]
 }
 
 """
@@ -7110,6 +7120,12 @@ input SearchPaymentPaymentMethodSnapshotInput {
   methods. This overrides the `type` field.
   """
   payPalDetails: SearchPaymentPayPalDetailsInput
+
+  """
+  Find SEPA payments with SEPA details. Passing a value here will scope your
+  search to *only* SEPA Direct Debit payment methods. This overrides the `type` field.
+  """
+  sepaDirectDebitDetails: SearchPaymentSEPADirectDebitDetailsInput
 }
 
 """
@@ -7118,6 +7134,14 @@ Input fields for searching for payments by payment method snapshot PayPal detail
 input SearchPaymentPayPalDetailsInput {
   """"The email address of the PayPal payer."""
   email: SearchTextInput
+}
+
+"""
+Input field for searching for payments by payment method snapshot SEPA Direct Debit details criteria.
+"""
+input SearchPaymentSEPADirectDebitDetailsInput {
+  """PayPal V2 OrderId."""
+  paymentId: SearchValueInput
 }
 
 """
@@ -7301,6 +7325,47 @@ input SelectedPayPalFinancingOptionInput {
 
   """The amount reduced from the total transaction amount."""
   discountAmount: Amount
+}
+
+"""Details about a SEPA Direct Debit account."""
+type SEPADirectDebitAccountDetails {
+  """Merchant or Partner Customer ID."""
+  merchantOrPartnerCustomerId: String
+
+  """Last 4 characters of IBAN number."""
+  last4: String
+
+  """Bank reference token."""
+  bankReferenceToken: String
+
+  """Mandate type."""
+  mandateType: MandateType
+}
+
+"""Refund-related details for SEPA Direct Debit transactions."""
+type SEPADirectDebitRefundDetails {
+  """The SEPA Direct Debit refund ID."""
+  refundId: ID
+
+  """Refunded transaction fee charged by SEPA Direct Debit."""
+  refundedFee: MonetaryAmount
+
+  """PayPal V2 OrderId."""
+  paymentId: String
+}
+
+"""Details about a SEPA Direct Debit account."""
+type SEPADirectDebitTransactionDetails {
+  """
+  If funds for the transaction have settled, the PayPal ID for the capture of funds.
+  """
+  captureId: String
+
+  """The fee charged by PayPal for the transaction."""
+  transactionFee: MonetaryAmount
+
+  """PayPal V2 OrderId."""
+  paymentId: String
 }
 
 """Accompanying information for a settled transaction."""
@@ -8186,7 +8251,9 @@ scalar Timestamp
 
 """Top-level input fields for tokenizing a credit card."""
 input TokenizeCreditCardInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Input fields for a credit card."""
@@ -8206,7 +8273,9 @@ input TokenizeCreditCardOptionsInput {
 
 """Top-level fields returned from a tokenized credit card."""
 type TokenizeCreditCardPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """A one-time-use reference to tokenized sensitive information."""
@@ -8232,7 +8301,9 @@ type TokenizeCreditCardPayload {
 
 """Top-level input fields for tokenizing Custom Actions."""
 input TokenizeCustomActionsPaymentMethodInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Input fields for a Custom Actions payment method."""
@@ -8243,7 +8314,9 @@ input TokenizeCustomActionsPaymentMethodInput {
 Top-level fields returned from tokenizing a CustomActionsPaymentMethod.
 """
 type TokenizeCustomActionsPaymentMethodPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """A single-use payment method."""
@@ -8254,7 +8327,9 @@ type TokenizeCustomActionsPaymentMethodPayload {
 Top-level input fields for tokenizing a CVV, otherwise known as CSC or CVC.
 """
 input TokenizeCvvInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -8266,7 +8341,9 @@ input TokenizeCvvInput {
 
 """Top-level fields returned from a tokenized CVV."""
 type TokenizeCvvPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """A single-use tokenized CVV."""
@@ -8289,7 +8366,9 @@ type TokenizedCvv {
 
 """Top-level input field for tokenizing a network token."""
 input TokenizeNetworkTokenInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Input fields for a network token object."""
@@ -8298,7 +8377,9 @@ input TokenizeNetworkTokenInput {
 
 """Top-level fields returned from a tokenized Network Token."""
 type TokenizeNetworkTokenPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """A single-use payment method."""
@@ -8307,7 +8388,9 @@ type TokenizeNetworkTokenPayload {
 
 """Top-level input fields for tokenizing a PayPal account."""
 input TokenizePayPalBillingAgreementInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Input fields for a PayPal Billing Agreement."""
@@ -8316,7 +8399,36 @@ input TokenizePayPalBillingAgreementInput {
 
 """Top-level fields returned from a tokenized PayPal account."""
 type TokenizePayPalBillingAgreementPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """A single-use payment method."""
+  paymentMethod: PaymentMethod
+}
+
+"""Top-level input fields for tokenizing a PayPal account."""
+input TokenizePayPalOneTimePaymentInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  Braintree merchant account ID associated with the PayPal account to be used for the One-Time payment tokenization.
+  """
+  merchantAccountId: ID
+
+  """Input fields for a PayPal One-Time Payment."""
+  paypalOneTimePayment: PayPalOneTimePaymentInput!
+}
+
+"""Top-level fields returned from a tokenized PayPal account."""
+type TokenizePayPalOneTimePaymentPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """A single-use payment method."""
@@ -8325,7 +8437,9 @@ type TokenizePayPalBillingAgreementPayload {
 
 """Top-level input field for tokenizing a Samsung Pay card."""
 input TokenizeSamsungPayCardInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Input fields for a Samsung Pay card."""
@@ -8334,7 +8448,9 @@ input TokenizeSamsungPayCardInput {
 
 """Top-level fields returned from a tokenized Samsung Pay card."""
 type TokenizeSamsungPayCardPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """A one-time-use reference to tokenized sensitive information."""
@@ -8346,7 +8462,9 @@ type TokenizeSamsungPayCardPayload {
 
 """Top-level input fields for tokenizing a US bank account."""
 input TokenizeUsBankAccountInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Input fields for a US bank account object."""
@@ -8355,7 +8473,9 @@ input TokenizeUsBankAccountInput {
 
 """Top-level fields returned from a tokenized US bank account."""
 type TokenizeUsBankAccountPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """A single-use payment method."""
@@ -8364,7 +8484,9 @@ type TokenizeUsBankAccountPayload {
 
 """Top-level input fields for tokenizing a US bank login."""
 input TokenizeUsBankLoginInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Input fields for a US bank login."""
@@ -8522,6 +8644,11 @@ type Transaction implements Node & Payment {
   A collection of AuthorizationAdjustments associated with the transaction.
   """
   authorizationAdjustments: [AuthorizationAdjustment!]
+
+  """
+  Whether or not the transaction was automatically retried by Braintree's internal systems.
+  """
+  retried: Boolean
 
   """Installment details associated with the transaction."""
   installmentDetails: TransactionInstallmentDetails
@@ -8729,7 +8856,9 @@ input TransactionInput {
   recurring: RecurringType
 
   """
-  The initiator of the payment. Payment can either be merchant-initiated or customer-initiated.
+  The initiator of the payment. Payment can either be merchant-initiated or
+  customer-initiated. If the transaction is an ecommerce transaction initiated
+  by the customer, no value is passed.
   """
   paymentInitiator: PaymentInitiator
 
@@ -9057,7 +9186,9 @@ enum TransactionLineItemType {
 
 """Top-level output field from creating a transaction."""
 type TransactionPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The transaction representing the charge on the payment method."""
@@ -9239,7 +9370,9 @@ type UnionPayConfiguration {
 Top-level input fields for updating a multi-use credit card to use a new billing address.
 """
 input UpdateCreditCardBillingAddressInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -9267,7 +9400,9 @@ input UpdateCreditCardBillingAddressInput {
 Top-level fields returned when updating a multi-use credit card to a new billing address.
 """
 type UpdateCreditCardBillingAddressPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -9283,7 +9418,9 @@ type UpdateCreditCardBillingAddressPayload {
 
 """Top-level field for updating a customer."""
 input UpdateCustomerInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of the customer to be updated."""
@@ -9295,7 +9432,9 @@ input UpdateCustomerInput {
 
 """Top-level fields returned when updating a customer."""
 type UpdateCustomerPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """Information about the customer that was updated."""
@@ -9304,7 +9443,9 @@ type UpdateCustomerPayload {
 
 """Input fields for updating an in-store location."""
 input UpdateInStoreLocationInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of the location to be updated."""
@@ -9316,7 +9457,9 @@ input UpdateInStoreLocationInput {
 
 """Top-level fields returned when creating an in-store location."""
 type UpdateInStoreLocationPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The in-store location."""
@@ -9325,7 +9468,9 @@ type UpdateInStoreLocationPayload {
 
 """Input fields for updating an in-store reader."""
 input UpdateInStoreReaderInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of the in-store reader to update."""
@@ -9338,126 +9483,11 @@ input UpdateInStoreReaderInput {
   locationId: ID
 }
 
-"""Input fields to update a Klarna order with shipping info."""
-input UpdateKlarnaEUOrderShippingInfoInput {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """
-  The ID of the Order, which can be retrieved when authorizing a transaction.
-  """
-  orderId: ID!
-
-  """Shipping info about Klarna."""
-  shippingInfo: KlarnaEUShippingInfoInput!
-}
-
-"""The result from a call to update the order and add shipping info."""
-type UpdateKlarnaEUOrderShippingInfoPayload {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-}
-
-"""
-Input fields to update a Klarna session. For more information, see [the Klarna docs](https://developers.klarna.com/api/#payments-api-update-an-existing-credit-session).
-"""
-input UpdateKlarnaEUSessionInput {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """The Klarna ID of the session to be updated."""
-  sessionId: ID!
-
-  """The acquiring channel which the session takes place."""
-  channel: String
-
-  """Extra merchant data required for additional risk check."""
-  attachment: KlarnaEUAttachmentInput
-
-  """The customer billing address."""
-  billingAddress: KlarnaEUAddressInput
-
-  """Details of the customer making the payment."""
-  customer: KlarnaEUCustomerInput
-
-  """Design package to use in the session."""
-  design: String
-
-  """
-  Defines the language and region of the customer following the [RFC
-  1766](https://en.wikipedia.org/wiki/IETF_language_tag) format.
-  
-  As per [Klarna's requirements](https://developers.klarna.com/api/#data-types):
-  
-  > Locales should be formatted as a language tag consisting of a two-letter
-  language code combined with a two-letter country code according to RFC 1766.
-  Examples are en-us for US English, en-gb for British English and sv-se for
-  Swedish (in Sweden).
-  """
-  locale: Language!
-
-  """Pass through field to send extra information. Max of 1024 characters."""
-  merchantData: String
-
-  """
-  Used for storing the merchant's internal order number or other reference. If
-  set, will be shown on the confirmation page as 'order number' and send to the
-  customer in the confirmation email after a successful direct bank transfer
-  payment. It will also be included in the payments description in the
-  customer's bank account and settlement files to the merchant. Max 255 characters.
-  """
-  orderId: String
-
-  """Merchant URLs that Klarna needs at different stages of the process."""
-  merchantUrls: KlarnaEUMerchantUrlsInput
-
-  """Design customization options for the Klarna Payments iframe."""
-  designOptions: KlarnaEUDesignOptionsInput
-
-  """
-  Total amount of the order including tax and any available discounts.
-  
-  **Example:** 25 Euros and 50 cents should be 25.50.
-  """
-  amount: Amount!
-
-  """
-  The array containing the list of items that are part of this order. Maximum of 1000 items.
-  """
-  lineItems: [KlarnaEULineItemInput!]!
-
-  """
-  Total tax amount of the order.
-  
-  **Example:** 25 Euros and 50 cents should be 25.50.
-  """
-  taxAmount: Amount
-
-  """
-  The purchase country of the customer. The billing country always overrides the
-  purchase country if the values are different.
-  """
-  purchaseCountry: CountryCode!
-
-  """The purchase currency of the order."""
-  purchaseCurrency: CurrencyCodeAlpha!
-
-  """The shipping address of the customer."""
-  shippingAddress: KlarnaEUAddressInput
-}
-
-"""The result from a call to update session."""
-type UpdateKlarnaEUSessionPayload {
-  """An identifier used to reconcile requests and responses."""
-  clientMutationId: String
-
-  """The Klarna ID of the session that was updated."""
-  sessionId: ID
-}
-
 """Top-level input fields for a updating a transaction's amount."""
 input UpdateTransactionAmountInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of the transaction on which to perform the adjustment."""
@@ -9473,7 +9503,9 @@ input UpdateTransactionAmountInput {
 
 """Input for creating or updating custom fields on a transaction."""
 input UpdateTransactionCustomFieldsInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The ID of the transaction to update."""
@@ -9490,7 +9522,9 @@ input UpdateTransactionCustomFieldsInput {
 Top-level output field from updating custom fields for a specific transaction.
 """
 type UpdateTransactionCustomFieldsPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -9501,8 +9535,8 @@ type UpdateTransactionCustomFieldsPayload {
 }
 
 """
-An http based URL string
-pattern: <code>https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,4}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)</code>
+A URL string
+pattern: <code>[a-zA-Z0-9+-.]:\\/\\/([-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.?[a-z]{2,4}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))?</code>
 """
 scalar URL
 
@@ -9821,7 +9855,9 @@ input VaultCreditCardExternalVaultOptionsInput {
 Top-level input field for vaulting a credit card so it can be used multiple times.
 """
 input VaultCreditCardInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of an existing single-use credit card payment method to be vaulted."""
@@ -9893,6 +9929,16 @@ input VaultCreditCardVerificationOptionsInput {
   fraudTools: CreditCardFraudToolsOptionsInput
 }
 
+""" Specifies behavior for vaulting a single-use payment method for an in-store transaction.
+"""
+input VaultInStorePaymentMethodAfterTransactingInput {
+  """Specifies the criteria which must be met to vault this payment method."""
+  when: VaultPaymentMethodCriteria!
+
+  """Vaulting behavior override for QR code payments."""
+  qrcOverride: VaultQRCOverride
+}
+
 """
 Input fields that provide information about the resulting PayPal account.
 """
@@ -9949,7 +9995,9 @@ enum VaultPaymentMethodCriteria {
 Top-level input field for vaulting a payment method so it can be used multiple times.
 """
 input VaultPaymentMethodInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of an existing single-use payment method to be vaulted."""
@@ -9993,7 +10041,9 @@ input VaultPaymentMethodInput {
 
 """Top-level output field from vaulting a payment method."""
 type VaultPaymentMethodPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -10009,7 +10059,9 @@ type VaultPaymentMethodPayload {
 Top-level input fields for importing and vaulting a PayPal Billing Agreement.
 """
 input VaultPayPalBillingAgreementInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -10041,7 +10093,9 @@ input VaultPayPalBillingAgreementInput {
 Top-level fields returned when importing and vaulting a PayPal Billing Agreement.
 """
 type VaultPayPalBillingAgreementPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """
@@ -10050,11 +10104,22 @@ type VaultPayPalBillingAgreementPayload {
   paymentMethod: PaymentMethod
 }
 
+"""The override options for QR code vaulting."""
+enum VaultQRCOverride {
+  """Do not show QR code as a payment option, even if it is enabled."""
+  HIDE_QRC
+
+  """If QR codes are enabled, show as a payment option, but do not vault."""
+  SHOW_QRC_NO_VAULT
+}
+
 """
 Top-level input field for vaulting a bank account so it can be used multiple times.
 """
 input VaultUsBankAccountInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of an existing single-use payment method to be vaulted."""
@@ -10328,7 +10393,9 @@ type VerifoneVendor {
 
 """Top-level input field for verifying a multi-use credit card."""
 input VerifyCreditCardInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of an existing multi-use payment method to be vaulted."""
@@ -10343,7 +10410,9 @@ input VerifyCreditCardInput {
 
 """Top-level input field for verifying a multi-use payment method."""
 input VerifyPaymentMethodInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of an existing multi-use payment method to be verified."""
@@ -10355,7 +10424,9 @@ input VerifyPaymentMethodInput {
 
 """Top-level output field from verifying a payment method."""
 type VerifyPaymentMethodPayload {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """The verification that was run on the payment method."""
@@ -10364,7 +10435,9 @@ type VerifyPaymentMethodPayload {
 
 """Top-level input field for retrying a verification on a bank account."""
 input VerifyUsBankAccountInput {
-  """An identifier used to reconcile requests and responses."""
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
   clientMutationId: String
 
   """ID of an existing multi-use payment method to be vaulted."""

@@ -1,3 +1,38 @@
+# 09-30-2022
+
+* Add 255 character limit to the `clientMutationId` field.
+* Add fields to `DeletePaymentMethodFromVaultInput`.
+* Deprecate `ChargebackProtectionLevel` under `Dispute`.
+* Add `protectionLevel` to `Dispute`.
+* Add `DisputeProtectionLevel` enum.
+* Add `protectionLevel` to `DisputeSearchInput`.
+* Add `EXCESSIVE_RETRY` to `GatewayRejectedEvent` enum
+* Remove `PARTIALLY_COMPLETE` from `InStoreContextStatus` enum.
+* Add `vaultPaymentMethodAfterTransacting` field to `InStoreTransactionInput.
+* Add `liabilityShift` to `RiskData` type.
+* Add `GRABPAY` and `SATISPAY` to `LocalPaymentMethodType` enum.
+* Add support for the `sepaDirectDebit` payment method.
+* Add `tokenizePayPalOneTimePayment` mutation.
+* Add `createPayPalOneTimePayment` mutation.
+* Remove `createKlarnaEUSession` mutation.
+* Remove `updateKlarnaEUSession` mutation.
+* Remove `updateKlarnaEUOrderShippingInfo` mutation.
+* Add `requestSignaturePromptFromInStoreReader` mutation.
+* Remove `createAfterpayAUNZCheckout` mutation.
+* Add `requestConfirmationPromptFromInStoreReader` mutation.
+* Update Docstring for `PaymentInitiator` enum.
+* Add `GRABPAY_VIA_PAYPAL`, `SATISPAY_VIA_PAYPAL`, and `SEPA_DIRECT_DEBIT` to `PaymentMethodSnapshotSearchType` enum.
+* Add `shippingAddress` to `PayPalAccountDetails`.
+* Add `description` and `reason` fields to `PayPalRefundDetails`.
+* Update Docstring for `report` and `search` queries.
+* Add `description` and `reason` to `RefundInput`.
+* Add `settlementState` to `SandboxSettleTransactionInput`.
+* Add deprecation note to `SearchChargebackProtectionLevelInput` Docstring,
+* Add `SearchDisputeProtectionLevelInput`
+* Add `retried` field to `Transaction`.
+* Update Docstring for `paymentInitiator` field under `TransactionInput`.
+* Update regex validation and Docstring for `URL` docstring.
+
 # 2022-03-02
 
 * Add `softwareVersion` and `readerStatus` to `InStoreReaderSearchInput`.
