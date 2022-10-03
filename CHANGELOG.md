@@ -1,3 +1,8 @@
+# 10-03-2022
+
+* Add `PAY_UPON_INVOICE' to `LocalPaymentMethodType` enum.
+* Add `PAY_UPON_INVOICE_VIA_PAYPAL` to `PaymentMethodSnapshotSearchType` enum.
+
 # 09-30-2022
 
 * Add 255 character limit to the `clientMutationId` field.
