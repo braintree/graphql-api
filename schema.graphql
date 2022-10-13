@@ -3638,7 +3638,8 @@ suggested actions.
 The tag is made up of the [ISO 639-2 language
 code](https://www.loc.gov/standards/iso639-2/php/code_list.php), the optional
 [ISO-15924 script tag](http://www.unicode.org/iso15924/codelists.html), and the
-[ISO-3166 alpha-2 country code](/docs/integration/direct/rest/country-codes/).
+[ISO-3166 alpha-2 country
+code](https://developer.paypal.com/braintree/docs/reference/general/countries).
 maxLength: 10
 minLength: 2
 pattern: <code>^[a-z]{2}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}))?$</code>

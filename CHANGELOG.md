@@ -1,3 +1,7 @@
+# 10-13-2022
+
+* Update `Language` scalar docstring.
+
 # 10-03-2022
 
 * Add `PAY_UPON_INVOICE' to `LocalPaymentMethodType` enum.
