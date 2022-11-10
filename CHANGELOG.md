@@ -1,3 +1,8 @@
+# 11-10-2022
+
+* Add `paymentInitiatedAt` to Refund.
+* Add `authorizationExpiredAt`, `authorizedAt`, `gatewayRejectedAt`, `processorDeclinedAt` to `SearchPaymentStatusTransitionInput`.
+
 # 10-13-2022
 
 * Update `Language` scalar docstring.

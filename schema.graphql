@@ -6131,6 +6131,9 @@ type Refund implements Node & Payment {
   available after the refund is SETTLED and if you have an eligible merchant account.
   """
   disbursementDetails: DisbursementDetails
+
+  """The refund date and time as reported by the in-store payment terminal."""
+  paymentInitiatedAt: Timestamp
 }
 
 """A paginated list of refunds."""
@@ -7176,6 +7179,18 @@ input SearchPaymentStatusTransitionInput {
 
   """Find transactions with a given voided at time."""
   voidedAt: SearchTimestampInput
+
+  """Find transactions with a given authorization expired at time."""
+  authorizationExpiredAt: SearchTimestampInput
+
+  """Find transactions with a given authorized at time."""
+  authorizedAt: SearchTimestampInput
+
+  """Find transactions with a given gateway rejected at time."""
+  gatewayRejectedAt: SearchTimestampInput
+
+  """Find transactions with a given processor declined at time."""
+  processorDeclinedAt: SearchTimestampInput
 }
 
 """Input fields for searching for payments by implementing type."""
