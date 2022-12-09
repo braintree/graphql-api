@@ -1,3 +1,13 @@
+# 12-08-2022
+
+* Remove `PayPalExperienceProfileInput` from `CreatePayPalBillingAgreementInput`.
+* Add  `PayPalBillingAgreementExperienceProfileInput` to `CreatePayPalBillingAgreementInput`. 
+* Add `paypalProductAttributes` to `CreatePayPalBillingAgreementInput`.
+* Add `preDisputeProgram` to `Dispute`.
+* Add `SearchPreDisputeProgramInput` to `DisputeSearchInput`.
+* Add `PayPalBillingAgreementChargePattern` enum.
+* Add `PayPalUserAction` field to `PayPalExperienceProfileInput` 
+
 # 11-10-2022
 
 * Add `paymentInitiatedAt` to Refund.

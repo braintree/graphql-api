@@ -1337,13 +1337,18 @@ input CreatePayPalBillingAgreementInput {
   """PayPal Risk correlation ID (also known as the Client Metadata ID)."""
   paypalRiskCorrelationId: ID
 
-  """Defines the experience profile used to render the approval flow."""
-  paypalExperienceProfile: PayPalExperienceProfileInput
+  """
+  Defines the experience profile used to render the billing agreement approval flow.
+  """
+  paypalExperienceProfile: PayPalBillingAgreementExperienceProfileInput
 
   """
   Merchant-provided shipping address. Fields addressLine1, adminArea2, and countryCode are required for Billing Agreements.
   """
   shippingAddress: AddressInput
+
+  """Product attributes input for PayPal billing agreement."""
+  paypalProductAttributes: PayPalProductAttributesInput
 }
 
 """
@@ -2336,6 +2341,9 @@ type Dispute implements Node {
 
   """The protection level of the dispute."""
   protectionLevel: DisputeProtectionLevel
+
+  """The pre-dispute program of the dispute."""
+  preDisputeProgram: PreDisputeProgram
 }
 
 """A paginated list of disputes."""
@@ -2568,6 +2576,9 @@ input DisputeSearchInput {
 
   """Find disputes with a given protection level."""
   protectionLevel: SearchDisputeProtectionLevelInput
+
+  """Find disputes with a given pre-dispute program."""
+  preDisputeProgram: SearchPreDisputeProgramInput
 }
 
 """The status of the dispute."""
@@ -5353,6 +5364,64 @@ input PayPalAccountInput {
   payerId: ID
 }
 
+"""
+Expected business/pricing model for a billing agreement (Charge Patterns).
+"""
+enum PayPalBillingAgreementChargePattern {
+  """Pay after use, non-recurring post-paid, variable amount, irregular."""
+  DEFERRED
+
+  """On-demand instant payments - non-recurring, pre-paid, variable amount."""
+  IMMEDIATE
+
+  """
+  Pay on a fixed date based on usage or consumption after the goods/service is delivered.
+  """
+  RECURRING_POSTPAID
+
+  """
+  Pay upfront fixed or variable amount on a fixed date before the goods/service is delivered.
+  """
+  RECURRING_PREPAID
+
+  """
+  Charge payer when the set amount is reached or monthly billing cycle,
+  whichever comes first, after the goods/service is delivered.
+  """
+  THRESHOLD_POSTPAID
+
+  """
+  Charge payer when the set amount is reached or monthly billing cycle,
+  whichever comes first, before the goods/service is delivered.
+  """
+  THRESHOLD_PREPAID
+}
+
+"""Controls the experience in a PayPal billing agreement approval flow."""
+input PayPalBillingAgreementExperienceProfileInput {
+  """Merchant brand name to be displayed on the PayPal approval pages."""
+  brandName: String
+
+  """
+  Indicates whether a shipping address will be collected from the customer during the agreement approval flow.
+  """
+  collectShippingAddress: Boolean
+
+  """
+  Specifies the PayPal page to display when a user lands on the PayPal site to complete the payment.
+  """
+  landingPageType: PayPalLandingPageType
+
+  """Locale of the PayPal payment approval experience."""
+  locale: Language
+
+  """
+  Indicates whether to enable user editing of the shipping address. Only applies
+  when shipping address is provided by merchant.
+  """
+  shippingAddressEditable: Boolean
+}
+
 """Input fields for a PayPal account to be vaulted."""
 input PayPalBillingAgreementInput {
   """The Billing Agreement token."""
@@ -5447,6 +5516,12 @@ input PayPalExperienceProfileInput {
   when shipping address is provided by merchant.
   """
   shippingAddressEditable: Boolean
+
+  """
+  Presents the customer with either the Continue or Pay Now (COMMIT) checkout
+  flow. Default is Continue flow if the field is not provided.
+  """
+  userAction: PayPalUserAction
 }
 
 """Possible identifiers for credit products provided via PayPal."""
@@ -5629,6 +5704,14 @@ input PayPalOneTimePaymentInput {
 input PayPalPayeeOptionsInput {
   """The email address associated with the payee PayPal account."""
   email: String
+}
+
+"""Product attributes input for PayPal billing agreement."""
+input PayPalProductAttributesInput {
+  """
+  Expected business/pricing model for a billing agreement (Charge Patterns).
+  """
+  paypalBillingAgreementChargePattern: PayPalBillingAgreementChargePattern
 }
 
 """PayPal qualifying financing options for a product."""
@@ -5820,6 +5903,12 @@ type PayPalTransactionPayload {
   billingAgreementWithPurchasePaymentMethod: PaymentMethod
 }
 
+"""PayPal User action type."""
+enum PayPalUserAction {
+  COMMIT
+  CONTINUE
+}
+
 """
 The percentage, as a fixed-point, signed decimal number. For example, define a 19.99% interest rate as `19.99`.
 """
@@ -5924,6 +6013,17 @@ input PhoneInput {
 
   """The extension number."""
   extensionNumber: String
+}
+
+"""The pre-dispute program of the dispute."""
+enum PreDisputeProgram {
+  """The dispute does not have a pre-dispute program."""
+  NONE
+
+  """
+  The dispute is part of the Visa Rapid Dispute Resolution (RDR) program.
+  """
+  VISA_RDR
 }
 
 """Accompanying information for a processor declined transaction."""
@@ -7197,6 +7297,17 @@ input SearchPaymentStatusTransitionInput {
 input SearchPaymentTypeInput {
   """The payment is a transaction and/or a refund."""
   in: [PaymentSearchType!]
+}
+
+"""
+Input fields for searching for a dispute with a given pre-dispute program.
+"""
+input SearchPreDisputeProgramInput {
+  """The dispute's pre-dispute program is exactly this value."""
+  is: PreDisputeProgram
+
+  """The dispute's pre-dispute program is one of these values."""
+  in: [PreDisputeProgram!]
 }
 
 """Input fields for searching for a range."""
