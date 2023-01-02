@@ -79,7 +79,7 @@ enum ACHStandardEntryClassCode {
 }
 
 """
-The authentication context class reference that indcates how a universal access token can be used.
+The authentication context class reference that indicates how a universal access token can be used.
 """
 enum ACRType {
   CLIENT
@@ -126,7 +126,7 @@ type Address {
   region: String @deprecated(reason: "Use `adminArea1` instead.")
 
   """
-  Highest level subdivision, such as state, province, or ISO-3166-2 subdivison.
+  Highest level subdivision, such as state, province, or ISO-3166-2 subdivision.
   """
   adminArea1: String
 
@@ -1662,7 +1662,7 @@ type CreditCardTransactionDetails {
   """
   The network transaction identifier provided by the payment network. If this
   transaction was created in order to verify a payment method before storing it
-  in an external vault, then this value can be pased when creating subsequent
+  in an external vault, then this value can be passed when creating subsequent
   transactions with the same payment method.
   """
   networkTransactionId: String
@@ -1710,7 +1710,7 @@ input CreditCardTransactionOptionsInput {
   accountType: CardAccountType
 
   """
-  The CVV for the credit card to be used when creating this transction, securely tokenized with the `tokenizeCvv` mutation.
+  The CVV for the credit card to be used when creating this transaction, securely tokenized with the `tokenizeCvv` mutation.
   """
   tokenizedCvv: ID
 
@@ -2040,7 +2040,7 @@ input CustomerSearchInput {
   phoneNumber: SearchTextInput
 }
 
-"""The customer's tax identifer for a given tax jurisdiction."""
+"""The customer's tax identifier for a given tax jurisdiction."""
 input CustomerTaxIdentifierInput {
   """
   The identifier provided in the format required for the given tax jurisdiction.
@@ -2919,7 +2919,7 @@ type ExchangeRateQuotePayload {
   quotes: [ExchangeRateQuote!]
 }
 
-"""A credit card's assocation with an external vault."""
+"""A credit card's association with an external vault."""
 enum ExternalVaultStatus {
   """
   The payment method for this transaction has been vaulted in an external vault.
@@ -2927,7 +2927,7 @@ enum ExternalVaultStatus {
   VAULTED
 
   """
-  The payment method has not been vaulted in an exernal vault, but it will be if this transaction is successfully processed.
+  The payment method has not been vaulted in an external vault, but it will be if this transaction is successfully processed.
   """
   WILL_VAULT
 }
@@ -5054,7 +5054,7 @@ enum PaymentMethodUsage {
 
 """
 Input fields that specify options for verifying the vaulted payment method. Only
-applicable for payment method types that suport verification.
+applicable for payment method types that support verification.
 """
 input PaymentMethodVerificationOptionsInput {
   """
@@ -7746,7 +7746,7 @@ enum ThreeDSecureAuthenticationDeliveryTimeframe {
 }
 
 """
-Input fields for passing auxillary 3D Secure information manually, as opposed to
+Input fields for passing auxiliary 3D Secure information manually, as opposed to
 tokenized on a single-use payment method ID.
 """
 input ThreeDSecureAuthenticationInput {
@@ -8650,7 +8650,7 @@ type Transaction implements Node & Payment {
 
   """
   The amount charged in this transaction. For transactions that are partially
-  captured, this amount will be the cummulative amount captured on this
+  captured, this amount will be the cumulative amount captured on this
   transaction. For transactions that are partially authorized, the amount will
   be less than the `initialRequestedAuthorizationAmount`.
   """
@@ -8836,7 +8836,7 @@ type TransactionAuthorizationProcessorResponse {
   authorizationId: String
 
   """
-  If present, any additional information recieved from the processor. May provide further insight into the `legacyCode`.
+  If present, any additional information received from the processor. May provide further insight into the `legacyCode`.
   """
   additionalInformation: String
 
@@ -8916,7 +8916,7 @@ multi-use payment methods, or from single-use payment methods which will not be
 stored in an external vault.
 """
 input TransactionExternalVaultOptionsInput {
-  """The credit card's assocation with an external vault."""
+  """The credit card's association with an external vault."""
   status: ExternalVaultStatus!
 
   """
@@ -9098,7 +9098,7 @@ type TransactionInstallment {
 """Adjustment information."""
 type TransactionInstallmentAdjustment {
   """
-  The projected date for the funds associated with the adjustements to be disbursed.
+  The projected date for the funds associated with the adjustments to be disbursed.
   """
   projectedDisbursementDate: Date
 
@@ -10458,7 +10458,7 @@ type VerificationProcessorResponse {
   avsStreetAddressResponse: AvsCvvResponseCode
 
   """
-  If present, any additional information recieved from the processor. May provide further insight into the `legacyCode`.
+  If present, any additional information received from the processor. May provide further insight into the `legacyCode`.
   """
   additionalInformation: String
 }
