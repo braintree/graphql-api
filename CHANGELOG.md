@@ -1,3 +1,26 @@
+# 05-23-2023
+
+* Add `userName` field to `AuthorizedEvent`, `FailedEvent`, `GatewayRejectedEvent`, `ProcessorDeclinedEvent`, `SettlementPendingEvent`, `SubmittedForSettlementEvent`, `VoidedEvent`.
+* Add `completedAt` and `submittedAt` fields to `BusinessAccountCreationRequest`.
+* Increase the maximum of `installmentCount` to 48.
+* Add `fax` and `website` fields to `Customer` and `CustomerInput`.
+* Add `evidenceSubmittable` field to `Dispute`.
+* Add `AUTO_ACCEPTED` to DisputesStatus enum.
+* Add `CARRIER_NAME`, `GENERAL`, `REFUND_ID`, and `TRACKING_NUMBER` to `DisputeTextEvidenceCategory` enum.
+* Add `PARTIALLY_COMPLETE` to `InStoreContextStatus` enum.
+* Add `purchaseOrderNumber`, `tax`, `shipping`, `discountAmount`, and `lineItems` fields to `InStoreTransactionInput`.
+* Add `shippingAddress`, `billingAddress`, `disputeReceivedDate`, and `processorAuthorizationId` to `PaymentSearchInput`, RefundSearchInput`, and `TransactionSearchInput`.
+* Add `requestedExemptionType` to `PerfomrThreeDSecureLookupInput`.
+* Add `company`, `addressLine1`, `addressLine2`, `firstName`, `lastName`, `adminArea1`, `adminArea2`, `postalCode`, and `countryName` fields to `Search`.
+* Add `fax`, `phone`, and `website` fields to `SearchPaymentCustomerInput`.
+* Deprecate `email` under `SearchPaymentPayPalDetailsInput`.
+* Add `payerEmail`, `authorizationId`, and `paymentId` to `SearchPaymentPayPalDetailsInput`.
+* Add `required` to `ThreeDSecureAuthenticationInput`,
+* Add `EXEMPTION_LOW_VALUE_SUCCESSFUL` , `EXEMPTION_TRA_SUCCESSFUL`, `MPI_SERVER_ERROR`, and `SKIPPED_DUE_TO_RULE` to `ThreeDSecureAuthenticationStatus` enum.
+* Remove `UNKNOWN` from `UsBankAccountType` enum.
+* Add `makeDefault` and `failOnDuplicatePaymentMethod` fields to `VaultCreditCardInput`.
+* Add `makeDefault` field to `VaultLimitedUsePayPalAccountOptionsInput`, `RiskDataInput`, and `VaultUsBankAccountInput`.
+
 # 12-08-2022
 
 * Remove `PayPalExperienceProfileInput` from `CreatePayPalBillingAgreementInput`.

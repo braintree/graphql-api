@@ -455,6 +455,11 @@ type AuthorizedEvent implements PaymentStatusEvent {
   more details on authorization expiration timeframes, see the [Statuses reference](https://developers.braintreepayments.com/reference/general/statuses#authorization-expired).
   """
   authorizationExpiresAt: Timestamp
+
+  """
+  User name of the person who performed an action that triggered the status change of the transaction.
+  """
+  userName: String
 }
 
 """
@@ -626,6 +631,12 @@ type BusinessAccountCreationRequest implements Node {
 
   """The account creation status for this account."""
   creationStatus: AccountCreationStatus
+
+  """The completion date and time of the merchant account application."""
+  completedAt: Timestamp
+
+  """The submitted date and time of the merchant account application."""
+  submittedAt: Timestamp
 }
 
 """A paginated list of BusinessAccountCreationRequests."""
@@ -1730,7 +1741,7 @@ input CreditCardTransactionOptionsInput {
   """The type of Strong Customer Authentication Exemption requested."""
   scaExemption: ScaExemptionType
 
-  """Number of monthly installments (can be anywhere between 2 and 12)."""
+  """Number of monthly installments (can be anywhere between 2 and 48)."""
   installmentCount: Int
 }
 
@@ -1910,6 +1921,12 @@ type Customer implements Node {
   """The phone number for this customer."""
   phoneNumber: String
 
+  """Customer's fax."""
+  fax: String
+
+  """Customer's website."""
+  website: String
+
   """Payment methods belonging to this customer."""
   paymentMethods(first: Int, after: String): PaymentMethodConnection
 
@@ -2003,6 +2020,12 @@ input CustomerInput {
 
   """The customer's phone number."""
   phoneNumber: String
+
+  """The customer's fax."""
+  fax: String
+
+  """The customer's website."""
+  website: URL
 
   """
   A set of country code ID pairs, analogous to Social Security numbers in the United States.
@@ -2342,6 +2365,11 @@ type Dispute implements Node {
   """The protection level of the dispute."""
   protectionLevel: DisputeProtectionLevel
 
+  """
+  Indicates whether or not the merchant can upload evidence for this dispute based on its current status.
+  """
+  evidenceSubmittable: Boolean
+
   """The pre-dispute program of the dispute."""
   preDisputeProgram: PreDisputeProgram
 }
@@ -2584,6 +2612,7 @@ input DisputeSearchInput {
 """The status of the dispute."""
 enum DisputeStatus {
   ACCEPTED
+  AUTO_ACCEPTED
   DISPUTED
   EXPIRED
   LOST
@@ -2635,11 +2664,13 @@ For text evidence: the evidence category that specifies which requirement it sat
 """
 enum DisputeTextEvidenceCategory {
   AVS_RESPONSE
+  CARRIER_NAME
   CREDIT_ISSUED_AMOUNT
   CREDIT_ISSUED_DATE_TIME
   DEVICE_ID
   DEVICE_NAME
   DOWNLOAD_DATE_TIME
+  GENERAL
   GEOGRAPHICAL_LOCATION
   PRIOR_DIGITAL_GOODS_TRANSACTION_ARN
   PRIOR_DIGITAL_GOODS_TRANSACTION_DATE_TIME
@@ -2657,6 +2688,8 @@ enum DisputeTextEvidenceCategory {
   RECURRING_TRANSACTION_ARN
   RECURRING_TRANSACTION_DATE_TIME
   RECURRING_TRANSACTION_ID
+  REFUND_ID
+  TRACKING_NUMBER
 }
 
 """Transaction input fields for searching for disputes."""
@@ -2972,6 +3005,11 @@ type FailedEvent implements PaymentStatusEvent {
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
+
+  """
+  User name of the person who performed an action that triggered the status change of the transaction.
+  """
+  userName: String
 }
 
 """Top-level input fields for finalizing a dispute."""
@@ -3057,6 +3095,11 @@ type GatewayRejectedEvent implements PaymentStatusEvent {
   The original transaction if the gateway rejection reason was `DUPLICATE`.
   """
   duplicateOf: Transaction
+
+  """
+  User name of the person who performed an action that triggered the status change of the transaction.
+  """
+  userName: String
 }
 
 """Possible reasons why a transaction was rejected by the gateway."""
@@ -3243,6 +3286,13 @@ enum InStoreContextStatus {
 
   """Not successful. The context was ended."""
   FAILED
+
+  """
+  Partially successful. The context was ended but only partially authorized.
+  Please note that partial authorizations are ONLY supported on versions >=
+  5.0.0 of the in-store reader payment application.
+  """
+  PARTIALLY_COMPLETE
 
   """Flow in-progress. Waiting for reader or point of sale interaction."""
   PENDING
@@ -3632,6 +3682,43 @@ input InStoreTransactionInput {
   transactions, this maps to paypal.bn_code.
   """
   channel: String
+
+  """
+  A purchase order identification value you associate with this transaction.
+  
+  *Required for Level 2 processing*.
+  """
+  purchaseOrderNumber: String
+
+  """
+  Tax information about the transaction.
+  
+  *Required for Level 2 processing*.
+  """
+  tax: TransactionTaxInput
+
+  """
+  Shipping information.
+  
+  *Required for Level 3 processing*.
+  """
+  shipping: TransactionShippingInput
+
+  """
+  Discount amount that was included in the total transaction amount. Does not
+  add to the total amount the payment method will be charged. This value can't
+  be negative. Please note that this field is not used on PayPal transactions.
+  
+  *Required for Level 3 processing*.
+  """
+  discountAmount: String
+
+  """
+  Line items for this transaction. Up to 249 line items may be specified.
+  
+  *Required for Level 3 processing*.
+  """
+  lineItems: [TransactionLineItemInput!]
 }
 
 """Configuration for Kount fraud tools."""
@@ -5163,6 +5250,18 @@ input PaymentSearchInput {
   Find payments by the ID of the store that the transaction was processed in.
   """
   storeId: SearchValueInput
+
+  """Find payments by the shipping address."""
+  shippingAddress: SearchAddressInput
+
+  """Find payments by the billing address."""
+  billingAddress: SearchAddressInput
+
+  """Find payments by dispute received date."""
+  disputeReceivedDate: SearchDateInput
+
+  """Find payments by the processor authorization code."""
+  processorAuthorizationId: SearchTextInput
 }
 
 """The type of a Payment, based primarily on implementing type."""
@@ -5957,6 +6056,11 @@ input PerformThreeDSecureLookupInput {
   """
   requestAuthenticationChallenge: Boolean
 
+  """
+  Indicates an exemption to be requested. If the exemption's conditions are satisfied, then will it be applied to 3D Secure.
+  """
+  requestedExemptionType: ScaExemptionType
+
   """Information about the client-side lookup process."""
   clientInformation: ThreeDSecureLookupClientInformationInput
 
@@ -6056,6 +6160,11 @@ type ProcessorDeclinedEvent implements PaymentStatusEvent {
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
+
+  """
+  User name of the person who performed an action that triggered the status change of the transaction.
+  """
+  userName: String
 }
 
 """
@@ -6394,6 +6503,18 @@ input RefundSearchInput {
   Find refunds by the ID of the store that the transaction was processed in.
   """
   storeId: SearchValueInput
+
+  """Find refunds by the shipping address."""
+  shippingAddress: SearchAddressInput
+
+  """Find refunds by the billing address."""
+  billingAddress: SearchAddressInput
+
+  """Find refunds by dispute received date."""
+  disputeReceivedDate: SearchDateInput
+
+  """Find refunds by the processor authorization code."""
+  processorAuthorizationId: SearchTextInput
 }
 
 """Top-level input fields for refunding a transaction."""
@@ -7033,6 +7154,44 @@ type Search {
   inStoreReaders(input: InStoreReaderSearchInput!, first: Int, after: String): InStoreReaderConnection
 }
 
+"""Input fields for searching by address."""
+input SearchAddressInput {
+  """Company name."""
+  company: SearchTextInput
+
+  """
+  The first line of the street address, such as street number, street name.
+  """
+  addressLine1: SearchTextInput
+
+  """
+  Extended address information, such as apartment number or suite number.
+  """
+  addressLine2: SearchTextInput
+
+  """First name."""
+  firstName: SearchTextInput
+
+  """Last name."""
+  lastName: SearchTextInput
+
+  """
+  Highest level subdivision, such as state, province or ISO-3166-2 subdivision.
+  """
+  adminArea1: SearchTextInput
+
+  """A city, town or village."""
+  adminArea2: SearchTextInput
+
+  """
+  Postal code in any country's format, otherwise known as CAP, CEP, Eircode, NPA, PIN, PLZ, or ZIP code.
+  """
+  postalCode: SearchTextInput
+
+  """Country code for the address."""
+  countryName: SearchTextInput
+}
+
 """
 Deprecated: Please use `SearchDisputeProtectionLevelInput` instead.
 
@@ -7176,6 +7335,15 @@ input SearchPaymentCustomerInput {
 
   """Find payments with a customer email."""
   email: SearchTextInput
+
+  """Find payments with a customer fax."""
+  fax: SearchTextInput
+
+  """Find payments with a customer phone."""
+  phone: SearchTextInput
+
+  """Find payments with a customer website."""
+  website: SearchTextInput
 }
 
 """
@@ -7238,8 +7406,21 @@ input SearchPaymentPaymentMethodSnapshotInput {
 Input fields for searching for payments by payment method snapshot PayPal details criteria.
 """
 input SearchPaymentPayPalDetailsInput {
-  """"The email address of the PayPal payer."""
+  """
+  Deprecated: This field is no longer supported. Please use `payerEmail` instead.
+  
+  The email address of the PayPal payer.
+  """
   email: SearchTextInput
+
+  """The email address of the PayPal payer."""
+  payerEmail: SearchTextInput
+
+  """The PayPal ID for the authorization."""
+  authorizationId: SearchTextInput
+
+  """The identification value of the payment within PayPal's API."""
+  paymentId: SearchTextInput
 }
 
 """
@@ -7595,6 +7776,11 @@ type SettlementPendingEvent implements PaymentStatusEvent {
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
+
+  """
+  User name of the person who performed an action that triggered the status change of the transaction.
+  """
+  userName: String
 }
 
 """
@@ -7641,6 +7827,11 @@ type SubmittedForSettlementEvent implements PaymentStatusEvent {
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
+
+  """
+  User name of the person who performed an action that triggered the status change of the transaction.
+  """
+  userName: String
 }
 
 """Input fields for local payment tax information."""
@@ -7764,6 +7955,13 @@ input ThreeDSecureAuthenticationInput {
   for you in our standard 3D Secure integration.
   """
   passThrough: ThreeDSecurePassThroughInput
+
+  """
+  Specify whether to require 3D Secure verification to succeed before creating a
+  transaction. Defaults to true for transactions sent through 3D Secure
+  verification but to false for transactions not sent through 3D Secure verification.
+  """
+  required: Boolean
 }
 
 """Merchant product code."""
@@ -7809,6 +8007,8 @@ enum ThreeDSecureAuthenticationStatus {
   AUTHENTICATION_UNAVAILABLE
   CHALLENGE_REQUIRED
   DATA_ONLY_SUCCESSFUL
+  EXEMPTION_LOW_VALUE_SUCCESSFUL
+  EXEMPTION_TRA_SUCCESSFUL
   LOOKUP_BYPASSED
   LOOKUP_CARD_ERROR
   LOOKUP_ENROLLED
@@ -7816,6 +8016,8 @@ enum ThreeDSecureAuthenticationStatus {
   LOOKUP_FAILED_ACS_ERROR
   LOOKUP_NOT_ENROLLED
   LOOKUP_SERVER_ERROR
+  MPI_SERVER_ERROR
+  SKIPPED_DUE_TO_RULE
   UNSUPPORTED_ACCOUNT_TYPE
   UNSUPPORTED_CARD
   UNSUPPORTED_THREE_D_SECURE_VERSION
@@ -9396,6 +9598,18 @@ input TransactionSearchInput {
   Find transactions by the ID of the store that the transaction was processed in.
   """
   storeId: SearchValueInput
+
+  """Find transactions by the shipping address."""
+  shippingAddress: SearchAddressInput
+
+  """Find transactions by the billing address."""
+  billingAddress: SearchAddressInput
+
+  """Find transactions by dispute received date."""
+  disputeReceivedDate: SearchDateInput
+
+  """Find transactions by the processor authorization code."""
+  processorAuthorizationId: SearchTextInput
 }
 
 """
@@ -9797,7 +10011,6 @@ enum UsBankAccountOwnershipType {
 enum UsBankAccountType {
   CHECKING
   SAVINGS
-  UNKNOWN
 }
 
 """
@@ -10029,6 +10242,18 @@ input VaultCreditCardInput {
   Customer device information, which is sent directly to supported processors for fraud analysis.
   """
   riskData: RiskDataInput
+
+  """
+  This option makes the specified payment method the default for the customer.
+  """
+  makeDefault: Boolean
+
+  """
+  If this option is passed and the same payment method has already been added to
+  the Vault for any customer, the request will fail. This option will be ignored
+  for Apple pay, Google pay, and Samsung pay payment methods.
+  """
+  failOnDuplicatePaymentMethod: Boolean
 }
 
 """
@@ -10096,6 +10321,11 @@ input VaultLimitedUsePayPalAccountOptionsInput {
 
   """Shipping destination address information."""
   shippingAddress: AddressInput
+
+  """
+  This option makes the specified payment method the default for the customer.
+  """
+  makeDefault: Boolean
 }
 
 """ Specifies behavior for vaulting a single-use payment method after transacting with it.
@@ -10166,6 +10396,11 @@ input VaultPaymentMethodInput {
   Customer device information, which is sent directly to supported processors for fraud analysis.
   """
   riskData: RiskDataInput
+
+  """
+  This option makes the specified payment method the default for the customer.
+  """
+  makeDefault: Boolean
 }
 
 """Top-level output field from vaulting a payment method."""
@@ -10264,6 +10499,11 @@ input VaultUsBankAccountInput {
 
   """Type of US bank account verification to perform."""
   verificationMethod: UsBankAccountVerificationMethod!
+
+  """
+  This option makes the specified payment method the default for the customer.
+  """
+  makeDefault: Boolean
 }
 
 """Details about a Venmo Account."""
@@ -10653,6 +10893,11 @@ type VoidedEvent implements PaymentStatusEvent {
 
   """Whether or not this is the final state for the transaction."""
   terminal: Boolean
+
+  """
+  User name of the person who performed an action that triggered the status change of the transaction.
+  """
+  userName: String
 }
 
 """A four-digit year."""
