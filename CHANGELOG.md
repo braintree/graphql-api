@@ -1,3 +1,22 @@
+# 06-06-2023
+
+* Add `ClientSDKMetadata` type.
+* Add `CreateVenmoPaymentContextInput` input.
+* Add `CustomerClient` enum.
+* Add `MerchantAdviceCodeResponse` type
+* Add `merchantAdviceCodeResponse` field to `FailedEvent`, `GatewayRejectedEvent`, and `ProcessorDeclinedEvent`.
+* Add `createVenmoPaymentContext` mutation.
+* Add `PaypalLineItem` type.
+* Add `enrichedCustomerDataEnabled` field for `VenmoConfiguration`.
+* Add `VenmoIntent` enum.
+* Add `VenmoPaymentContext` type.
+* Add `VenmoPaymentContextPayload` type.
+* Add `VenmoPaymentContextStatus` enum.
+* Add `VenmoPaysheetDetails` type.
+* Add `VenmoPaysheetDetailsInput` input.
+* Add `VenmoPaysheetTransactionDetails` type.
+* Add `VenmoPaysheetTransactionDetailsInput
+
 # 05-23-2023
 
 * Add `userName` field to `AuthorizedEvent`, `FailedEvent`, `GatewayRejectedEvent`, `ProcessorDeclinedEvent`, `SettlementPendingEvent`, `SubmittedForSettlementEvent`, `VoidedEvent`.

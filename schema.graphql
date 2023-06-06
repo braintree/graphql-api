@@ -1083,6 +1083,21 @@ enum ClientFeature {
   tokenize_credit_cards
 }
 
+"""Analytics data provided by a client SDK."""
+type ClientSDKMetadata {
+  """Name of the platform."""
+  platform: String
+
+  """Session ID on the device."""
+  sessionId: String
+
+  """Version of the client SDK."""
+  version: String
+
+  """Name of the client SDK integration type (e.g. dropin or custom)."""
+  integration: String
+}
+
 """Input fields for creating a client token."""
 input ClientTokenInput {
   """
@@ -1491,6 +1506,43 @@ type CreateUniversalAccessTokenPayload {
 
   """The created universal access token."""
   accessToken: AccessToken
+}
+
+"""Fields that are provided when creating a Venmo context."""
+input CreateVenmoPaymentContextInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Complete the transaction from merchant site or Venmo App."""
+  intent: VenmoIntent!
+
+  """
+  Whether the resulting payment method may be used to make a one time payment
+  (`SINGLE_USE`) or to create a vaulted multi-use payment token (`MULTI_USE`).
+  """
+  paymentMethodUsage: PaymentMethodUsage!
+
+  """Client the customer used to initiate the transaction."""
+  customerClient: CustomerClient!
+
+  """
+  An identifier representing the profile of the merchant used to initiate the transaction.
+  """
+  merchantProfileId: ID
+
+  """
+  The sub-merchant display name shown on the Venmo app consent screen. This
+  field will only be present for PayFast channel partner merchants.
+  """
+  displayName: String
+
+  """Details about the information to be displayed on the Venmo Paysheet."""
+  paysheetDetails: VenmoPaysheetDetailsInput
+
+  """URL for redirecting back to merchant app or website on the client."""
+  returnUrl: URL
 }
 
 """A code identifying the card brand."""
@@ -1973,6 +2025,14 @@ enum CustomerAuthenticationRegulationEnvironment {
 
   """No customer authentication regulations apply to this transaction."""
   UNREGULATED
+}
+
+"""Client the customer used to initiate the transaction."""
+enum CustomerClient {
+  DESKTOP
+  MOBILE_APP
+  MOBILE_WEB
+  NATIVE_WEB
 }
 
 """A paginated list of customers."""
@@ -3000,6 +3060,11 @@ type FailedEvent implements PaymentStatusEvent {
   """Fields describing the network response to the authorization request."""
   networkResponse: PaymentNetworkResponse
 
+  """
+  Fields describing the merchant advice code response to the authorization request.
+  """
+  merchantAdviceCodeResponse: MerchantAdviceCodeResponse
+
   """Risk decision for this transaction."""
   riskDecision: RiskDecision
 
@@ -3082,6 +3147,11 @@ type GatewayRejectedEvent implements PaymentStatusEvent {
 
   """Fields describing the network response to the authorization request."""
   networkResponse: PaymentNetworkResponse
+
+  """
+  Fields describing the merchant advice code response to the authorization request.
+  """
+  merchantAdviceCodeResponse: MerchantAdviceCodeResponse
 
   """
   Risk decision for this transaction. If the gatewayRejectionReason is fraud, this may be the reason for the rejection.
@@ -4105,6 +4175,21 @@ type MerchantAccountThreeDSecureVersionConfiguration {
   supportedCardBrands: [CreditCardBrandCode!]
 }
 
+"""
+The Merchant Advice Code response, this field can provide to merchants the
+reason for declining a recurring payment transaction, and the actions merchants
+can take to continue to serve their recurring payment customers.
+"""
+type MerchantAdviceCodeResponse {
+  """
+  The merchant advice code, see the [list of possible merchant advice codes](https://developer.paypal.com/braintree/docs/reference/general/merchant-responses/merchant-advice-codes).
+  """
+  code: String
+
+  """The merchant advice code text."""
+  message: String
+}
+
 """A monetary amount with currency."""
 type MonetaryAmount {
   """
@@ -4468,6 +4553,9 @@ type Mutation {
 
   """Request an in-store reader to display a confirmation prompt."""
   requestConfirmationPromptFromInStoreReader(input: RequestConfirmationPromptFromInStoreReaderInput!): InStoreContextPayload
+
+  """Create a Venmo payment context."""
+  createVenmoPaymentContext(input: CreateVenmoPaymentContextInput!): VenmoPaymentContextPayload
 
   """Updates the authorization amount of the transaction."""
   updateTransactionAmount(input: UpdateTransactionAmountInput!): TransactionPayload
@@ -5723,6 +5811,43 @@ enum PayPalLandingPageType {
 }
 
 """Line items for a PayPal payment."""
+type PaypalLineItem {
+  """Item name. Maximum 127 characters."""
+  name: String
+
+  """
+  Number of units of the item purchased. This value can't be negative or zero.
+  """
+  quantity: Int
+
+  """
+  Per-unit price of the item. Can include up to 2 decimal places. This value can't be negative or zero.
+  """
+  unitAmount: Amount
+
+  """
+  Indicates whether the line item is a debit (sale) or credit (refund or discount) to the customer.
+  """
+  type: TransactionLineItemType
+
+  """Item description. Maximum 127 characters."""
+  description: String
+
+  """Product or UPC code for the item. Maximum 127 characters."""
+  productCode: String
+
+  """
+  Per-unit tax price of the item. Can include up to 2 decimal places. This value
+  can't be negative or zero. If this is a line item for a Venmo transaction,
+  this value can be zero.
+  """
+  unitTaxAmount: Amount
+
+  """The URL to product information."""
+  url: URL
+}
+
+"""Line items for a PayPal payment."""
 input PayPalLineItemInput {
   """Item name. Maximum 127 characters."""
   name: String!
@@ -5749,7 +5874,9 @@ input PayPalLineItemInput {
   productCode: String
 
   """
-  Per-unit tax price of the item. Can include up to 2 decimal places. This value can't be negative or zero.
+  Per-unit tax price of the item. Can include up to 2 decimal places. This value
+  can't be negative or zero. If this is a line item for a Venmo transaction,
+  this value can be zero.
   """
   unitTaxAmount: Amount!
 
@@ -6154,6 +6281,11 @@ type ProcessorDeclinedEvent implements PaymentStatusEvent {
 
   """Fields describing the network response to the authorization request."""
   networkResponse: PaymentNetworkResponse
+
+  """
+  Fields describing the merchant advice code response to the authorization request.
+  """
+  merchantAdviceCodeResponse: MerchantAdviceCodeResponse
 
   """Risk decision for this transaction."""
   riskDecision: RiskDecision
@@ -10525,6 +10657,9 @@ type VenmoConfiguration {
 
   """The Venmo environment."""
   environment: VenmoEnvironment
+
+  """Indicates whether Enriched Customer Data is enabled for your merchant."""
+  enrichedCustomerDataEnabled: Boolean
 }
 
 """The environment being used for Venmo."""
@@ -10533,6 +10668,15 @@ enum VenmoEnvironment {
   SANDBOX
   production
   sandbox
+}
+
+"""The intended checkout flow communicated to the Venmo app."""
+enum VenmoIntent {
+  """Continue through the current checkout flow."""
+  CONTINUE
+
+  """Initiate the transaction directly from the Venmo app."""
+  PAY_FROM_APP
 }
 
 """Information about a payer's Venmo account."""
@@ -10587,6 +10731,232 @@ input VenmoPayerInfoInput {
 
   """The payer's shipping address."""
   shippingAddress: AddressInput
+}
+
+"""Fields returned from a Venmo payment context."""
+type VenmoPaymentContext implements Node & PaymentContext {
+  """The unique identifier."""
+  id: ID!
+
+  """The ID of the transacting merchant."""
+  merchantId: String
+
+  """The intended payment flow this payment context was created with."""
+  intent: VenmoIntent
+
+  """Date and time when the payment context was created."""
+  createdAt: Timestamp!
+
+  """Date and time when the payment context was updated."""
+  updatedAt: Timestamp!
+
+  """The status of the payment context."""
+  status: VenmoPaymentContextStatus
+
+  """The Venmo environment this payment context was created in."""
+  environment: VenmoEnvironment
+
+  """Date and time when the payment context expires."""
+  expiresAt: Timestamp
+
+  """The single-use Venmo account payment method ID."""
+  paymentMethodId: ID
+
+  """Analytics data of the SDK where the QR code was scanned."""
+  clientSDKMetadata: ClientSDKMetadata
+
+  """
+  Deprecated: This field is included for supporting legacy clients. Please use `payerInfo.userName` instead.
+  
+  The username associated with the payment.
+  """
+  userName: String
+
+  """
+  Whether the `paymentMethodId` may be used to make a one time payment
+  (`SINGLE_USE`) or to create a vaulted multi-use payment token (`MULTI_USE`).
+  This field will only be populated when the context was created by the
+  `createVenmoPaymentContext` mutation, it will be `null` if the context was
+  created by the deprecated `createVenmoQRCodePaymentContext` mutation.
+  """
+  paymentMethodUsage: PaymentMethodUsage
+
+  """
+  Client the customer used to initiate the transaction. This field will only be
+  populated when the context was created by the `createVenmoPaymentContext`
+  mutation, it will be `null` if the context was created by the deprecated
+  `createVenmoQRCodePaymentContext` mutation.
+  """
+  customerClient: CustomerClient
+
+  """
+  An identifier representing the profile of the merchant used to initiate the transaction.
+  """
+  merchantProfileId: ID
+
+  """
+  The unique identifier of the parent payment context. The presence of this
+  field indicates that a customer has previously consented to all future
+  purchases with this merchant, so they should not be asked again for this
+  specific merchant.
+  """
+  parentPaymentContextId: ID
+
+  """
+  The sub-merchant display name shown on the Venmo app consent screen. This
+  field will only be present for PayFast channel partner merchants.
+  """
+  displayName: String
+
+  """Information about the payer's Venmo account."""
+  payerInfo: VenmoPayerInfo
+
+  """Details about the information to be displayed on the paysheet."""
+  paysheetDetails: VenmoPaysheetDetails
+
+  """URL for redirecting back to merchant app on the client."""
+  returnUrl: URL
+}
+
+"""Top-level fields returned when creating a Venmo payment context."""
+type VenmoPaymentContextPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The payment context object."""
+  venmoPaymentContext: VenmoPaymentContext
+}
+
+"""The status of the Venmo payment context."""
+enum VenmoPaymentContextStatus {
+  """Venmo user has approved the payment."""
+  APPROVED
+
+  """Venmo user has canceled the payment."""
+  CANCELED
+
+  """The Venmo payment context is created."""
+  CREATED
+
+  """The window for payment has expired and the context was ended."""
+  EXPIRED
+
+  """The payment failed and the context was ended."""
+  FAILED
+
+  """Venmo user has scanned the QR code."""
+  SCANNED
+}
+
+"""Details about the information to be displayed on the Venmo paysheet."""
+type VenmoPaysheetDetails {
+  """
+  Indicates whether to collect a billing address from the customer on the paysheet.
+  """
+  collectCustomerBillingAddress: Boolean
+
+  """
+  Indicates whether to collect a shipping address from the customer on the paysheet.
+  """
+  collectCustomerShippingAddress: Boolean
+
+  """The different amounts and line items belonging to the transaction."""
+  transactionDetails: VenmoPaysheetTransactionDetails
+}
+
+"""Input fields for paysheet details."""
+input VenmoPaysheetDetailsInput {
+  """
+  Indicates whether to collect a billing address from the customer on the paysheet.
+  """
+  collectCustomerBillingAddress: Boolean
+
+  """
+  Indicates whether to collect a shipping address from the customer on the paysheet.
+  """
+  collectCustomerShippingAddress: Boolean
+
+  """
+  Input fields for transaction details to be displayed on the Venmo Paysheet.
+  """
+  transactionDetails: VenmoPaysheetTransactionDetailsInput
+}
+
+"""
+Details about the different amounts and line items belonging to a transaction.
+"""
+type VenmoPaysheetTransactionDetails {
+  """
+  The subtotal amount of the transaction. Either a whole number or a number with two decimal places. Must be non-negative.
+  """
+  subTotalAmount: Amount
+
+  """
+  The tax amount of the transaction. Either a whole number or a number with two decimal places. Must be non-negative.
+  """
+  taxAmount: Amount
+
+  """
+  The total discount applied to the transaction. Either a whole number or a
+  number with two decimal places. Must be non-negative.
+  """
+  discountAmount: Amount
+
+  """
+  The shipping amount for the transaction. Either a whole number or a number with two decimal places. Must be non-negative.
+  """
+  shippingAmount: Amount
+
+  """
+  The grand total amount of the transaction. Either a whole number or a number
+  with two decimal places. Must be non-negative.
+  """
+  totalAmount: Amount
+
+  """
+  The list of line items belonging to the transaction. Can include up to 249 line items.
+  """
+  lineItems: [PaypalLineItem!]
+}
+
+"""
+Input fields for the transaction details to be displayed on the Venmo Paysheet.
+"""
+input VenmoPaysheetTransactionDetailsInput {
+  """
+  The subtotal amount of the transaction. Either a whole number or a number with two decimal places. Must be non-negative.
+  """
+  subTotalAmount: Amount
+
+  """
+  The tax amount of the transaction. Either a whole number or a number with
+  exactly two decimal places. Must be non-negative.
+  """
+  taxAmount: Amount
+
+  """
+  The total discount applied to the transaction. Either a whole number or a
+  number with two decimal places. Must be non-negative.
+  """
+  discountAmount: Amount
+
+  """
+  The shipping amount for the transaction. Either a whole number or a number with two decimal places. Must be non-negative.
+  """
+  shippingAmount: Amount
+
+  """
+  The grand total amount of the transaction. Either a whole number or a number
+  with two decimal places. Must be non-negative.
+  """
+  totalAmount: Amount!
+
+  """
+  The list of line items belonging to the transaction. Can include up to 249 line items.
+  """
+  lineItems: [PayPalLineItemInput!]
 }
 
 """
