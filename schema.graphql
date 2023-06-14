@@ -9113,6 +9113,17 @@ type Transaction implements Node & Payment {
   """
   retried: Boolean
 
+  """
+  If this transaction is an automatic retry of a previous, failed transaction,
+  this is the parent transaction that was retried.
+  """
+  retriedParentTransaction: Transaction
+
+  """
+  If this transaction was automatically retried, this is a collection of all the retry transactions.
+  """
+  retriedTransactions: [Transaction!]
+
   """Installment details associated with the transaction."""
   installmentDetails: TransactionInstallmentDetails
 

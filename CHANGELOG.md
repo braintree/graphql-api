@@ -1,3 +1,8 @@
+# 06-14-2023
+
+* Add `retiredParentTransaction` field to `Transaction` type
+* Add `retriedTransactions` field to `Transaction` type
+
 # 06-06-2023
 
 * Add `ClientSDKMetadata` type.
