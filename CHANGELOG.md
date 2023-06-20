@@ -1,3 +1,41 @@
+# 06-20-2023
+
+* Remove `ConfirmationPromptAlignment` enum.
+* Add new enum
+    * `DecimalPlaces` enum for `CustomFieldName`.
+    * `InStoreReaderDisplayAlignment` enum to `InStoreReaderConnectionEdge` type.
+    * `InStoreReaderTextPromptType` enum to `InStoreReaderSetupInput` input.
+* Add new input
+    * `InStoreAuthorizationInput`
+    * `RequestAmountPromptFromInStoreReaderInput`
+    * `RequestAuthorizeFromInStoreReaderInput`
+    * `RequestNonPciCardDataFromInStoreReaderInput`
+    * `RequestTextPromptFromInStoreReaderInput`
+* Add new mutation
+    * `requestAuthorizationFromInStoreReader`
+    * `requestNonPciCardDataFromInStoreReader`
+    * `requestAmountPromptFromInStoreReader`
+    * `requestTextPromptFromInstoreReader`
+* Add new union
+    * `NonPciCardData`
+* Add new type
+    * `NonPciFinancialCardMagneticStripeData`
+    * `RequestAmountPromptInStoreContext`
+    * `RequestAuthorizeInStoreContext`
+    * `RequestNonPciCardDataInStoreContext`
+    * `RequestTextPromptInStoreContext`
+* Add new field
+    * In `RequestSignaturePropmtFromInStoreReaderInput`
+        * `waitForNextRequest`
+        * `displayTimeout`
+    * In `RequestTextDispalyFromInStoreReaderInput`
+        * `title`
+        * `alignment`
+        * `waitForNextRequest`
+        * `displayTimeout`
+* Deprecate `reason` for `RefundInput`
+* Change type of `alignment` field in `RequestConfirmationPromptFromInStoreReaderInput` to `InStoreReaderDisplayAlignment`
+
 # 06-14-2023
 
 * Add `retiredParentTransaction` field to `Transaction` type

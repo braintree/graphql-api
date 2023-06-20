@@ -1111,14 +1111,6 @@ input ClientTokenInput {
   customerId: ID
 }
 
-"""
-The alignment of the confirmation prompt text when displayed on the in-store reader.
-"""
-enum ConfirmationPromptAlignment {
-  CENTER
-  LEFT
-}
-
 """Top-level input field for confirming micro-transfer values."""
 input ConfirmMicroTransferAmountsInput {
   """
@@ -2170,6 +2162,13 @@ scalar CVV
 
 """A date in the format YYYY-MM-DD."""
 scalar Date
+
+"""The allowed digits to the right of the decimal point."""
+enum DecimalPlaces {
+  THREE
+  TWO
+  ZERO
+}
 
 """Top-level input fields for deleting a customer."""
 input DeleteCustomerInput {
@@ -3295,6 +3294,63 @@ type IDealConfiguration {
   assetsUrl: String
 }
 
+"""Input fields for creating an in-store authorization."""
+input InStoreAuthorizationInput {
+  """
+  Billing amount of the request. This value must be greater than 0, and must
+  match the currency format of the merchant account. This can only contain
+  numbers and one decimal point (e.g. x.xx). Can't be greater than the maximum
+  allowed by the processor.
+  """
+  amount: Amount!
+
+  """
+  Merchant account ID used to process the transaction. Currency is also
+  determined by merchant account ID. If no merchant account ID is specified, we
+  will use your default merchant account.
+  """
+  merchantAccountId: ID
+
+  """
+  Additional information about the transaction. On PayPal transactions, this
+  field maps to the PayPal invoice number. PayPal invoice numbers must be unique
+  in your PayPal business account. Maximum 255 characters or 127 for PayPal transactions.
+  """
+  orderId: String
+
+  """
+  Collection of custom field/value pairs. You must [set up each custom field in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#creating-a-custom-field)
+  prior to passing it with a request.
+  """
+  customFields: [CustomFieldInput!]
+
+  """
+  Fields used to define what will appear on a customer's bank statement for a specific purchase.
+  """
+  descriptor: TransactionDescriptorInput
+
+  """
+  If charging a single-use payment method, optional ID of a customer to
+  associate the transaction with. If vaulting the single-use payment method,
+  this customer will be associated with the resulting multi-use payment method.
+  """
+  customerId: ID
+
+  """
+  When a single-use payment method is used to create this transaction, it can be
+  automatically stored in the vault after transacting. If this field is left
+  blank, the single-use payment method will not be vaulted.
+  """
+  vaultPaymentMethodAfterTransacting: VaultPaymentMethodAfterTransactingInput
+
+  """
+  For partners and shopping carts only. If you are a shopping cart provider or
+  other Braintree partner, pass a string identifier for your service. For PayPal
+  transactions, this maps to paypal.bn_code.
+  """
+  channel: String
+}
+
 """Reference object for an in-store request."""
 type InStoreContext implements Node & InStoreContextResult {
   """A unique ID for this in-store request."""
@@ -3605,6 +3661,12 @@ type InStoreReaderConnectionEdge {
   node: InStoreReader
 }
 
+"""The alignment of the text when displayed on the in-store reader."""
+enum InStoreReaderDisplayAlignment {
+  CENTER
+  LEFT
+}
+
 """
 Additional information about the payment method supplied by an in-store payment reader.
 """
@@ -3656,6 +3718,17 @@ input InStoreReaderSetupInput {
 
   """Name given to the Reader."""
   name: String
+}
+
+"""
+The type of text prompt on the in-store reader. If any of the SENSITIVE values
+are selected, the input characters will be masked on the device display.
+"""
+enum InStoreReaderTextPromptType {
+  ALPHANUMERIC
+  NUMERIC
+  SENSITIVE_ALPHANUMERIC
+  SENSITIVE_NUMERIC
 }
 
 """A union of all possible in-store reader vendors."""
@@ -4528,6 +4601,9 @@ type Mutation {
   """Request an in-store reader to begin the charge flow."""
   requestChargeFromInStoreReader(input: RequestChargeFromInStoreReaderInput!): InStoreContextPayload
 
+  """Request an in-store reader to begin the authorize flow."""
+  requestAuthorizeFromInStoreReader(input: RequestAuthorizeFromInStoreReaderInput!): InStoreContextPayload
+
   """Request an in-store reader to cancel the charge flow."""
   requestCancelFromInStoreReader(input: RequestCancelFromInStoreReaderInput!): InStoreContextPayload
 
@@ -4553,6 +4629,17 @@ type Mutation {
 
   """Request an in-store reader to display a confirmation prompt."""
   requestConfirmationPromptFromInStoreReader(input: RequestConfirmationPromptFromInStoreReaderInput!): InStoreContextPayload
+
+  """
+  Request an in-store reader to collect non [PCI-scoped](https://www.braintreepayments.com/blog/understanding-pci-dss-compliance) card data.
+  """
+  requestNonPciCardDataFromInStoreReader(input: RequestNonPciCardDataFromInStoreReaderInput!): InStoreContextPayload
+
+  """Request an in-store reader to display an amount prompt."""
+  requestAmountPromptFromInStoreReader(input: RequestAmountPromptFromInStoreReaderInput!): InStoreContextPayload
+
+  """Request an in-store reader to display a text prompt."""
+  requestTextPromptFromInStoreReader(input: RequestTextPromptFromInStoreReaderInput!): InStoreContextPayload
 
   """Create a Venmo payment context."""
   createVenmoPaymentContext(input: CreateVenmoPaymentContextInput!): VenmoPaymentContextPayload
@@ -4758,6 +4845,27 @@ enum NonInstantLocalPaymentMethodType {
   BOLETOBANCARIO
   MULTIBANCO
   OXXO
+}
+
+"""
+A union of all possible non [PCI-scoped](https://www.braintreepayments.com/blog/understanding-pci-dss-compliance)
+cards read from an in-store reader.
+"""
+union NonPciCardData = NonPciFinancialCardMagneticStripeData
+
+"""
+Financial card data from its magnetic stripe, read by an in-store reader.
+"""
+type NonPciFinancialCardMagneticStripeData {
+  """
+  Track 1 data from the non [PCI-scoped](https://www.braintreepayments.com/blog/understanding-pci-dss-compliance) card.
+  """
+  track1: String
+
+  """
+  Track 2 data from the non [PCI-scoped](https://www.braintreepayments.com/blog/understanding-pci-dss-compliance) card.
+  """
+  track2: String
 }
 
 """Information about an OAuth Application."""
@@ -6550,6 +6658,8 @@ input RefundInput {
   description: String
 
   """
+  Deprecated: Please use `description` instead.
+  
   Reason of the refund transaction. This field maps to the PayPal refund reason.
   """
   reason: String
@@ -6715,6 +6825,107 @@ type Report {
   paymentLevelFees(date: Date!, merchantAccountId: ID): PaymentLevelFeeReport
 }
 
+"""Input fields for requesting an amount on an in-store reader."""
+input RequestAmountPromptFromInStoreReaderInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of the in-store reader to request an amount from."""
+  readerId: ID!
+
+  """Title to be displayed on the in-store reader. 1000 character maximum."""
+  title: String
+
+  """
+  Text to be displayed on the in-store reader. 65536 character maximum. '\n' line breaks will be respected.
+  """
+  text: String
+
+  """
+  The way the text is aligned when displayed on an in-store reader. Defaults to CENTER.
+  """
+  alignment: InStoreReaderDisplayAlignment
+
+  """
+  Once the customer submits a response, a loading screen should be displayed on
+  the in-store reader until the next request comes in. The screen saver is
+  displayed by default.
+  """
+  waitForNextRequest: Boolean
+
+  """
+  Display timeout in seconds. This is the time allotted for the user to complete their input. Defaults to 120 seconds.
+  """
+  displayTimeout: Int
+
+  """
+  The number of digits that appear after the decimal point in the amount.
+  Defaults to TWO. Allowed to be ZERO, TWO, or THREE.
+  """
+  decimalPlaces: DecimalPlaces
+
+  """
+  Text for the cancellation button to be displayed on the in-store reader. 20 character maximum. Defaults to 'Cancel'.
+  """
+  cancellationText: String
+
+  """
+  Text for the confirmation button to be displayed on the in-store reader. 20 character maximum. Defaults to 'Submit'.
+  """
+  confirmationText: String
+}
+
+"""Reference object for an in-store reader amount prompt."""
+type RequestAmountPromptInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this amount prompt request."""
+  id: ID!
+
+  """The reader from which the amount prompt was requested."""
+  reader: InStoreReader
+
+  """
+  The status of the context created when the amount prompt was requested.
+  """
+  status: InStoreContextStatus!
+
+  """The amount collected by the in-store reader."""
+  amountPromptResult: Amount
+}
+
+"""Input fields for requesting an authorization from an in-store reader."""
+input RequestAuthorizeFromInStoreReaderInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of the Reader to request an authorization from."""
+  readerId: ID!
+
+  """Information about the requested in-store transaction."""
+  transaction: InStoreAuthorizationInput!
+}
+
+"""Reference object for an in-store authorize request."""
+type RequestAuthorizeInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this authorize request."""
+  id: ID!
+
+  """The reader from which the authorize was requested."""
+  reader: InStoreReader
+
+  """
+  The status of the context created when the authorize was requested. A status
+  of COMPLETE does not indicate a successful payment.
+  """
+  status: InStoreContextStatus!
+
+  """The transaction representing the authorization on the payment method."""
+  transaction: Transaction
+}
+
 """Input fields for requesting a cancel during an in-store charge flow."""
 input RequestCancelFromInStoreReaderInput {
   """
@@ -6781,7 +6992,19 @@ input RequestConfirmationPromptFromInStoreReaderInput {
   """
   The way the text is aligned when displayed on an in-store reader. Defaults to CENTER.
   """
-  alignment: ConfirmationPromptAlignment
+  alignment: InStoreReaderDisplayAlignment
+
+  """
+  Once the customer submits a response, a loading screen should be displayed on
+  the in-store reader until the next request comes in. The screen saver is
+  displayed by default.
+  """
+  waitForNextRequest: Boolean
+
+  """
+  Display timeout in seconds. This is the time allotted for the user to complete their input. Defaults to 120 seconds.
+  """
+  displayTimeout: Int
 
   """
   Text for the cancellation option to be displayed on the in-store reader. 20 character maximum.
@@ -6875,6 +7098,67 @@ input RequestItemDisplayFromInStoreReaderInput {
   discountAmount: Amount
 }
 
+"""
+Input fields for requesting non [PCI-scoped](https://www.braintreepayments.com/blog/understanding-pci-dss-compliance)
+card data from an in-store reader.
+"""
+input RequestNonPciCardDataFromInStoreReaderInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of the Reader to request card data from."""
+  readerId: ID!
+
+  """
+  Title to be displayed on the in-store reader. 1000 character maximum. '\n' line breaks will be respected.
+  """
+  title: String
+
+  """
+  Large text to be displayed on the in-store reader directly below the title.
+  1000 character maximum. '\n' line breaks will be respected.
+  """
+  textAreaOne: String
+
+  """
+  Text to be displayed on the in-store reader. 1000 character maximum. '\n' line breaks will be respected.
+  """
+  textAreaTwo: String
+
+  """
+  Once the customer submits a response, a loading screen should be displayed on
+  the in-store reader until the next request comes in. The screen saver is
+  displayed by default.
+  """
+  waitForNextRequest: Boolean
+
+  """
+  Display timeout in seconds. This is the time allotted for the user to complete
+  their input. Defaults to 120 seconds. Unsuccessful input attempts will reset the timer.
+  """
+  displayTimeout: Int
+}
+
+"""
+Reference object for an in-store reader non [PCI-scoped](https://www.braintreepayments.com/blog/understanding-pci-dss-compliance)
+card data request.
+"""
+type RequestNonPciCardDataInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this card data request."""
+  id: ID!
+
+  """The reader from which the card data was requested."""
+  reader: InStoreReader
+
+  """The status of the context created when the card data was requested."""
+  status: InStoreContextStatus!
+
+  """The non-pci data read from the card by the in-store reader."""
+  cardData: NonPciCardData
+}
+
 """Input fields for beginning the in-store refund flow."""
 input RequestRefundFromInStoreReaderInput {
   """
@@ -6921,6 +7205,18 @@ input RequestSignaturePromptFromInStoreReaderInput {
   title: String
 
   """
+  Once the customer submits a response, a loading screen should be displayed on
+  the in-store reader until the next request comes in. The screen saver is
+  displayed by default.
+  """
+  waitForNextRequest: Boolean
+
+  """
+  Display timeout in seconds. This is the time allotted for the user to complete their input. Defaults to 120 seconds.
+  """
+  displayTimeout: Int
+
+  """
   Text for the cancellation option to be displayed on the in-store reader. 20 character maximum.
   """
   cancellationText: String
@@ -6960,10 +7256,110 @@ input RequestTextDisplayFromInStoreReaderInput {
   """ID of the Reader to request a text display from."""
   readerId: ID!
 
+  """Title to be displayed on the in-store reader. 1000 character maximum."""
+  title: String
+
   """
-  Text to be displayed on the in-store reader. 255 character maximum. '\n' line breaks will be respected.
+  The way the text is aligned when displayed on an in-store reader. Defaults to CENTER.
+  """
+  alignment: InStoreReaderDisplayAlignment
+
+  """
+  Text to be displayed on the in-store reader. 65536 character maximum. '\n' line breaks will be respected.
   """
   text: String!
+
+  """
+  Once the customer submits a response, a loading screen should be displayed on
+  the in-store reader until the next request comes in. The screen saver is
+  displayed by default.
+  """
+  waitForNextRequest: Boolean
+
+  """
+  Display timeout in seconds. This is the time allotted for the user to complete their input. Defaults to 120 seconds.
+  """
+  displayTimeout: Int
+}
+
+"""Input fields for requesting a text on an in-store reader."""
+input RequestTextPromptFromInStoreReaderInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of the in-store reader to request a text prompt from."""
+  readerId: ID!
+
+  """Title to be displayed on the in-store reader. 1000 character maximum."""
+  title: String
+
+  """
+  Text to be displayed on the in-store reader. 65536 character maximum. '\n' line breaks will be respected.
+  """
+  text: String
+
+  """
+  The way the text is aligned when displayed on an in-store reader. Defaults to CENTER.
+  """
+  alignment: InStoreReaderDisplayAlignment
+
+  """
+  Once the customer submits a response, a loading screen should be displayed on
+  the in-store reader until the next request comes in. The screen saver is
+  displayed by default.
+  """
+  waitForNextRequest: Boolean
+
+  """
+  Display timeout in seconds. This is the time allotted for the user to complete their input. Defaults to 120 seconds.
+  """
+  displayTimeout: Int
+
+  """The input types available for user input."""
+  inputType: InStoreReaderTextPromptType!
+
+  """
+  Placeholder text in the input box to indicate to the user the expected input format.
+  """
+  inputPlaceholder: String
+
+  """
+  Custom format used for text input, where the '*' symbol indicates a mandatory
+  input character, and all other characters are treated as literals. For
+  instance, a phone number format in the US would be '(***) ***-****', while a
+  zip code format would be '*****'.
+  """
+  inputFormat: String
+
+  """
+  Text for the cancellation button to be displayed on the in-store reader. 20 character maximum. Defaults to 'Cancel'.
+  """
+  cancellationText: String
+
+  """
+  Text for the confirmation button to be displayed on the in-store reader. 20 character maximum. Defaults to 'Submit'.
+  """
+  confirmationText: String
+}
+
+"""Reference object for an in-store reader text prompt."""
+type RequestTextPromptInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this text prompt request."""
+  id: ID!
+
+  """The reader from which the text prompt was requested."""
+  reader: InStoreReader
+
+  """The status of the context created when the text prompt was requested."""
+  status: InStoreContextStatus!
+
+  """The input types available for user input."""
+  inputType: InStoreReaderTextPromptType
+
+  """The text collected by the in-store reader."""
+  textPromptResult: String
 }
 
 """Input fields for beginning the in-store charge flow."""
