@@ -2473,7 +2473,7 @@ interface DisputeEvidence {
 
 """The evidence category that specifies which requirement it satisfies."""
 enum DisputeEvidenceCategory {
-  AVS_RESPONSE
+  AVS_RESPONSE @deprecated(reason: "AVS_RESPONSE from the original transaction is provided on your behalf when submitting a dispute.")
   CARRIER_NAME
   CARRIER_NAME_OTHER
   CREDIT_ISSUED_AMOUNT
@@ -2722,7 +2722,7 @@ type DisputeTextEvidence implements DisputeEvidence {
 For text evidence: the evidence category that specifies which requirement it satisfies.
 """
 enum DisputeTextEvidenceCategory {
-  AVS_RESPONSE
+  AVS_RESPONSE @deprecated(reason: "AVS_RESPONSE from the original transaction is provided on your behalf when submitting a dispute.")
   CARRIER_NAME
   CREDIT_ISSUED_AMOUNT
   CREDIT_ISSUED_DATE_TIME
@@ -11537,14 +11537,14 @@ type VerifoneVendor {
   serialNumber: String
 }
 
-"""Top-level input field for verifying a multi-use credit card."""
+"""Top-level input field for verifying a credit card."""
 input VerifyCreditCardInput {
   """
   An identifier used to reconcile requests and responses. 255 characters maximum.
   """
   clientMutationId: String
 
-  """ID of an existing multi-use payment method to be vaulted."""
+  """ID of the payment method to be verified."""
   paymentMethodId: ID!
 
   """ID of the merchant account to use when verifying the credit card."""

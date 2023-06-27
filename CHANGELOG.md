@@ -1,3 +1,7 @@
+# 06-27-2023
+
+* Deprecate `AVS_RESPONSE` enum value for `DisputeEvidenceCategory` and `DisputeTextEvidenceCategory` enum.
+
 # 06-20-2023
 
 * Remove `ConfirmationPromptAlignment` enum.
