@@ -190,14 +190,14 @@ input AddressInput {
   NPA, PIN, PLZ, or ZIP code. Nine alphanumeric characters maximum, may also
   contain spaces and hyphens.
   
-  *Required for Level 3 processing*.
+  *Required in the shipping address for Level 3 processing*.
   """
   postalCode: String
 
   """
   Country code for the address.
   
-  *Required for Level 3 processing*.
+  *Required in the shipping address for Level 3 processing*.
   """
   countryCode: CountryCode
 
@@ -1593,6 +1593,12 @@ type CreditCardConfiguration {
 
   """Whether or not fraud data collection is enabled for the merchant."""
   fraudDataCollectionEnabled: Boolean
+}
+
+"""The location of customer in the transaction."""
+enum CreditCardCustomerLocation {
+  INTERNATIONAL
+  US
 }
 
 """Details about a credit card."""
@@ -3415,7 +3421,7 @@ enum InStoreContextStatus {
 
   """
   Partially successful. The context was ended but only partially authorized.
-  Please note that partial authorizations are ONLY supported on versions >=
+  Please note that partial authorizations are only supported on versions >=
   5.0.0 of the in-store reader payment application.
   """
   PARTIALLY_COMPLETE
@@ -4601,7 +4607,9 @@ type Mutation {
   """Request an in-store reader to begin the charge flow."""
   requestChargeFromInStoreReader(input: RequestChargeFromInStoreReaderInput!): InStoreContextPayload
 
-  """Request an in-store reader to begin the authorize flow."""
+  """
+  Request an in-store reader to begin the authorize flow. Only supported on payment application versions >= 5.1.0.
+  """
   requestAuthorizeFromInStoreReader(input: RequestAuthorizeFromInStoreReaderInput!): InStoreContextPayload
 
   """Request an in-store reader to cancel the charge flow."""
@@ -4624,21 +4632,30 @@ type Mutation {
   """
   requestFirmwareUpdateFromInStoreReader(input: RequestFirmwareUpdateFromInStoreReaderInput!): InStoreContextPayload
 
-  """Request an in-store reader to display a signature prompt."""
+  """
+  Request an in-store reader to display a signature prompt. Only supported on payment application versions >= 3.3.0.
+  """
   requestSignaturePromptFromInStoreReader(input: RequestSignaturePromptFromInStoreReaderInput!): InStoreContextPayload
 
-  """Request an in-store reader to display a confirmation prompt."""
+  """
+  Request an in-store reader to display a confirmation prompt. Only supported on payment application versions >= 3.3.0.
+  """
   requestConfirmationPromptFromInStoreReader(input: RequestConfirmationPromptFromInStoreReaderInput!): InStoreContextPayload
 
   """
-  Request an in-store reader to collect non [PCI-scoped](https://www.braintreepayments.com/blog/understanding-pci-dss-compliance) card data.
+  Request an in-store reader to collect non [PCI-scoped](https://www.braintreepayments.com/blog/understanding-pci-dss-compliance)
+  card data. Only supported on payment application versions >= 5.2.0.
   """
   requestNonPciCardDataFromInStoreReader(input: RequestNonPciCardDataFromInStoreReaderInput!): InStoreContextPayload
 
-  """Request an in-store reader to display an amount prompt."""
+  """
+  Request an in-store reader to display an amount prompt. Only supported on payment application versions >= 5.2.0.
+  """
   requestAmountPromptFromInStoreReader(input: RequestAmountPromptFromInStoreReaderInput!): InStoreContextPayload
 
-  """Request an in-store reader to display a text prompt."""
+  """
+  Request an in-store reader to display a text prompt. Only supported on payment application versions >= 5.2.0.
+  """
   requestTextPromptFromInStoreReader(input: RequestTextPromptFromInStoreReaderInput!): InStoreContextPayload
 
   """Create a Venmo payment context."""
@@ -6997,12 +7014,14 @@ input RequestConfirmationPromptFromInStoreReaderInput {
   """
   Once the customer submits a response, a loading screen should be displayed on
   the in-store reader until the next request comes in. The screen saver is
-  displayed by default.
+  displayed by default. Only supported on payment application versions >= 5.2.0.
   """
   waitForNextRequest: Boolean
 
   """
-  Display timeout in seconds. This is the time allotted for the user to complete their input. Defaults to 120 seconds.
+  Display timeout in seconds. This is the time allotted for the user to complete
+  their input. Defaults to 120 seconds. Only supported on payment application
+  versions >= 5.2.0.
   """
   displayTimeout: Int
 
@@ -7207,12 +7226,14 @@ input RequestSignaturePromptFromInStoreReaderInput {
   """
   Once the customer submits a response, a loading screen should be displayed on
   the in-store reader until the next request comes in. The screen saver is
-  displayed by default.
+  displayed by default. Only supported on payment application versions >= 5.2.0.
   """
   waitForNextRequest: Boolean
 
   """
-  Display timeout in seconds. This is the time allotted for the user to complete their input. Defaults to 120 seconds.
+  Display timeout in seconds. This is the time allotted for the user to complete
+  their input. Defaults to 120 seconds. Only supported on payment application
+  versions >= 5.2.0.
   """
   displayTimeout: Int
 
@@ -7256,11 +7277,15 @@ input RequestTextDisplayFromInStoreReaderInput {
   """ID of the Reader to request a text display from."""
   readerId: ID!
 
-  """Title to be displayed on the in-store reader. 1000 character maximum."""
+  """
+  Title to be displayed on the in-store reader. 1000 character maximum. Only
+  supported on payment application versions >= 5.2.0.
+  """
   title: String
 
   """
-  The way the text is aligned when displayed on an in-store reader. Defaults to CENTER.
+  The way the text is aligned when displayed on an in-store reader. Defaults to
+  CENTER. Only supported on payment application versions >= 5.2.0.
   """
   alignment: InStoreReaderDisplayAlignment
 
@@ -7272,12 +7297,14 @@ input RequestTextDisplayFromInStoreReaderInput {
   """
   Once the customer submits a response, a loading screen should be displayed on
   the in-store reader until the next request comes in. The screen saver is
-  displayed by default.
+  displayed by default. Supported on payment application version >= 5.2.0.
   """
   waitForNextRequest: Boolean
 
   """
-  Display timeout in seconds. This is the time allotted for the user to complete their input. Defaults to 120 seconds.
+  Display timeout in seconds. This is the time allotted for the user to complete
+  their input. Defaults to 120 seconds. Only supported on payment application
+  versions >= 5.2.0.
   """
   displayTimeout: Int
 }
@@ -7743,6 +7770,17 @@ input SearchCreditCardBrandCodeInput {
 }
 
 """
+Input fields for searching for a transaction created with a give credit card customer location.
+"""
+input SearchCreditCardCustomerLocationInput {
+  """The creditCardCustomerLocation is exactly this value."""
+  is: CreditCardCustomerLocation
+
+  """The creditCardCustomerLocation is one of these values."""
+  in: [CreditCardCustomerLocation!]
+}
+
+"""
 Input fields for searching for payments by payment method snapshot credit card expiration date criteria.
 """
 input SearchCreditCardExpirationDateInput {
@@ -7845,6 +7883,9 @@ input SearchPaymentCreditCardDetailsInput {
 
   """The brand code of the credit card number used for the payment."""
   brandCode: SearchCreditCardBrandCodeInput
+
+  """Find transaction by the credit card customer location."""
+  customerLocation: SearchCreditCardCustomerLocationInput
 }
 
 """Input fields for searching payments by customer."""
@@ -8690,6 +8731,17 @@ type ThreeDSecureDetails {
   transactionStatusReason: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.transactionStatusReason instead.")
 }
 
+"""The 3D Secure device channel."""
+enum ThreeDSecureDeviceChannel {
+  BROWSER
+
+  """For transactions initiated with Cardinal Mobile SDK."""
+  SDK
+
+  """For Merchant Initiated or 3RI transactions."""
+  THREE_R_I
+}
+
 """ The billing address of the cardholder sent with 3D Secure Lookup requests.
 """
 input ThreeDSecureLookupBillingAddressInput {
@@ -8726,6 +8778,42 @@ input ThreeDSecureLookupBillingAddressInput {
 
   """Postal code of billing address used for verification."""
   postalCode: String
+}
+
+"""Information about the cardholder's browser."""
+input ThreeDSecureLookupBrowserInformationInput {
+  """Whether the cardholder browser can execute Java."""
+  javaEnabled: Boolean
+
+  """Whether the cardholder browser can execute JavaScript."""
+  javascriptEnabled: Boolean
+
+  """
+  The exact content of the HTTP accept headers sent from the cardholder's browser.
+  """
+  acceptHeader: String
+
+  """The browser language as defined in IETF BCP47."""
+  language: String
+
+  """
+  The bit depth of the color palette for displaying images, in bits per pixel.
+  """
+  colorDepth: Int
+
+  """Total height of the cardholder's screen in pixels."""
+  screenHeight: Int
+
+  """Total width of the cardholder's screen in pixels."""
+  screenWidth: Int
+
+  """
+  Time difference between UTC time and the cardholder browser local time, in minutes.
+  """
+  timeZone: Int
+
+  """The exact content of the HTTP user agent header."""
+  userAgent: String
 }
 
 """
@@ -9017,8 +9105,15 @@ input ThreeDSecureLookupTransactionInformationInput {
   """Tax amount."""
   taxAmount: Amount
 
-  """The exact content of the HTTP user agent header."""
+  """
+  Deprecated: Please use `ThreeDSecureLookupBrowserInformationInput.userAgent` instead.
+  
+  The exact content of the HTTP user agent header.
+  """
   userAgent: String
+
+  """Information about the cardholder's browser."""
+  browserInformation: ThreeDSecureLookupBrowserInformationInput
 
   """
   Indicates the maximum number of authorizations for installment payments. An
@@ -9041,6 +9136,9 @@ input ThreeDSecureLookupTransactionInformationInput {
   of 28 days will be used to indicate months. Example: 6 months = 168.
   """
   recurringFrequency: Int
+
+  """The channel for the transaction."""
+  deviceChannel: ThreeDSecureDeviceChannel
 }
 
 """Results of a merchant-performed 3D Secure authentication."""

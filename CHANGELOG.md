@@ -1,3 +1,17 @@
+# 08-08-2023
+
+* Update schema descriptions for clearer documentation
+* Add new enum
+  * `CreditCardCustomerLocation` for `SearchCreditCardCustomerLocationInput`
+  * `ThreeDSecureDeviceChannel` for `ThreeDSecureDetails`
+* Add new input
+  * `SearchCreditCardLocationInput`
+  * `ThreeDSecureLookupBrowserInformationInput
+* Add new field
+  * `customerLocation` to `SearchPaymentCreditCardDetailsInput`
+  * `browserInformation` to `ThreeDecureLookupTransactionInformationInput`
+  * `deviceChannel` to `ThreeDSecureLookupTransactionInformationInput`
+
 # 06-27-2023
 
 * Deprecate `AVS_RESPONSE` enum value for `DisputeEvidenceCategory` and `DisputeTextEvidenceCategory` enum.
