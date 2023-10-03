@@ -1,3 +1,27 @@
+# 10-03-2023
+
+* Add new field / value
+    * `metaCheckout` for `ClientConfiguration`
+    * `MetaCheckoutOriginDetails` for `PaymentMethodOriginDetails` union
+    * `META_CHECKOUT` to `PaymentMethodOriginType`
+    * `CREDIT_CARD_VIA_META_CHECKOUT` to `PaymentMethodShapshotSearchType` enum
+    * `selectedFinancingOption` for `PayPalAccountDetails`
+    * `statusReason` for `RequestAuthorizeInStoreContext` and `RequestChargeInStoreContext`
+    * `processingOverrides` for `TransactionInput`
+    * `threeDSecureAuthenticationId` for `VaultCreditCardInput` and `VaultPaymentMethodInput`
+* Deprecate
+    * `PARTIALLY_COMPLETE` value for `InStoreContextStatusi`
+    * `privacyUrl` for `PayPalConfiguration`
+    * `userAgreementUrl` for `PayPalConfiguration`
+* Add new enum
+    * `InStoreTransactionContextStatusReason`
+* Add new type
+    * `MetaCheckoutConfiguration`
+    * `MetaCheckoutOriginDetails`
+* Add new input
+    * `TransactionProcessingOverridesInput`
+
+
 # 08-08-2023
 
 * Update schema descriptions for clearer documentation

@@ -1055,6 +1055,9 @@ type ClientConfiguration {
   """Configuration for Visa Checkout."""
   visaCheckout: VisaCheckoutConfiguration
 
+  """Configuration for Meta Checkout."""
+  metaCheckout: MetaCheckoutConfiguration
+
   """
   A list of challenges that are required by the current merchant to process a given credit card.
   """
@@ -3424,7 +3427,7 @@ enum InStoreContextStatus {
   Please note that partial authorizations are only supported on versions >=
   5.0.0 of the in-store reader payment application.
   """
-  PARTIALLY_COMPLETE
+  PARTIALLY_COMPLETE @deprecated(reason: "This enum variant is being replaced with a new field on the transaction contexts.")
 
   """Flow in-progress. Waiting for reader or point of sale interaction."""
   PENDING
@@ -3774,6 +3777,18 @@ input InStoreRefundInput {
   Fields used to define what will appear on a customer's bank statement for a specific purchase.
   """
   descriptor: TransactionDescriptorInput
+}
+
+"""
+Additional information about an in-store charge or authorize context status.
+"""
+enum InStoreTransactionContextStatusReason {
+  """
+  The context was completed with a partially authorized transaction. Please note
+  that partial authorizations are only supported on versions >= 5.0.0 of the
+  in-store reader payment application.
+  """
+  PARTIALLY_AUTHORIZED
 }
 
 """Input fields for creating an in-store transaction."""
@@ -4267,6 +4282,34 @@ type MerchantAdviceCodeResponse {
 
   """The merchant advice code text."""
   message: String
+}
+
+"""Configuration for Meta Checkout."""
+type MetaCheckoutConfiguration {
+  """The Meta Checkout partner id."""
+  partnerId: String
+
+  """
+  The merchant identifier that must be supplied to Meta when onboarding a merchant for Meta Checkout.
+  """
+  partnerMerchantId: String
+
+  """A list of supported container types for Meta Checkout."""
+  supportedContainers: [String!]
+}
+
+"""
+Additional information about the payment method specific to Meta Checkout.
+"""
+type MetaCheckoutOriginDetails {
+  """A Meta assigned identifier for the transaction."""
+  containerId: String
+
+  """
+  The first 6 digits of the credit card, known as the Bank Identification
+  Number. This BIN may differ from the BIN of the customer's actual card.
+  """
+  bin: String
 }
 
 """A monetary amount with currency."""
@@ -5281,7 +5324,7 @@ A union of all possible payment method origin details.
 PaymentMethodOriginDetails contain additional information specific to the third
 party the payment method was provided by.
 """
-union PaymentMethodOriginDetails = ApplePayOriginDetails | GooglePayOriginDetails | MasterpassOriginDetails | NetworkTokenOriginDetails | SamsungPayOriginDetails | VisaCheckoutOriginDetails | PayPalLocalPaymentOriginDetails | CardPresentOriginDetails | EmvCardOriginDetails
+union PaymentMethodOriginDetails = ApplePayOriginDetails | GooglePayOriginDetails | MasterpassOriginDetails | MetaCheckoutOriginDetails | NetworkTokenOriginDetails | SamsungPayOriginDetails | VisaCheckoutOriginDetails | PayPalLocalPaymentOriginDetails | CardPresentOriginDetails | EmvCardOriginDetails
 
 """
 A value identifying the third-party origin from which a customer provided their payment method.
@@ -5291,6 +5334,7 @@ enum PaymentMethodOriginType {
   GOOGLE_PAY
   IN_STORE_READER
   MASTERPASS
+  META_CHECKOUT
   NETWORK_TOKEN
   PAYPAL
   SAMSUNG_PAY
@@ -5318,6 +5362,7 @@ enum PaymentMethodSnapshotSearchType {
   CREDIT_CARD_VIA_APPLE_PAY
   CREDIT_CARD_VIA_GOOGLE_PAY
   CREDIT_CARD_VIA_MASTERPASS
+  CREDIT_CARD_VIA_META_CHECKOUT
   CREDIT_CARD_VIA_NETWORK_TOKEN
   CREDIT_CARD_VIA_SAMSUNG_PAY
   CREDIT_CARD_VIA_VISA_CHECKOUT
@@ -5668,6 +5713,11 @@ type PayPalAccountDetails {
 
   """Limited use PayPal provided Order ID (starts with O-)."""
   limitedUseOrderId: String
+
+  """
+  Payer's selected financing option at the time of creating a transaction.
+  """
+  selectedFinancingOption: SelectedPayPalFinancingOptionDetails
 }
 
 """Input for identifying a PayPal account."""
@@ -5751,10 +5801,10 @@ type PayPalConfiguration {
   clientId: String
 
   """The merchant's privacy policy URL."""
-  privacyUrl: String
+  privacyUrl: String @deprecated(reason: "This field is deprecated and will no longer be returned")
 
   """The merchant's user agreement URL."""
-  userAgreementUrl: String
+  userAgreementUrl: String @deprecated(reason: "This field is deprecated and will no longer be returned")
 
   """
   A URL pointing to the base path of Braintree's web pages used for various browser switches and popups.
@@ -6941,6 +6991,9 @@ type RequestAuthorizeInStoreContext implements Node & InStoreContextResult {
 
   """The transaction representing the authorization on the payment method."""
   transaction: Transaction
+
+  """The reason for the context status."""
+  statusReason: InStoreTransactionContextStatusReason
 }
 
 """Input fields for requesting a cancel during an in-store charge flow."""
@@ -6984,6 +7037,9 @@ type RequestChargeInStoreContext implements Node & InStoreContextResult {
 
   """The transaction representing the charge on the payment method."""
   transaction: Transaction
+
+  """The reason for the context status."""
+  statusReason: InStoreTransactionContextStatusReason
 }
 
 """
@@ -9908,6 +9964,13 @@ input TransactionInput {
   used when creating a new customer for the newly-vaulted payment method.
   """
   customerDetails: TransactionCustomerDetailsInput
+
+  """
+  The values provided will take precedence over any similar fields, and will
+  only be used for processing. These values will not update any similar fields
+  and will not be returned in responses.
+  """
+  processingOverrides: TransactionProcessingOverridesInput
 }
 
 """Transaction Installment information."""
@@ -10161,6 +10224,33 @@ type TransactionPayload {
 
   """The transaction representing the charge on the payment method."""
   transaction: Transaction
+}
+
+"""
+Processing overrides are additional data fields to be used only for processing.
+Provided values will take precedence over any similar fields(e.g.
+`processingOverrides.customerEmail` takes precedence over the vaulted customer's
+email address).
+
+However, these values will not update any similar fields (e.g. providing
+`processingOverrides.customerEmail` will not update a vaulted customer's email
+address). These values are not returned in responses.
+"""
+input TransactionProcessingOverridesInput {
+  """Customer's email address to be used by the processor."""
+  customerEmail: String
+
+  """Customer's first name to be used by the processor."""
+  customerFirstName: String
+
+  """Customer's last name to be used by the processor."""
+  customerLastName: String
+
+  """
+  Customer's tax identifier to be used by the processor. It is the social
+  security number analogue for the corresponding country.
+  """
+  customerTaxIdentifier: String
 }
 
 """
@@ -10875,6 +10965,9 @@ input VaultCreditCardInput {
   """
   threeDSecurePassThrough: ThreeDSecurePassThroughInput
 
+  """ID of 3D Secure authentication performed using the Braintree SDK."""
+  threeDSecureAuthenticationId: String
+
   """
   Customer device information, which is sent directly to supported processors for fraud analysis.
   """
@@ -11028,6 +11121,9 @@ input VaultPaymentMethodInput {
   for you in our standard 3D Secure integration.
   """
   threeDSecurePassThrough: ThreeDSecurePassThroughInput
+
+  """ID of 3D Secure authentication performed using the Braintree SDK."""
+  threeDSecureAuthenticationId: String
 
   """
   Customer device information, which is sent directly to supported processors for fraud analysis.
