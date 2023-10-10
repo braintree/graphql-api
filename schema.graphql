@@ -1806,11 +1806,7 @@ type CreditCardVerificationDetails {
 
 """Input fields that specify options for verifying the credit card."""
 input CreditCardVerificationOptionsInput {
-  """
-  Deprecated: Please use `merchantAccountId` in the base input instead.
-  
-  ID of the merchant account to use when verifying the credit card.
-  """
+  """ID of the merchant account to use when verifying the credit card."""
   merchantAccountId: ID
 
   """The type of account to be used when verifying a combo card."""
@@ -4587,6 +4583,13 @@ type Mutation {
   before updating.
   """
   updateCreditCardBillingAddress(input: UpdateCreditCardBillingAddressInput!): UpdateCreditCardBillingAddressPayload
+
+  """
+  Set a new expiration date for a multi-use credit card payment method. By
+  default, this mutation will also verify the card with the new expiration date
+  before updating.
+  """
+  updateCreditCardExpirationDate(input: UpdateCreditCardExpirationDateInput!): UpdateCreditCardExpirationDatePayload
 
   """
   Attempt to perform 3D Secure Authentication on credit card payment method.
@@ -10475,13 +10478,64 @@ type UpdateCreditCardBillingAddressPayload {
   """
   clientMutationId: String
 
+  """The multi-use payment method which was updated."""
+  paymentMethod: PaymentMethod
+
   """
   The new billing address. Will be `null` if a failed verification prevented the update.
   """
-  billingAddress: Address
+  billingAddress: Address @deprecated(reason: "Use `paymentMethod.details.billingAddress` instead.")
 
   """
   The verification that was run on the payment method prior to updating the billing address, if present.
+  """
+  verification: Verification
+}
+
+"""
+Top-level input fields for updating a multi-use credit card to use a new expiration date.
+"""
+input UpdateCreditCardExpirationDateInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  The multi-use credit card for which the expiration date will be updated or added.
+  """
+  paymentMethodId: ID!
+
+  """
+  The new four-digit year associated with a credit card, formatted `YYYY`.
+  """
+  expirationYear: Year
+
+  """The new expiration month of a credit card, formatted `MM`."""
+  expirationMonth: Month
+
+  """
+  Input fields that specify options for verifying the credit card with the new
+  billing address. By default, a verification will be performed. If the
+  verification fails, the update will not be performed.
+  """
+  verification: CreditCardVerificationOptionsInput
+}
+
+"""
+Top-level fields returned when updating a multi-use credit card to a new expiration date.
+"""
+type UpdateCreditCardExpirationDatePayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """A single-use payment method."""
+  paymentMethod: PaymentMethod
+
+  """
+  The verification that was run on the payment method prior to updating the expiration date, if present.
   """
   verification: Verification
 }

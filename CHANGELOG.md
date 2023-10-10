@@ -1,3 +1,14 @@
+# 10-10-2023
+
+* Remove deprecation
+    * `merchantAccountId` for `CreditCardVerificationOptionsInput`
+* Add new mutation with assocaited input and payload
+    * `updateCreditCardExpirationDate`
+* Add new field / value
+    * `paymentMethod` for `UpdateCreditCardBillingAddressPayload`
+* Deprecate
+    * `billingAddress` for `UpdateCreditCardBillingAddressPayload`
+
 # 10-03-2023
 
 * Add new field / value
