@@ -1,3 +1,30 @@
+# 10-24-2023
+
+* Add field
+    * `industry` for `CaptureTransactionOptionsInput`, `InStoreAuthorizationInput`, `InStoreTransactionInput`, `PartialCaptureTransactionOptionsInput`, `TransactionInput`
+* Deprecate
+    * `evidenceSubmittable` for `Dispute`
+    * `updateTransactionCustomFields` mutation
+    * `UpdateTransactionCustomFieldsInput`
+    * `UpdateTransactionCustomFieldsPayload`
+* Add new input
+    * `IndustryAdditionalChargeInput`
+    * `IndustryCruiseInput`
+    * `IndustryFlightInput`
+    * `IndustryFlightLegInput`
+    * `IndustryLodgingInput`
+    * `TransactionIndustryInput`
+    * `UpdateCustomFieldsInput`
+* Add new enum
+    * `IndustryAdditionalChargeType`
+    * `IndustryCruiseTravelPackageType`
+* Update doc strings for `InStoreContextStatus` enum values
+* Update `InStoreLocation` type to implement `Node` interface
+* Add new mutation
+    * `updateCustomFields`
+* Add new type
+    * `UpdateCustomFieldsPayload`
+
 # 10-10-2023
 
 * Remove deprecation

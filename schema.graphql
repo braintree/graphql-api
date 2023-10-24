@@ -782,6 +782,11 @@ input CaptureTransactionOptionsInput {
   *Required for Level 2 processing*.
   """
   tax: TransactionTaxInput
+
+  """
+  Industry data information. Only one of the three sub-input fields can be provided.
+  """
+  industry: TransactionIndustryInput
 }
 
 """The type of account to be used when transacting with a combo card."""
@@ -2432,7 +2437,7 @@ type Dispute implements Node {
   """
   Indicates whether or not the merchant can upload evidence for this dispute based on its current status.
   """
-  evidenceSubmittable: Boolean
+  evidenceSubmittable: Boolean @deprecated(reason: "This field is redundant to `OPEN` status which represents disputes with allowed evidence submission. For all other statuses it is not possible to submit evidence.")
 
   """The pre-dispute program of the dispute."""
   preDisputeProgram: PreDisputeProgram
@@ -3299,6 +3304,212 @@ type IDealConfiguration {
   assetsUrl: String
 }
 
+"""Input fields for industry data additional charges."""
+input IndustryAdditionalChargeInput {
+  """The kind of charge."""
+  kind: IndustryAdditionalChargeType!
+
+  """The amount of the additional charge."""
+  amount: Amount!
+}
+
+"""The type of additional charge for industry data."""
+enum IndustryAdditionalChargeType {
+  GIFT_SHOP
+  LAUNDRY
+  MINI_BAR
+  OTHER
+  RESTAURANT
+  TELEPHONE
+}
+
+"""Input fields for industry cruise data."""
+input IndustryCruiseInput {
+  """The cruise travel package."""
+  travelPackage: IndustryCruiseTravelPackageType!
+
+  """The date of cruise check in."""
+  lodgingCheckInDate: Date
+
+  """The date of cruise check out."""
+  lodgingCheckOutDate: Date
+
+  """The date of cruise departure."""
+  departureDate: Date
+
+  """The cruise lodging name."""
+  lodgingName: String
+}
+
+"""The type of cruise travel package."""
+enum IndustryCruiseTravelPackageType {
+  CAR
+  FLIGHT
+  FLIGHT_AND_CAR
+  OTHER
+}
+
+"""Input fields for industry flight data."""
+input IndustryFlightInput {
+  """The passenger's first name."""
+  passengerFirstName: String
+
+  """The passenger's last name."""
+  passengerLastName: String
+
+  """The passenger's middle initial."""
+  passengerMiddleInitial: String
+
+  """The passenger's title (e.g. Mr, Ms)."""
+  passengerTitle: String
+
+  """The day on which the tickets were issued."""
+  issuedDate: Date
+
+  """The travel agency's name."""
+  travelAgencyName: String
+
+  """The travel agency's IATA code."""
+  travelAgencyCode: String
+
+  """The primary ticket number. Maximum 15 characters."""
+  ticketNumber: String
+
+  """
+  The ticket issuer's IATA code. Maximum 4 characters. For airline, code is
+  obtained from the Official Airline Guide or its equivalent. Required for
+  Reduced Interchange.
+  """
+  issuingCarrierCode: String
+
+  """
+  The code supplied by the customer using a purchase card. Maximum 17 characters.
+  """
+  customerCode: String
+
+  """The fare amount."""
+  fareAmount: Amount
+
+  """The fee amount."""
+  feeAmount: Amount
+
+  """The tax amount."""
+  taxAmount: Amount
+
+  """Indicates if the ticket is restricted."""
+  restrictedTicket: Boolean!
+
+  """The date of check-in."""
+  arrivalDate: Date
+
+  """The address of the agency issuing the ticket."""
+  ticketIssuerAddress: AddressInput
+
+  """Identifies the different legs of travel. It can include up to 4 items."""
+  legs: [IndustryFlightLegInput!]
+}
+
+"""Input fields for industry data legs."""
+input IndustryFlightLegInput {
+  """The conjunction ticket. Maximum 14 characters."""
+  conjunctionTicket: String
+
+  """
+  The ticket number issued when the ticket was exchanged. Maximum 15 characters.
+  """
+  exchangeTicket: String
+
+  """The coupon number. Exactly 1 character."""
+  couponNumber: String
+
+  """The class of service's IATA code. Maximum 2 characters."""
+  serviceClass: String
+
+  """The carrier's IATA code. Maximum 2 characters."""
+  carrierCode: String
+
+  """The fare basis code. Maximum 15 characters."""
+  fareBasisCode: String
+
+  """The flight number. Maximum 5 characters."""
+  flightNumber: String
+
+  """The day of departure."""
+  departureDate: Date
+
+  """The departure airport's IATA code. Exactly 3 characters."""
+  departureAirportCode: String
+
+  """The departure time in the 24-hour format HH:MM."""
+  departureTime: String
+
+  """The arrival airport's IATA code. Exactly 3 characters."""
+  arrivalAirportCode: String
+
+  """The arrival time in the 24-hour format HH:MM."""
+  arrivalTime: String
+
+  """Indicates whether a stopover is permitted."""
+  stopoverPermitted: Boolean
+
+  """The fare amount."""
+  fareAmount: Amount
+
+  """The fee amount."""
+  feeAmount: Amount
+
+  """The tax amount."""
+  taxAmount: Amount
+
+  """
+  The notes or notations about endorsements or restrictions (e.g. NOT REFUNDABLE).
+  """
+  endorsementOrRestrictions: String
+}
+
+"""Input fields for industry lodging data."""
+input IndustryLodgingInput {
+  """
+  The folio number assigned to the itemized statement assigned to this stay. Alphanumeric with a maximum of 12 characters.
+  """
+  folioNumber: String
+
+  """Customer check-in date."""
+  checkInDate: Date
+
+  """Customer check-out date."""
+  checkOutDate: Date
+
+  """Hotel daily room charge."""
+  roomRate: Amount
+
+  """Hotel daily tax."""
+  roomTax: Amount
+
+  """
+  Indicates whether or not the customer checked in, rented a car, etc. It should
+  be true when the guest did not show up for the reservation.
+  """
+  noShow: Boolean
+
+  """This transaction is an advanced payment for a hotel stay."""
+  advancedDeposit: Boolean
+
+  """
+  This property complies with the Hotel and Motel Fire Safety Act of 1990.
+  """
+  fireSafe: Boolean
+
+  """
+  The property's 10-digit phone number, consisting of digits (0-9), dashes (-),
+  parentheses (()), and dots (.). Examples: (555)555-1234, 555-555-1234.
+  """
+  propertyPhone: String
+
+  """The list of additional charges for the hotel stay."""
+  additionalCharges: [IndustryAdditionalChargeInput!]
+}
+
 """Input fields for creating an in-store authorization."""
 input InStoreAuthorizationInput {
   """
@@ -3354,6 +3565,11 @@ input InStoreAuthorizationInput {
   transactions, this maps to paypal.bn_code.
   """
   channel: String
+
+  """
+  Industry data information. Only one of the three sub-input fields can be provided.
+  """
+  industry: TransactionIndustryInput
 }
 
 """Reference object for an in-store request."""
@@ -3409,28 +3625,21 @@ interface InStoreContextResult {
 Potential statuses of a context created as part of an in-store request.
 """
 enum InStoreContextStatus {
-  """The context was successfully canceled."""
+  """The request was canceled."""
   CANCELLED
 
-  """Successful. The context was ended."""
+  """The requested operation was successfully completed."""
   COMPLETE
 
-  """Not successful. The context was ended."""
+  """The requested operation failed."""
   FAILED
 
   """
-  Partially successful. The context was ended but only partially authorized.
-  Please note that partial authorizations are only supported on versions >=
-  5.0.0 of the in-store reader payment application.
+  The request has been sent to the reader and is pending customer or point-of-sale interaction.
   """
-  PARTIALLY_COMPLETE @deprecated(reason: "This enum variant is being replaced with a new field on the transaction contexts.")
-
-  """Flow in-progress. Waiting for reader or point of sale interaction."""
   PENDING
 
-  """
-  Payment flow in-progress. Customer payment method submitted for transaction processing.
-  """
+  """The requested operation is in progress."""
   PROCESSING
 }
 
@@ -3454,7 +3663,7 @@ input InStoreDisplayItemInput {
 }
 
 """An in-store location."""
-type InStoreLocation {
+type InStoreLocation implements Node {
   """Unique identifier."""
   id: ID!
 
@@ -3879,6 +4088,11 @@ input InStoreTransactionInput {
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
+
+  """
+  Industry data information. Only one of the three sub-input fields can be provided.
+  """
+  industry: TransactionIndustryInput
 }
 
 """Configuration for Kount fraud tools."""
@@ -4468,7 +4682,12 @@ type Mutation {
   """
   Update custom fields on a transaction. Custom fields are [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
   """
-  updateTransactionCustomFields(input: UpdateTransactionCustomFieldsInput!): UpdateTransactionCustomFieldsPayload
+  updateTransactionCustomFields(input: UpdateTransactionCustomFieldsInput!): UpdateTransactionCustomFieldsPayload @deprecated(reason: "Use `updateCustomFields` instead.")
+
+  """
+  Update custom fields on a transaction or refund. Custom fields are [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
+  """
+  updateCustomFields(input: UpdateCustomFieldsInput!): UpdateCustomFieldsPayload
 
   """Run a verification on a multi-use payment method."""
   verifyPaymentMethod(input: VerifyPaymentMethodInput!): VerifyPaymentMethodPayload
@@ -5114,6 +5333,11 @@ input PartialCaptureTransactionOptionsInput {
   the transaction.
   """
   descriptor: TransactionDescriptorInput
+
+  """
+  Industry data information. Only one of the three sub-input fields can be provided.
+  """
+  industry: TransactionIndustryInput
 }
 
 """Top-level output field from partially capturing a transaction."""
@@ -9827,6 +10051,20 @@ input TransactionExternalVaultOptionsInput {
   verifyingNetworkTransactionId: String
 }
 
+"""
+Input fields for industry data. Only one of the input fields may be provided.
+"""
+input TransactionIndustryInput {
+  """Input fields for lodging data."""
+  lodging: IndustryLodgingInput
+
+  """Input fields for cruise data."""
+  cruise: IndustryCruiseInput
+
+  """Input fields for flight data."""
+  flight: IndustryFlightInput
+}
+
 """Input fields for creating a transaction."""
 input TransactionInput {
   """
@@ -9974,6 +10212,11 @@ input TransactionInput {
   and will not be returned in responses.
   """
   processingOverrides: TransactionProcessingOverridesInput
+
+  """
+  Industry data information. Only one of the three sub-input fields can be provided.
+  """
+  industry: TransactionIndustryInput
 }
 
 """Transaction Installment information."""
@@ -10565,6 +10808,41 @@ type UpdateCustomerPayload {
   customer: Customer
 }
 
+"""
+Input for creating or updating custom fields on a transaction or a refund.
+"""
+input UpdateCustomFieldsInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The ID of the transaction or the refund to update."""
+  id: ID!
+
+  """
+  The list of custom fields to update. You must [set up each custom field in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#creating-a-custom-field)
+  prior to passing it with a request.
+  """
+  customFields: [CustomFieldInput!]!
+}
+
+"""
+Top-level output field from updating custom fields for a specific transaction or a refund.
+"""
+type UpdateCustomFieldsPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  A list of all custom fields on the updated transaction or refund. Custom
+  fields are [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
+  """
+  customFields: [CustomField!]
+}
+
 """Input fields for updating an in-store location."""
 input UpdateInStoreLocationInput {
   """
@@ -10625,7 +10903,11 @@ input UpdateTransactionAmountInput {
   amount: Amount!
 }
 
-"""Input for creating or updating custom fields on a transaction."""
+"""
+Deprecated: `UpdateTransactionCustomFields` mutation is no longer supported,
+please use `UpdateCustomFields` mutation instead.
+Input for creating or updating custom fields on a transaction.
+"""
 input UpdateTransactionCustomFieldsInput {
   """
   An identifier used to reconcile requests and responses. 255 characters maximum.
@@ -10643,6 +10925,8 @@ input UpdateTransactionCustomFieldsInput {
 }
 
 """
+Deprecated: `UpdateTransactionCustomFields` mutation is no longer supported,
+please use `UpdateCustomFields` mutation instead.
 Top-level output field from updating custom fields for a specific transaction.
 """
 type UpdateTransactionCustomFieldsPayload {
