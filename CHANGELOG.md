@@ -1,3 +1,12 @@
+# 10-31-2023 🎃
+
+* Add new mutation
+    * `updateCreditCardCardholderName`
+* Add new input
+    * `UpdateCreditCardCardholderNameInput`
+* Add new type
+    * `UpdateCreditCardCardholderNamePayload`
+
 # 10-24-2023
 
 * Add field

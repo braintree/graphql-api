@@ -4804,6 +4804,13 @@ type Mutation {
   updateCreditCardBillingAddress(input: UpdateCreditCardBillingAddressInput!): UpdateCreditCardBillingAddressPayload
 
   """
+  Set a new cardholder name for a multi-use credit card payment method. By
+  default, this mutation will also verify the card with the new cardholder name
+  before updating.
+  """
+  updateCreditCardCardholderName(input: UpdateCreditCardCardholderNameInput!): UpdateCreditCardCardholderNamePayload
+
+  """
   Set a new expiration date for a multi-use credit card payment method. By
   default, this mutation will also verify the card with the new expiration date
   before updating.
@@ -10731,6 +10738,51 @@ type UpdateCreditCardBillingAddressPayload {
 
   """
   The verification that was run on the payment method prior to updating the billing address, if present.
+  """
+  verification: Verification
+}
+
+"""
+Top-level input fields for updating a multi-use credit card to use a new cardholder name.
+"""
+input UpdateCreditCardCardholderNameInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  The multi-use credit card for which the expiration date will be updated or added.
+  """
+  paymentMethodId: ID!
+
+  """
+  The new cardholder name that will be added to the multi-use credit card.
+  """
+  cardholderName: String!
+
+  """
+  Input fields that specify options for verifying the credit card with the new
+  billing address. By default, a verification will be performed. If the
+  verification fails, the update will not be performed.
+  """
+  verification: CreditCardVerificationOptionsInput
+}
+
+"""
+Top-level fields returned when updating a multi-use credit card to a new cardholder name.
+"""
+type UpdateCreditCardCardholderNamePayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """A single-use payment method."""
+  paymentMethod: PaymentMethod
+
+  """
+  The verification that was run on the payment method prior to updating the cardholder name, if present.
   """
   verification: Verification
 }
