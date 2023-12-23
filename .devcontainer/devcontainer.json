@@ -12,3 +12,68 @@
 # Versión de herramientas de compilación para instalar: "33.0.2" (default)
 
 ghcr.io/akhildevelops/devcontainer-features/android-cli:0
+De 4304b3c95a312a465226cc0fa83931662a9ffc79 lunes 17 de septiembre 00:00:00 2001
+De: David Oswaldo Azamar Alonso See More
+ <146601218+DawallAZllon91@users.noreply.github.com>
+Fecha: sábado 23 de diciembre de 2023 00:11:32 -0600
+Asunto: [PARCHE] Crear devcontainer.json
+
+---
+ .devcontainer/devcontainer.json | 14 ++++++++++++++
+ 1 archivo modificado, 14 inserciones(+)
+ crear modo 100644 .devcontainer/devcontainer.json
+
+diferencia --git a/.devcontainer/devcontainer.json b/.devcontainer/devcontainer.json
+nuevo modo de archivo 100644
+índice 0000000..dd5250a
+--- /dev/nulo
++++ b/.devcontainer/devcontainer.json
+@@ -0,0 +1,14 @@
++{
++ "imagen": "mcr.microsoft.com/devcontainers/universal:2",
++ "características": {
++ }
++}
++"ghcr.io/devcontainers/features/aws-cli:1": {2}
++"ghcr.io/joshuanianji/devcontainer-features/aws-cli-persistence:0": {1}
++"ghcr.io/devcontainers-contrib/features/airplane-cli:1": {2}
++
++"ghcr.io/jarrodcolburn/features/android-sdk:0": {33}
++
++# Versión de herramientas de compilación para instalar: "33.0.2" (predeterminado)
++
++ghcr.io/akhildevelops/devcontainer-features/android-cli:0De 4304b3c95a312a465226cc0fa83931662a9ffc79 lunes 17 de septiembre 00:00:00 2001
+De: David Oswaldo Azamar Alonso See More
+ <146601218+DawallAZllon91@users.noreply.github.com>
+Fecha: sábado 23 de diciembre de 2023 00:11:32 -0600
+Asunto: [PARCHE] Crear devcontainer.json
+
+---
+ .devcontainer/devcontainer.json | 14 ++++++++++++++
+ 1 archivo modificado, 14 inserciones(+)
+ crear modo 100644 .devcontainer/devcontainer.json
+
+diferencia --git a/.devcontainer/devcontainer.json b/.devcontainer/devcontainer.json
+nuevo modo de archivo 100644
+índice 0000000..dd5250a
+--- /dev/nulo
++++ b/.devcontainer/devcontainer.json
+@@ -0,0 +1,14 @@
++{
++ "imagen": "mcr.microsoft.com/devcontainers/universal:2",
++ "características": {
++ }
++}
++"ghcr.io/devcontainers/features/aws-cli:1": {2}
++"ghcr.io/joshuanianji/devcontainer-features/aws-cli-persistence:0": {1}
++"ghcr.io/devcontainers-contrib/features/airplane-cli:1": {2}
++
++"ghcr.io/jarrodcolburn/features/android-sdk:0": {33}
++
++# Versión de herramientas de compilación para instalar: "33.0.2" (predeterminado)
++
++ghcr.io/akhildevelops/devcontainer-features/android-cli:0
+
+## REFERENCIAS
+
+"https://containers.dev/implementors/json_reference/" 
