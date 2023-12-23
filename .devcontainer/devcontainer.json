@@ -1,0 +1,14 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+  }
+} 
+"ghcr.io/devcontainers/features/aws-cli:1": {2}
+"ghcr.io/joshuanianji/devcontainer-features/aws-cli-persistence:0": {1}
+"ghcr.io/devcontainers-contrib/features/airplane-cli:1": {2}
+
+"ghcr.io/jarrodcolburn/features/android-sdk:0": {33}
+
+# Versión de herramientas de compilación para instalar: "33.0.2" (default)
+
+ghcr.io/akhildevelops/devcontainer-features/android-cli:0
