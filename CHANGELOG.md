@@ -1,3 +1,32 @@
+# 01-02-2023
+
+* Add new field
+    * `phoneNumber` to `AddressInput`
+    * `dateOfBirth` and `countryCode` to `IndustryFlightInput`
+    * `implicitlyVaultedPaymentMethodId` to `LocalPaymentDetails`
+    * `errors` to `RequestAuthorizeInStoreContext` and `RequestChargeInStoreContext`
+    * `surchargeAmount` and `processingMode` to `Transaction`
+    * `surchargeAmount` to `TransactionInput`
+    * `shippingMethod` to `TransactionShipping` and `TransactionShippingInput`
+    * `verificationAddOns` to `VaultUsBankAccountInput` and `VerifyUsBankAccountInput`
+* Update doc string
+    * `skipCvv` and `skipAvs` in `CreditCardDetails`
+    * `legs` in `IndustryFlightInput`
+* Delete field
+    * `initiatedBy`, `deleteRelatedPaymentMethods`, and `fraudRelated` from `DeletePaymentMethodFromVaultInput`
+* Add new value
+    * `UNDER_REVIEW` to `DisputeStatus` enum
+    * `TRUSTLY` to `NonInstantLocalPaymentMethodType` enum
+    * `INSTALLMENT` and `INSTALLMENT_FIRST` to `PaymentInitiator` enum
+* Add new object
+    * `InStoreContextError` type
+    * `ProcessingMode` enum
+    * `TransactionShippingMethod` enum
+    * `UsBankAccountVerificationAddOn` enum
+* Update type
+    * `InStoreReader`
+
+
 # 10-31-2023 🎃
 
 * Add new mutation

@@ -201,6 +201,9 @@ input AddressInput {
   """
   countryCode: CountryCode
 
+  """Phone number associated with the address."""
+  phoneNumber: String
+
   """
   Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
   
@@ -1671,12 +1674,18 @@ Input fields that allow you to skip certain fraud checks. These will override Co
 """
 input CreditCardFraudToolsOptionsInput {
   """
-  Skip CVV checks. Will result in a `cvvResponse` of `BYPASS` in the response from the processor.
+  Skip CVV checks. Will result in a `cvvResponse` of `BYPASS` in the response
+  from the processor. This only applies to chargeCreditCard and
+  authorizeCreditCard; you cannot use these fields for vaultCreditCard and
+  verifyCreditCard.
   """
   skipCvv: Boolean
 
   """
-  Skip AVS checks. Will result in an `avsPostalCodeResponse` of `BYPASS` in the response from the processor.
+  Skip AVS checks. Will result in an `avsPostalCodeResponse` of `BYPASS` in the
+  response from the processor. This only applies to chargeCreditCard and
+  authorizeCreditCard; you cannot use these fields for vaultCreditCard and
+  verifyCreditCard.
   """
   skipAvs: Boolean
 
@@ -2255,23 +2264,6 @@ input DeletePaymentMethodFromVaultInput {
 
   """The ID of the multi-use payment method to be deleted."""
   paymentMethodId: ID!
-
-  """
-  Indicates whether this deletion was initiated by the merchant or the customer (via the merchant site/app).
-  """
-  initiatedBy: PaymentMethodDeletionInitiator
-
-  """
-  Additionally request deletion of all related payment methods (ones that store
-  the same underlying payment instrument as the one specified by
-  `paymentMethodId`) across all customers for current merchant.
-  """
-  deleteRelatedPaymentMethods: Boolean
-
-  """
-  Indicates if this deletion is related to suspected fraud, as determined by the merchant.
-  """
-  fraudRelated: Boolean
 }
 
 """Top-level output field from deleting a multi-use payment method."""
@@ -2686,6 +2678,7 @@ enum DisputeStatus {
   EXPIRED
   LOST
   OPEN
+  UNDER_REVIEW
   WON
 }
 
@@ -3363,6 +3356,12 @@ input IndustryFlightInput {
   """The passenger's title (e.g. Mr, Ms)."""
   passengerTitle: String
 
+  """The passenger's date of birth."""
+  dateOfBirth: Date
+
+  """The passenger's nationality."""
+  countryCode: CountryCodeAlpha2
+
   """The day on which the tickets were issued."""
   issuedDate: Date
 
@@ -3405,7 +3404,9 @@ input IndustryFlightInput {
   """The address of the agency issuing the ticket."""
   ticketIssuerAddress: AddressInput
 
-  """Identifies the different legs of travel. It can include up to 4 items."""
+  """
+  Identifies the different legs of travel. It can include up to 12 items.
+  """
   legs: [IndustryFlightLegInput!]
 }
 
@@ -3588,6 +3589,17 @@ type InStoreContext implements Node & InStoreContextResult {
 
   """The status of the context created."""
   status: InStoreContextStatus! @deprecated(reason: "Use the status field from the InStoreContextPayload")
+}
+
+"""An in-store context error object."""
+type InStoreContextError {
+  """The text explanation of the in-store context error."""
+  message: String
+
+  """
+  A unique code identifying the error, which can be used to look up a [detailed description](https://braintree.gitbook.io/in-person/guides/graphql-error-handling#table-1-error-code-explanations).
+  """
+  errorCode: String
 }
 
 """
@@ -3820,7 +3832,7 @@ input InStoreLocationUpdateInput {
 }
 
 """An in-store payment card reader."""
-type InStoreReader {
+type InStoreReader implements Node {
   """Unique identifier."""
   id: ID!
 
@@ -4249,6 +4261,9 @@ type LocalPaymentDetails {
 
   """Description of the payment method that can be displayed to customers."""
   displayName: String
+
+  """Payment method identifier for recurrent local payment."""
+  implicitlyVaultedPaymentMethodId: String
 }
 
 """A value identifying the type of regional payment method."""
@@ -5134,6 +5149,7 @@ enum NonInstantLocalPaymentMethodType {
   BOLETOBANCARIO
   MULTIBANCO
   OXXO
+  TRUSTLY
 }
 
 """
@@ -5446,6 +5462,20 @@ interface PaymentContext {
 The initiator of the payment. Payment can either be merchant-initiated or customer-initiated.
 """
 enum PaymentInitiator {
+  """
+  Transactions for subsequent installment payments. (e.g. when the customer
+  makes a single large purchase and wants to make payments over time).
+  """
+  INSTALLMENT
+
+  """
+  Transactions that represent the first in a series of installment payments.
+  Note: INSTALLMENT and INSTALLMENT_FIRST may only be available in certain
+  regions. If installment transactions are not supported in your region, the
+  transaction will automatically be categorized as recurring.
+  """
+  INSTALLMENT_FIRST
+
   """
   Transactions that are initiated by the customer via the merchant by mail or telephone.
   """
@@ -6666,6 +6696,14 @@ enum PreDisputeProgram {
   VISA_RDR
 }
 
+"""
+A value identifying whether the authorization for a transaction was requested online or as a deferred authorization.
+"""
+enum ProcessingMode {
+  DEFERRED
+  ONLINE
+}
+
 """Accompanying information for a processor declined transaction."""
 type ProcessorDeclinedEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
@@ -7228,6 +7266,9 @@ type RequestAuthorizeInStoreContext implements Node & InStoreContextResult {
 
   """The reason for the context status."""
   statusReason: InStoreTransactionContextStatusReason
+
+  """The list of errors for the failed context."""
+  errors: [InStoreContextError!]
 }
 
 """Input fields for requesting a cancel during an in-store charge flow."""
@@ -7274,6 +7315,9 @@ type RequestChargeInStoreContext implements Node & InStoreContextResult {
 
   """The reason for the context status."""
   statusReason: InStoreTransactionContextStatusReason
+
+  """The list of errors for the failed context."""
+  errors: [InStoreContextError!]
 }
 
 """
@@ -9853,6 +9897,9 @@ type Transaction implements Node & Payment {
   """Discount amount that was included in the total transaction amount."""
   discountAmount: String
 
+  """Surcharge amount that was included in the total transaction amount."""
+  surchargeAmount: String
+
   """Line items for this transaction."""
   lineItems: [TransactionLineItem!]
 
@@ -9915,6 +9962,9 @@ type Transaction implements Node & Payment {
   The transaction date and time as reported by the in-store payment terminal.
   """
   paymentInitiatedAt: Timestamp
+
+  """The processing mode of the transaction."""
+  processingMode: ProcessingMode
 }
 
 """
@@ -10170,6 +10220,14 @@ input TransactionInput {
   *Required for Level 3 processing*.
   """
   discountAmount: String
+
+  """
+  Surcharge amount that was included in the total transaction amount. Does not
+  add to the total amount the payment method will be charged. This value can't be negative.
+  
+  *Required for Visa Rent Discount Program*.
+  """
+  surchargeAmount: String
 
   """
   Line items for this transaction. Up to 249 line items may be specified.
@@ -10628,6 +10686,9 @@ type TransactionShipping {
 
   """The postal code of the source shipping location."""
   shipsFromPostalCode: String
+
+  """The shipping method."""
+  shippingMethod: TransactionShippingMethod
 }
 
 """Information related to shipping a physical product."""
@@ -10652,6 +10713,20 @@ input TransactionShippingInput {
   *Required for Level 3 processing*.
   """
   shipsFromPostalCode: String
+
+  """The shipping method."""
+  shippingMethod: TransactionShippingMethod
+}
+
+"""Shipping method."""
+enum TransactionShippingMethod {
+  ELECTRONIC
+  GROUND
+  NEXT_DAY
+  PICKUP_IN_STORE
+  PRIORITY
+  SAME_DAY
+  SHIP_TO_STORE
 }
 
 """Information related to taxes on the transaction."""
@@ -11128,6 +11203,15 @@ enum UsBankAccountOwnershipType {
 enum UsBankAccountType {
   CHECKING
   SAVINGS
+}
+
+"""
+Additional verifications for UsBankAccountVerificationMethod of type Network
+Check. See our [ACH guide](https://articles.braintreepayments.com/guides/payment-methods/ach#verification-methods).
+"""
+enum UsBankAccountVerificationAddOn {
+  """Additional verification via customer information."""
+  CUSTOMER_VERIFICATION
 }
 
 """
@@ -11622,6 +11706,9 @@ input VaultUsBankAccountInput {
 
   """Type of US bank account verification to perform."""
   verificationMethod: UsBankAccountVerificationMethod!
+
+  """Type of US bank account verification add ons."""
+  verificationAddOns: [UsBankAccountVerificationAddOn!]
 
   """
   This option makes the specified payment method the default for the customer.
@@ -12178,6 +12265,9 @@ input VerifyUsBankAccountInput {
 
   """Type of US bank account verification to perform."""
   verificationMethod: UsBankAccountVerificationMethod!
+
+  """Type of US bank account verification add ons."""
+  verificationAddOns: [UsBankAccountVerificationAddOn!]
 }
 
 """Details about the user and merchant authenticated in this request."""
