@@ -1,4 +1,8 @@
-# 01-02-2023
+# 01-16-2024
+
+* Add new docstring for date in `transactionLevelFees` and `paymentLevelFees` under the `Report` type
+
+# 01-02-2024
 
 * Add new field
     * `phoneNumber` to `AddressInput`

@@ -7158,10 +7158,18 @@ type RefundUsBankAccountPayload {
 """Top-level fields returned for a report query."""
 type Report {
   """Top-level fields returned in the transaction-level fee report query."""
-  transactionLevelFees(date: Date!, merchantAccountId: ID): TransactionLevelFeeReport @deprecated(reason: "This report has been renamed `paymentLevelFees`, since it applies to all types in the Payment interface, including transactions and refunds. Use the `paymentLevelFees` field instead, which returns the same report.")
+  transactionLevelFees(
+    """Report date (UTC)."""
+    date: Date!
+    merchantAccountId: ID
+  ): TransactionLevelFeeReport @deprecated(reason: "This report has been renamed `paymentLevelFees`, since it applies to all types in the Payment interface, including transactions and refunds. Use the `paymentLevelFees` field instead, which returns the same report.")
 
   """Top-level fields returned in the payment-level fee report query."""
-  paymentLevelFees(date: Date!, merchantAccountId: ID): PaymentLevelFeeReport
+  paymentLevelFees(
+    """Report date (UTC)."""
+    date: Date!
+    merchantAccountId: ID
+  ): PaymentLevelFeeReport
 }
 
 """Input fields for requesting an amount on an in-store reader."""
