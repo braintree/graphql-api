@@ -1,3 +1,12 @@
+# 01-29-2024
+
+* Delete / Deprecate field
+    * `phoneNumber` from `AddressInput`
+    * `bankAccount` from `MerchantAccount` 
+* Add new field
+    * `acquirerCountryCode` to `MetaCheckoutConfiguration`
+    * `merchantAccountId` to `TokenizeNetworkTokenPayload`
+
 # 01-16-2024
 
 * Add new docstring for date in `transactionLevelFees` and `paymentLevelFees` under the `Report` type

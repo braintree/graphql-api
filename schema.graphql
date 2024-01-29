@@ -201,9 +201,6 @@ input AddressInput {
   """
   countryCode: CountryCode
 
-  """Phone number associated with the address."""
-  phoneNumber: String
-
   """
   Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
   
@@ -4378,7 +4375,7 @@ type MerchantAccount {
   id: ID!
 
   """The disbursement bank account linked with the merchant account."""
-  bankAccount: DisbursementBankAccount
+  bankAccount: DisbursementBankAccount @deprecated(reason: "This field is no longer supported and will always be null.")
 
   """The ISO code for the currency the merchant account uses."""
   currencyCode: CurrencyCodeAlpha
@@ -4521,6 +4518,9 @@ type MetaCheckoutConfiguration {
 
   """A list of supported container types for Meta Checkout."""
   supportedContainers: [String!]
+
+  """The acquirer country code used for Meta Checkout."""
+  acquirerCountryCode: String
 }
 
 """
@@ -9691,6 +9691,11 @@ input TokenizePayPalBillingAgreementInput {
   An identifier used to reconcile requests and responses. 255 characters maximum.
   """
   clientMutationId: String
+
+  """
+  Braintree merchant account ID associated with the PayPal account to be used for the One-Time payment tokenization.
+  """
+  merchantAccountId: ID
 
   """Input fields for a PayPal Billing Agreement."""
   billingAgreement: PayPalBillingAgreementInput!
