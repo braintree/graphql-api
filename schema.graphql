@@ -1117,6 +1117,11 @@ input ClientTokenInput {
   The ID of an existing customer. Including this will allow your customer to vault and manage their payment methods.
   """
   customerId: ID
+
+  """
+  Some services require a list of domains that are allowed to use this token.
+  """
+  domains: [String!]
 }
 
 """Top-level input field for confirming micro-transfer values."""
@@ -1540,6 +1545,9 @@ input CreateVenmoPaymentContextInput {
 
   """Details about the information to be displayed on the Venmo Paysheet."""
   paysheetDetails: VenmoPaysheetDetailsInput
+
+  """Indicates whether the purchase amount is the final amount."""
+  isFinalAmount: Boolean
 
   """URL for redirecting back to merchant app or website on the client."""
   returnUrl: URL
@@ -11846,6 +11854,9 @@ type VenmoPaymentContext implements Node & PaymentContext {
 
   """The Venmo environment this payment context was created in."""
   environment: VenmoEnvironment
+
+  """Indicates whether the purchase amount is the final amount."""
+  isFinalAmount: Boolean
 
   """Date and time when the payment context expires."""
   expiresAt: Timestamp

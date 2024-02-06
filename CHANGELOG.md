@@ -1,3 +1,9 @@
+# 02-06-2024
+* Add new field
+    * `domains` to `ClientTokenInput`
+    * `isFinalAmount` to CreateVenmoPaymentContextInput
+    * `isFinalAmount` to VenmoPaymentContext
+
 # 01-29-2024
 
 * Delete / Deprecate field
