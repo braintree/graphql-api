@@ -2484,6 +2484,7 @@ enum DisputeEvidenceCategory {
   CARRIER_NAME
   CARRIER_NAME_OTHER
   CREDIT_ISSUED_AMOUNT
+  CREDIT_ISSUED_ARN
   CREDIT_ISSUED_DATE_TIME
   DEVICE_ID
   DEVICE_NAME
@@ -2733,6 +2734,7 @@ enum DisputeTextEvidenceCategory {
   AVS_RESPONSE @deprecated(reason: "AVS_RESPONSE from the original transaction is provided on your behalf when submitting a dispute.")
   CARRIER_NAME
   CREDIT_ISSUED_AMOUNT
+  CREDIT_ISSUED_ARN
   CREDIT_ISSUED_DATE_TIME
   DEVICE_ID
   DEVICE_NAME
@@ -4781,7 +4783,7 @@ type Mutation {
   """
   Tokenize US bank login fields and return a payload that includes a single-use payment method.
   """
-  tokenizeUsBankLogin(input: TokenizeUsBankLoginInput!): TokenizeUsBankAccountPayload
+  tokenizeUsBankLogin(input: TokenizeUsBankLoginInput!): TokenizeUsBankAccountPayload @deprecated(reason: "US bank logins are no longer supported.")
 
   """
   Tokenize PayPal One-Time Payment and return a payload that includes a single-use payment method.
@@ -9794,7 +9796,11 @@ type TokenizeUsBankAccountPayload {
   paymentMethod: PaymentMethod
 }
 
-"""Top-level input fields for tokenizing a US bank login."""
+"""
+Deprecated: US bank logins are no longer supported.
+
+Top-level input fields for tokenizing a US bank login.
+"""
 input TokenizeUsBankLoginInput {
   """
   An identifier used to reconcile requests and responses. 255 characters maximum.
@@ -11137,7 +11143,7 @@ type UsBankAccountConfiguration {
   routeId: String
 
   """The public key for Plaid to use to log in to a bank account."""
-  plaidPublicKey: String
+  plaidPublicKey: String @deprecated(reason: "US bank logins are no longer supported.")
 }
 
 """Details about a US bank account."""
@@ -11281,7 +11287,11 @@ enum UsBankAccountVerificationMethod {
   TOKENIZED_CHECK
 }
 
-"""Input fields for a US bank login object."""
+"""
+Deprecated: US bank logins are no longer supported.
+
+Input fields for a US bank login object.
+"""
 input UsBankLoginInput {
   """The public token returned from the bank login."""
   publicToken: String!

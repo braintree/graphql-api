@@ -1,4 +1,15 @@
+# 02-27-2024
+
+* Add new enum value
+    * `CREDIT_ISSUED_ARN` to `DisputeEvidenceCategory` and `DisputeTextEvidenceCategory`
+* Deprecate
+    * `tokenizeUsBankLogin` mutation
+    * `TokenizeUsBankLoginInput`
+    * `plaidPublicKey` field under `UsBankAccountBusinessOwnerInput`
+    * `UsBankLoginInput`
+
 # 02-06-2024
+
 * Add new field
     * `domains` to `ClientTokenInput`
     * `isFinalAmount` to CreateVenmoPaymentContextInput
