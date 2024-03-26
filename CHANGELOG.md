@@ -1,3 +1,23 @@
+# 03-26-2024
+* Add new enum
+    * `InStoreBackgroundStyle`
+    * `UpcType`
+* Add new input
+    * `InStoreChoiceInput`
+    * `LineItemUpcInput`
+    * `RequestMultiChoiceSingleSelectPromptFromInStoreReaderInput`
+    * `SearchPaymentMerchantAccountIdInput`
+* Add new type
+    * `LineItemsUpc`
+    * `RequesyMultiChoiceSingleSelectPromptInStoreContext
+* Add new mutation
+    * `requestMultiChoiceSingleSelectPromptFromInStoreReader`
+* Update type
+    * Change `merchantAccountId` in `PaymentSearchInput`, `RefundSearchInput`, `TransactionSearchInput` to `SearchPaymentMerchantAccountIdInput`
+* Add new field
+    * `imageUrl`, `upc` to `PayPalLineItem` and `PayPalLineItemInput`
+    * `upc` to `TransactionLineItem` and `TransactionLineItemInput`
+
 # 02-27-2024
 
 * Add new enum value

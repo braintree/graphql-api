@@ -3580,6 +3580,28 @@ input InStoreAuthorizationInput {
   industry: TransactionIndustryInput
 }
 
+"""The type of background style on an in-store reader."""
+enum InStoreBackgroundStyle {
+  PRIMARY
+  SECONDARY
+}
+
+"""Input fields for a choice on an in-store reader."""
+input InStoreChoiceInput {
+  """
+  The primary text of the choice to be displayed on the in-store reader, with a maximum of 35 characters.
+  """
+  primaryText: String!
+
+  """
+  The secondary text of the choice to be displayed on the in-store reader, with a maximum of 35 characters.
+  """
+  secondaryText: String
+
+  """The background style of the choice. Defaults to PRIMARY."""
+  style: InStoreBackgroundStyle
+}
+
 """Reference object for an in-store request."""
 type InStoreContext implements Node & InStoreContextResult {
   """A unique ID for this in-store request."""
@@ -4182,6 +4204,24 @@ transaction is disputed, these are the possible parties which can assume liabili
 enum LiabilityShiftResponsibleParty {
   ISSUER
   PAYPAL
+}
+
+"""UPC(Universal Product Code) of a line items."""
+type LineItemUpc {
+  """UPC code for the item. Minimum 6 characters, maximum 17 characters."""
+  upcCode: String
+
+  """UPC type for the item."""
+  upcType: UpcType
+}
+
+"""UPC(Universal Product Code) of a line item."""
+input LineItemUpcInput {
+  """UPC code for the item. Minimum 6 characters, maximum 17 characters."""
+  upcCode: String!
+
+  """UPC type for the item."""
+  upcType: UpcType!
 }
 
 """Input fields for local payment addresses."""
@@ -4949,6 +4989,12 @@ type Mutation {
   Request an in-store reader to display an amount prompt. Only supported on payment application versions >= 5.2.0.
   """
   requestAmountPromptFromInStoreReader(input: RequestAmountPromptFromInStoreReaderInput!): InStoreContextPayload
+
+  """
+  Request an in-store reader to display a multi-choice single-select prompt.
+  Only supported on payment application versions >= 5.4.0.
+  """
+  requestMultiChoiceSingleSelectPromptFromInStoreReader(input: RequestMultiChoiceSingleSelectPromptFromInStoreReaderInput!): InStoreContextPayload
 
   """
   Request an in-store reader to display a text prompt. Only supported on payment application versions >= 5.2.0.
@@ -5745,7 +5791,7 @@ input PaymentSearchInput {
   orderId: SearchTextInput
 
   """Find payments processed through a merchant account ID or IDs."""
-  merchantAccountId: SearchValueInput
+  merchantAccountId: SearchPaymentMerchantAccountIdInput
 
   """Find payments with a given customer."""
   customer: SearchPaymentCustomerInput
@@ -6294,6 +6340,12 @@ type PaypalLineItem {
 
   """The URL to product information."""
   url: URL
+
+  """URL to an image that represents the product. Max 1024 characters."""
+  imageUrl: URL
+
+  """UPC of the line item."""
+  upc: LineItemUpc
 }
 
 """Line items for a PayPal payment."""
@@ -6331,6 +6383,12 @@ input PayPalLineItemInput {
 
   """The URL to product information."""
   url: URL
+
+  """URL to an image that represents the product. Max 1024 characters."""
+  imageUrl: URL
+
+  """UPC of the line item."""
+  upc: LineItemUpcInput
 }
 
 """
@@ -7057,7 +7115,7 @@ input RefundSearchInput {
   Find refunds processed through a merchant account ID or IDs. In most cases,
   this will be the merchant account of the original refunded transaction.
   """
-  merchantAccountId: SearchValueInput
+  merchantAccountId: SearchPaymentMerchantAccountIdInput
 
   """Find refunds with a given customer."""
   customer: SearchPaymentCustomerInput
@@ -7467,6 +7525,75 @@ input RequestItemDisplayFromInStoreReaderInput {
 
   """The total discount amount for the entire transaction."""
   discountAmount: Amount
+}
+
+"""
+Input fields for requesting a multi-choice single select prompt on an in-store reader.
+"""
+input RequestMultiChoiceSingleSelectPromptFromInStoreReaderInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  ID of the in-store reader to request a multi-choice single-select from.
+  """
+  readerId: ID!
+
+  """Title to be displayed on the in-store reader. 1000 character maximum."""
+  title: String
+
+  """
+  Text to be displayed on the in-store reader. 65536 character maximum. '\n' line breaks will be respected.
+  """
+  text: String
+
+  """
+  The way the text is aligned when displayed on an in-store reader. Defaults to CENTER.
+  """
+  alignment: InStoreReaderDisplayAlignment
+
+  """
+  Once the customer submits a response, a loading screen should be displayed on
+  the in-store reader until the next request comes in. The screensaver is
+  displayed by default.
+  """
+  waitForNextRequest: Boolean
+
+  """
+  Display timeout in seconds. This is the time allotted for the user to complete their input. Defaults to 120 seconds.
+  """
+  displayTimeout: Int
+
+  """
+  The list of available choices for user selection, limited to a maximum of 15 choices.
+  """
+  choices: [InStoreChoiceInput!]!
+}
+
+"""
+Reference object for an in-store reader multi-choice single-select prompt.
+"""
+type RequestMultiChoiceSingleSelectPromptInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this multi-choice single-select prompt request."""
+  id: ID!
+
+  """
+  The reader from which the multi-choice single-select prompt was requested.
+  """
+  reader: InStoreReader
+
+  """
+  The status of the context created when the multi-choice single-select prompt was requested.
+  """
+  status: InStoreContextStatus!
+
+  """
+  A list of choices where '1' signifies selected choices and '0' indicates
+  unselected choices. The original ordering is maintained from the input.
+  """
+  selections: [Int!]
 }
 
 """
@@ -8265,6 +8392,29 @@ input SearchPaymentCustomerInput {
 
   """Find payments with a customer website."""
   website: SearchTextInput
+}
+
+"""
+Input fields for searching transactions with merchant account id criteria.
+"""
+input SearchPaymentMerchantAccountIdInput {
+  """Field is exactly this value."""
+  is: String
+
+  """Field is one of these values."""
+  in: [String!]
+
+  """Field is not this value."""
+  isNot: String
+
+  """Field starts with this value."""
+  startsWith: String
+
+  """Field ends with this value."""
+  endsWith: String
+
+  """Field contains this value."""
+  contains: String
 }
 
 """
@@ -10437,6 +10587,9 @@ type TransactionLineItem {
 
   """URL to an image that represents the product. Max 1024 characters."""
   imageUrl: String
+
+  """UPC of the line item."""
+  upc: LineItemUpc
 }
 
 """Data for individual line items on a transaction."""
@@ -10543,6 +10696,9 @@ input TransactionLineItemInput {
 
   """URL to an image that represents the product. Max 1024 characters."""
   imageUrl: String
+
+  """UPC of the line item."""
+  upc: LineItemUpcInput
 }
 
 """
@@ -10621,7 +10777,7 @@ input TransactionSearchInput {
   orderId: SearchTextInput
 
   """Find payments processed through a merchant account ID or IDs."""
-  merchantAccountId: SearchValueInput
+  merchantAccountId: SearchPaymentMerchantAccountIdInput
 
   """Find transactions with a given customer."""
   customer: SearchPaymentCustomerInput
@@ -10789,6 +10945,17 @@ input TransactionTaxInput {
 type UnionPayConfiguration {
   """The Braintree merchant account ID with UnionPay processing enabled."""
   merchantAccountId: String
+}
+
+"""The type of UPC(Universal Product Code)."""
+enum UpcType {
+  UPC_2
+  UPC_5
+  UPC_A
+  UPC_B
+  UPC_C
+  UPC_D
+  UPC_E
 }
 
 """
