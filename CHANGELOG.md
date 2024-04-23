@@ -1,3 +1,26 @@
+# 04-23-2024
+* Update doc string
+    * `paymentId` in `CreatePayPalOneTimePaymentPayload`
+* Add new input
+    * `CreateTransactionPackageTrackingInput`
+    * `SearchDisputeMerchantAccountIdInput`
+    * `TransactionPackageTrackingLineItemInput`
+    * `VenmoPaysheetLineItemInput`
+* Add new type
+    * `CreateTransactionPackageTrackingPayload`
+    * `TransactionPackageTracker`
+    * `VenmoPaysheetLineItem`
+* Change expected input
+    * `merchantAccountId` in `DisputeTransactionSearchInput`
+* Add new mutation
+    * `createTransactionPackageTracking`
+* Add new field
+    * `partiallyAuthorized` in `Transaction`, `TransactionSearchInput`
+    * `packageTrackers` in `TransactionShipping`
+    * `venmoPaysheetLineItems` in `VenmoPaysheetTransactionDetails`, `VenmoPaysheetTransactionDetailsInput`
+* Deprecate field
+    * `lineItems` in `VenmoPaysheetTransactionDetails`
+
 # 03-26-2024
 * Add new enum
     * `InStoreBackgroundStyle`

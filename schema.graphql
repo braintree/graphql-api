@@ -1482,8 +1482,60 @@ type CreatePayPalOneTimePaymentPayload {
   """The URL for getting user approval of the PayPal payment."""
   approvalUrl: URL
 
-  """The PayPal payment ID. This ID is prefixed with "PAYID-"."""
+  """The PayPal payment ID / order ID."""
   paymentId: String
+}
+
+"""
+Input fields for creating an individual package tracker for a PayPal transaction.
+"""
+input CreateTransactionPackageTrackingInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  The ID of the transaction to create the tracker for. The transaction be must
+  be submitted for settlement before adding trackers. If this is a partial
+  settlement transaction, provide the child transaction ID.
+  """
+  transactionId: ID!
+
+  """Tracking number for this package. 64 characters maximum."""
+  trackingNumber: String!
+
+  """
+  Shipping carrier. In order to provide customer with convenient tracking
+  updates, refer to [PayPal Add Tracking API
+  Carriers](https://developer.paypal.com/docs/tracking/reference/carriers/), and
+  use the middle column of screaming snake case values for the carrier of the
+  shipment. If the carrier cannot be found in this list, use the carrier's name.
+  64 characters maximum.
+  """
+  carrier: String!
+
+  """
+  Indicator of whether or not to send customer notifications of shipment. Defaults to false.
+  """
+  notifyPayer: Boolean
+
+  """Line items for this shipment. Up to 249 line items may be specified."""
+  lineItems: [TransactionPackageTrackingLineItemInput!]
+}
+
+"""Top-level output field from creating a transaction package tracker."""
+type CreateTransactionPackageTrackingPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The package tracker created during the request."""
+  packageTracker: TransactionPackageTracker
+
+  """The representing of the transaction for which the tracker was added."""
+  transaction: Transaction
 }
 
 """Top-level input field for generating a PayPal access token."""
@@ -2788,7 +2840,7 @@ input DisputeTransactionSearchInput {
   """
   Find disputes on transactions associated with a merchant account ID or IDs.
   """
-  merchantAccountId: SearchValueInput
+  merchantAccountId: SearchDisputeMerchantAccountIdInput
 }
 
 """Type of dispute."""
@@ -5018,6 +5070,11 @@ type Mutation {
   Creates a non-instant local payment context. Your account must be enabled to use this feature.
   """
   createNonInstantLocalPaymentContext(input: CreateNonInstantLocalPaymentContextInput!): CreateNonInstantLocalPaymentContextPayload
+
+  """
+  Creates a package tracker record for Pay with PayPal transactions. Your account must be enabled to use this feature.
+  """
+  createTransactionPackageTracking(input: CreateTransactionPackageTrackingInput!): CreateTransactionPackageTrackingPayload
 }
 
 """Means by which customers by their bills."""
@@ -8305,6 +8362,27 @@ input SearchDateInput {
   lessThanOrEqualTo: Date
 }
 
+"""Input fields for searching disputes with merchant account id criteria."""
+input SearchDisputeMerchantAccountIdInput {
+  """Field is exactly this value."""
+  is: String
+
+  """Field is one of these values."""
+  in: [String!]
+
+  """Field is not this value."""
+  isNot: String
+
+  """Field starts with this value."""
+  startsWith: String
+
+  """Field ends with this value."""
+  endsWith: String
+
+  """Field contains this value."""
+  contains: String
+}
+
 """
 Input fields for searching for a dispute with a given protection level.
 """
@@ -10142,6 +10220,11 @@ type Transaction implements Node & Payment {
 
   """The processing mode of the transaction."""
   processingMode: ProcessingMode
+
+  """
+  Indicates whether the transaction has been authorized for an amount lower than the requested amount.
+  """
+  partiallyAuthorized: Boolean
 }
 
 """
@@ -10709,6 +10792,53 @@ enum TransactionLineItemType {
   DEBIT
 }
 
+"""Data for an individual package tracker on a PayPal transaction."""
+type TransactionPackageTracker {
+  """Unique identifier for the tracker."""
+  id: ID
+
+  """Tracking number for this package."""
+  trackingNumber: String
+
+  """Shipping carrier."""
+  carrier: String
+
+  """
+  PayPal assigned identifier for this tracker. This field may not be immediately
+  available, but will be available when querying the transaction at a later
+  time. This field is only available for PayPal transactions.
+  """
+  paypalTrackerId: String
+}
+
+"""
+Data for individual line items for adding package trackers for transactions.
+"""
+input TransactionPackageTrackingLineItemInput {
+  """Item name. Maximum 127 characters."""
+  name: String!
+
+  """
+  Number of units of the item purchased. Can include up to 4 decimal places. This value can't be negative or zero.
+  """
+  quantity: String!
+
+  """Product code(SKU) for the item."""
+  productCode: String
+
+  """Item description."""
+  description: String
+
+  """A URL to information about the product."""
+  url: URL
+
+  """URL to an image that represents the product."""
+  imageUrl: URL
+
+  """UPC of the line item."""
+  upc: LineItemUpcInput
+}
+
 """Top-level output field from creating a transaction."""
 type TransactionPayload {
   """
@@ -10831,6 +10961,9 @@ input TransactionSearchInput {
 
   """Find transactions by the processor authorization code."""
   processorAuthorizationId: SearchTextInput
+
+  """Find fully or partially authorized transactions."""
+  partiallyAuthorized: Boolean
 }
 
 """
@@ -10872,6 +11005,9 @@ type TransactionShipping {
 
   """The shipping method."""
   shippingMethod: TransactionShippingMethod
+
+  """Shipment package trackers for PayPal transactions."""
+  packageTrackers: [TransactionPackageTracker!]
 }
 
 """Information related to shipping a physical product."""
@@ -12163,6 +12299,80 @@ input VenmoPaysheetDetailsInput {
   transactionDetails: VenmoPaysheetTransactionDetailsInput
 }
 
+"""Line items for a Venmo pay sheet."""
+type VenmoPaysheetLineItem {
+  """Item name. Maximum 127 characters."""
+  name: String
+
+  """
+  Number of units of the item purchased. This value can't be negative or zero.
+  """
+  quantity: Int
+
+  """
+  Per-unit price of the item. Can include up to 2 decimal places. This value can't be negative or zero.
+  """
+  unitAmount: Amount
+
+  """
+  Indicates whether the line item is a debit (sale) or credit (refund or discount) to the customer.
+  """
+  type: TransactionLineItemType
+
+  """Item description. Maximum 127 characters."""
+  description: String
+
+  """Product or UPC code for the item. Maximum 127 characters."""
+  productCode: String
+
+  """
+  Per-unit tax price of the item. Can include up to 2 decimal places. This value
+  can't be negative or zero. If this is a line item for a Venmo transaction,
+  this value can be zero.
+  """
+  unitTaxAmount: Amount
+
+  """The URL to product information."""
+  url: URL
+}
+
+"""Line items for a Venmo pay sheet."""
+input VenmoPaysheetLineItemInput {
+  """Item name. Maximum 127 characters."""
+  name: String!
+
+  """
+  Number of units of the item purchased. This value can't be negative or zero.
+  """
+  quantity: Int!
+
+  """
+  Per-unit price of the item. Can include up to 2 decimal places. This value can't be negative or zero.
+  """
+  unitAmount: Amount!
+
+  """
+  Indicates whether the line item is a debit (sale) or credit (refund or discount) to the customer.
+  """
+  type: TransactionLineItemType!
+
+  """Item description. Maximum 127 characters."""
+  description: String
+
+  """Product or UPC code for the item. Maximum 127 characters."""
+  productCode: String
+
+  """
+  Per-unit tax price of the item. Can include up to 2 decimal places. This value
+  can't be negative or zero. If this is a line item for a Venmo transaction,
+  this value can be zero.
+  """
+  unitTaxAmount: Amount!
+
+  """The URL to product information."""
+  url: URL
+}
+
 """
 Details about the different amounts and line items belonging to a transaction.
 """
@@ -12197,7 +12407,12 @@ type VenmoPaysheetTransactionDetails {
   """
   The list of line items belonging to the transaction. Can include up to 249 line items.
   """
-  lineItems: [PaypalLineItem!]
+  lineItems: [PaypalLineItem!] @deprecated(reason: "Use `venmoPaysheetLineItems` instead.")
+
+  """
+  The list of line items belonging to the Venmo pay sheet. Can include up to 249 line items.
+  """
+  venmoPaysheetLineItems: [VenmoPaysheetLineItem!]
 }
 
 """
@@ -12236,6 +12451,11 @@ input VenmoPaysheetTransactionDetailsInput {
   The list of line items belonging to the transaction. Can include up to 249 line items.
   """
   lineItems: [PayPalLineItemInput!]
+
+  """
+  The list of line items belonging to the pay sheet. Can include up to 249 line items.
+  """
+  venmoPaysheetLineItems: [VenmoPaysheetLineItemInput!]
 }
 
 """
