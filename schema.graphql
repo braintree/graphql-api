@@ -1022,6 +1022,9 @@ type ClientConfiguration {
   """The enum of the current environment."""
   environment: ClientConfigurationEnvironment
 
+  """Configuration for PayPal Fastlane."""
+  fastlane: FastlaneConfiguration
+
   """Configuration for fraud protection provider."""
   fraudProvider: FraudProviderConfiguration
 
@@ -2358,6 +2361,28 @@ input DetachedRefundInput {
   descriptor: TransactionDescriptorInput
 }
 
+"""Input to disable a Product for a Merchant."""
+input DisableProductForMerchantInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Unique code of the product being disabled."""
+  code: ProductCode!
+}
+
+"""Payload from disabling a Product for a Merchant."""
+type DisableProductForMerchantPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Product that was disabled."""
+  product: Product
+}
+
 """Details about the disbursement bank account."""
 type DisbursementBankAccount {
   """The last four digits of the bank account number."""
@@ -2992,6 +3017,28 @@ type EmvCardOriginDetails implements InStoreReaderOriginDetails {
   issuerActionCodeOnline: String
 }
 
+"""Input to enable a Product for a Merchant."""
+input EnableProductForMerchantInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Unique code of the product being enabled."""
+  code: ProductCode!
+}
+
+"""Payload from enabling a Product for a Merchant."""
+type EnableProductForMerchantPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Product that was enabled."""
+  product: Product
+}
+
 """
 A value with more than one decimal place, representing an exchange rate between currencies. For example, `0.93014065558374`.
 minLength: 3
@@ -3136,6 +3183,12 @@ type FailedEvent implements PaymentStatusEvent {
   User name of the person who performed an action that triggered the status change of the transaction.
   """
   userName: String
+}
+
+"""Configuration for PayPal Fastlane."""
+type FastlaneConfiguration {
+  """Whether or not Fastlane is enabled for the merchant."""
+  enabled: Boolean
 }
 
 """Top-level input fields for finalizing a dispute."""
@@ -3630,6 +3683,17 @@ input InStoreAuthorizationInput {
   Industry data information. Only one of the three sub-input fields can be provided.
   """
   industry: TransactionIndustryInput
+
+  """
+  Controls whether to allow partial authorizations (or "partial approvals") for this transaction. Defaults to false.
+  """
+  acceptPartialAuthorization: Boolean
+
+  """
+  This field denotes the nature or characteristic of a transaction, including
+  whether it is initiated by the merchant or the customer.
+  """
+  paymentInitiator: InStorePaymentInitiator
 }
 
 """The type of background style on an in-store reader."""
@@ -3827,6 +3891,27 @@ input InStoreLocationAddressInput {
   countryCode: CountryCode!
 }
 
+"""
+Input fields for searching an in-store location address. If multiple fields are
+specified, location addresses will be returned which meet all of the specified criteria.
+"""
+input InStoreLocationAddressSearchInput {
+  """Find in-store locations with a given street address."""
+  streetAddress: SearchTextValueInput
+
+  """Find in-store locations with a given extended address."""
+  extendedAddress: SearchTextValueInput
+
+  """Find in-store locations with a given locality."""
+  locality: SearchTextValueInput
+
+  """Find in-store locations with a given region."""
+  region: SearchTextValueInput
+
+  """Find in-store locations with a given postal code."""
+  postalCode: SearchTextValueInput
+}
+
 """Input fields for an in-store Location Address update."""
 input InStoreLocationAddressUpdateInput {
   """The street address."""
@@ -3848,6 +3933,24 @@ input InStoreLocationAddressUpdateInput {
 
   """Country code for the address."""
   countryCode: CountryCode
+}
+
+"""
+Input fields for searching an in-store location. If multiple fields are
+specified, locations will be returned which meet all of the specified criteria.
+"""
+input InStoreLocationConditionInput {
+  """Find in-store locations with a given ID or IDs."""
+  id: SearchValueInput
+
+  """Find in-store locations with a given name."""
+  name: SearchTextValueInput
+
+  """Find in-store locations with a given internal name."""
+  internalName: SearchTextValueInput
+
+  """Find in-store locations with a given address."""
+  address: InStoreLocationAddressSearchInput
 }
 
 """A paginated list of in-store locations."""
@@ -3891,6 +3994,21 @@ input InStoreLocationInput {
   enableQRCodePayments: Boolean!
 }
 
+"""A paginated list of searched in-store locations."""
+type InStoreLocationSearchConnection {
+  """A list of in-store locations."""
+  edges: [InStoreLocationConnectionEdge]
+
+  """Information about the page of in-store locations contained in `edges`."""
+  pageInfo: PageInfo!
+}
+
+"""Input fields for searching in-store locations."""
+input InStoreLocationSearchInput {
+  """Find in-store locations which meet any of the specified conditions."""
+  conditionsIn: [InStoreLocationConditionInput!]!
+}
+
 """Fields required to update an in-store location."""
 input InStoreLocationUpdateInput {
   """The publicly visible label of this location."""
@@ -3910,6 +4028,18 @@ input InStoreLocationUpdateInput {
 
   """Whether QR code payments will be enabled for this location."""
   enableQRCodePayments: Boolean
+}
+
+"""
+The nature or characteristic of a transaction, including whether it is initiated by the merchant or the customer.
+"""
+enum InStorePaymentInitiator {
+  """
+  Transactions that are initiated by the customer when the final amount of the
+  transaction is not known at the time of authorization. Applicable for
+  InStoreAuthorizationInput only.
+  """
+  ESTIMATED
 }
 
 """An in-store payment card reader."""
@@ -4186,6 +4316,11 @@ input InStoreTransactionInput {
   Industry data information. Only one of the three sub-input fields can be provided.
   """
   industry: TransactionIndustryInput
+
+  """
+  Controls whether to allow partial authorizations (or "partial approvals") for this transaction. Defaults to false.
+  """
+  acceptPartialAuthorization: Boolean
 }
 
 """Configuration for Kount fraud tools."""
@@ -4466,6 +4601,9 @@ type Merchant {
   A paginated list of merchant accounts that belong to this merchant. Filtered by search criteria, if provided.
   """
   merchantAccounts(input: MerchantAccountSearchInput, first: Int, after: String): MerchantAccountConnection
+
+  """Detailed information about products available to the calling merchant."""
+  products(input: ProductsInput!): [Product!]
 }
 
 """Information about a merchant account associated with a merchant."""
@@ -5071,6 +5209,12 @@ type Mutation {
   """
   createNonInstantLocalPaymentContext(input: CreateNonInstantLocalPaymentContextInput!): CreateNonInstantLocalPaymentContextPayload
 
+  """Enable product for calling merchant."""
+  enableProductForMerchant(input: EnableProductForMerchantInput!): EnableProductForMerchantPayload
+
+  """Disable product for calling merchant."""
+  disableProductForMerchant(input: DisableProductForMerchantInput!): DisableProductForMerchantPayload
+
   """
   Creates a package tracker record for Pay with PayPal transactions. Your account must be enabled to use this feature.
   """
@@ -5576,6 +5720,12 @@ The initiator of the payment. Payment can either be merchant-initiated or custom
 """
 enum PaymentInitiator {
   """
+  Transactions that are initiated by the merchant or customer when the final
+  amount of the transaction is not known at the time of authorization.
+  """
+  ESTIMATED
+
+  """
   Transactions for subsequent installment payments. (e.g. when the customer
   makes a single large purchase and wants to make payments over time).
   """
@@ -5897,6 +6047,9 @@ input PaymentSearchInput {
 
   """Find payments by the processor authorization code."""
   processorAuthorizationId: SearchTextInput
+
+  """Find payments by the processing mode."""
+  processingMode: SearchProcessingModeInput
 }
 
 """The type of a Payment, based primarily on implementing type."""
@@ -6767,6 +6920,9 @@ input PerformThreeDSecureLookupInput {
   when adding a card to a merchant’s vault and not for creating transactions.
   """
   cardAdd: Boolean
+
+  """3RI (3DS Requester Initiated) request."""
+  merchantInitiatedRequest: ThreeDSecureMerchantInitiatedRequestInput
 }
 
 """Top-level fields returned when performing a 3D Secure Lookup."""
@@ -6888,6 +7044,38 @@ enum ProcessorDeclineType {
   charges on the same payment method may be successful.
   """
   SOFT
+}
+
+"""Represents a product that may be enabled."""
+type Product {
+  """Unique code of product."""
+  code: ProductCode!
+
+  """Display name of product."""
+  name: String!
+
+  """Enablement status of product."""
+  status: ProductEnablementStatus!
+}
+
+"""Available product names."""
+enum ProductCode {
+  FASTLANE
+}
+
+"""Product enablement state."""
+enum ProductEnablementStatus {
+  AVAILABLE
+  DISABLED
+  ENABLED
+  NOT_AVAILABLE
+  PROVISIONING
+}
+
+"""Input for selecting products to be returned."""
+input ProductsInput {
+  """Products to be returned."""
+  codes: [ProductCode!]!
 }
 
 """The top-level Query type. Queries are used to fetch data."""
@@ -7221,6 +7409,9 @@ input RefundSearchInput {
 
   """Find refunds by the processor authorization code."""
   processorAuthorizationId: SearchTextInput
+
+  """Find refunds by the processing mode."""
+  processingMode: SearchProcessingModeInput
 }
 
 """Top-level input fields for refunding a transaction."""
@@ -8243,6 +8434,11 @@ type Search {
   A paginated list of in-store readers that match the InStoreReaderSearchInput.
   """
   inStoreReaders(input: InStoreReaderSearchInput!, first: Int, after: String): InStoreReaderConnection
+
+  """
+  A paginated list of in-store locations that match any of the conditions in InStoreLocationSearchInput.
+  """
+  inStoreLocations(input: InStoreLocationSearchInput!, first: Int, after: String): InStoreLocationSearchConnection
 }
 
 """Input fields for searching by address."""
@@ -8640,6 +8836,21 @@ input SearchPreDisputeProgramInput {
   in: [PreDisputeProgram!]
 }
 
+"""
+Input fields for searching for transactions with a given processing mode.
+"""
+input SearchProcessingModeInput {
+  """
+  This value represents the processing mode used to create a transaction.
+  """
+  is: ProcessingMode
+
+  """
+  These values represent the processing mode used to create a transaction.
+  """
+  in: [ProcessingMode!]
+}
+
 """Input fields for searching for a range."""
 input SearchRangeInput {
   """Field is exactly this value."""
@@ -8683,6 +8894,27 @@ input SearchTextInput {
 
   """Field contains this value."""
   contains: String
+}
+
+"""Input fields for searching text fields or for specific values."""
+input SearchTextValueInput {
+  """Field is exactly this value."""
+  is: String
+
+  """Field is not this value."""
+  isNot: String
+
+  """Field starts with this value."""
+  startsWith: String
+
+  """Field ends with this value."""
+  endsWith: String
+
+  """Field contains this value."""
+  contains: String
+
+  """Field is one of these values."""
+  in: [String!]
 }
 
 """
@@ -9148,7 +9380,7 @@ enum ThreeDSecureAuthenticationStatus {
   AUTHENTICATE_FAILED_ACS_ERROR
   AUTHENTICATE_FRICTIONLESS_FAILED
   AUTHENTICATE_REJECTED
-  AUTHENTICATE_SIGNATURE_VERIFICATION_FAILED
+  AUTHENTICATE_SIGNATURE_VERIFICATION_FAILED @deprecated(reason: "This was a 3DS1 status.")
   AUTHENTICATE_SUCCESSFUL
   AUTHENTICATE_SUCCESSFUL_ISSUER_NOT_PARTICIPATING @deprecated(reason: "No longer applicable.")
   AUTHENTICATE_UNABLE_TO_AUTHENTICATE
@@ -9721,6 +9953,23 @@ input ThreeDSecureLookupTransactionInformationInput {
   deviceChannel: ThreeDSecureDeviceChannel
 }
 
+"""3RI (3DS Requester Initiated) request."""
+input ThreeDSecureMerchantInitiatedRequestInput {
+  """The type of 3RI request."""
+  requestType: ThreeDSecureMerchantInitiatedRequestType!
+
+  """Information about the customer-initiated 3DS."""
+  priorAuthentication: ThreeDSecurePriorAuthenticationInput!
+}
+
+"""The 3D Secure Merchant Initiated Request Type."""
+enum ThreeDSecureMerchantInitiatedRequestType {
+  DELAYED_SHIPMENT
+  INSTALLMENT
+  RECURRING
+  SPLIT_SHIPMENT
+}
+
 """Results of a merchant-performed 3D Secure authentication."""
 input ThreeDSecurePassThroughInput {
   """
@@ -9771,6 +10020,14 @@ input ThreeDSecurePassThroughInput {
   directory server. This field must be supplied for Mastercard Identity Check.
   """
   directoryServerTransactionId: String
+}
+
+"""Information about the customer-initiated 3DS."""
+input ThreeDSecurePriorAuthenticationInput {
+  """
+  The authenticationId of the customer-initiated 3DS performed at Braintree. 255 characters maximum.
+  """
+  authenticationId: String
 }
 
 """A raw 3D Secure PARes or VARes response code (e.g. 'Y')."""
@@ -10964,6 +11221,9 @@ input TransactionSearchInput {
 
   """Find fully or partially authorized transactions."""
   partiallyAuthorized: Boolean
+
+  """Find transactions by the processing mode."""
+  processingMode: SearchProcessingModeInput
 }
 
 """

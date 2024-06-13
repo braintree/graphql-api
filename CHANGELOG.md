@@ -1,3 +1,45 @@
+# 06-13-2024
+* Add new field
+    * `fastlane` to `ClientConfiguration`
+    * `acceptPartialAuthorization` to `InStoreAuthorizationInput`
+    * `paymentInitiator` to `InStoreAuthorizationInput`
+    * `acceptPartialAuthorization` to `InStoreTransactionInput`
+    * `products` to `Merchant`
+    * `processingMode` to `PaymentSearchInput`
+    * `merchantInitiatedRequest` to `PerformThreeDSecureLookupInput`
+    * `processingMode` to `RefundSearchInput`
+    * `inStoreLocations` to `Search`
+    * `processingMode` to `TransactionSearchInput`
+* Add new input
+    * `DisableProductForMerchantInput`
+    * `EnableProductForMerchantInput`
+    * `InStoreLocationAddressSearchInput`
+    * `InStoreLocationConditionInput`
+    * `InStoreLocationSearchInput`
+    * `ProductInput`
+    * `SearchProcessingModeInput`
+    * `SearchTextValueInput`
+    * `ThreeDSecureMerchantInitiatedRequestInput`
+    * `ThreeDSecurePriorAuthenticationInput`
+* Add new type
+    * `DisableProductForMerchantPayload`
+    * `EnableProductForMerchantPayload`
+    * `FastlaneConfiguration`
+    * `InStoreLocationSearchConnection`
+    * `Product`
+* Add new enum
+    * `InStorePaymentInitiator`
+    * `ProductCode`
+    * `ProductEnablementStatus`
+    * `ThreeDSecureMerchantInitiatedRequestType`
+* Add new mutation
+    * `enableProductForMerchant`
+    * `disableProductForMerchant`
+* Add new enum value
+    * `ESTIMATED` to `PaymentInitiator`
+* Deprecate
+    * `AUTHENTICATE_SIGNATURE_VERIFICATION_FAILED` enum value for `ThreeDSecureAuthenticationShippingType` enum 
+
 # 04-23-2024
 * Update doc string
     * `paymentId` in `CreatePayPalOneTimePaymentPayload`
