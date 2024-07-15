@@ -1,3 +1,22 @@
+# 07-15-2024
+* Add new input
+    * `DeleteInStoreLocationInput`
+* Add new type
+    * `DeleteInStoreLocationPayload`
+* Update doc strings
+    * Fields in `InStoreLocationAddressSearchInput` and `InStoreLocationConditionInput` of `SearchTextValueInput` type to clarify case-insensitivity
+    * Change `creating` to `updating` for `UpdateInStoreLocationPayload`
+* Change `geoCoordinates` field in `InStoreLocationInput` to no longer be required
+* Add new mutation
+    * `deleteInStoreLocation`
+* Add new enum value
+    * `ADD_SURCHARGE_MID` and `IN_PERSON` to `ProductCode`
+    * `PAYMENT_WITH_MULTIPLE_MERCHANTS` to `ThreeDSecureMerchantInitiatedRequestType`
+* Deprecate
+    * `AUTHENTICATION_BYPASSED` value for `ThreeDSecureAuthenticationStatus` enum
+* Add new field
+    `merchantOnRecordname` to `ThreeDSecureLookupTransactionInformationInput`
+
 # 06-13-2024
 * Add new field
     * `fastlane` to `ClientConfiguration`

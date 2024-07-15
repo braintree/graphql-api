@@ -2290,6 +2290,25 @@ type DeleteDisputeEvidencePayload {
   clientMutationId: String
 }
 
+"""Top-level input fields for deleting an in-store location."""
+input DeleteInStoreLocationInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of the location to be deleted."""
+  locationId: ID!
+}
+
+"""Top-level fields returned when deleting an in-store location."""
+type DeleteInStoreLocationPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+}
+
 """
 Top-level input fields for deleting a payment method referenced by a single-use token.
 """
@@ -3896,16 +3915,20 @@ Input fields for searching an in-store location address. If multiple fields are
 specified, location addresses will be returned which meet all of the specified criteria.
 """
 input InStoreLocationAddressSearchInput {
-  """Find in-store locations with a given street address."""
+  """
+  Find in-store locations with a given street address (case-insensitive).
+  """
   streetAddress: SearchTextValueInput
 
-  """Find in-store locations with a given extended address."""
+  """
+  Find in-store locations with a given extended address (case-insensitive).
+  """
   extendedAddress: SearchTextValueInput
 
-  """Find in-store locations with a given locality."""
+  """Find in-store locations with a given locality (case-insensitive)."""
   locality: SearchTextValueInput
 
-  """Find in-store locations with a given region."""
+  """Find in-store locations with a given region (case-insensitive)."""
   region: SearchTextValueInput
 
   """Find in-store locations with a given postal code."""
@@ -3943,10 +3966,10 @@ input InStoreLocationConditionInput {
   """Find in-store locations with a given ID or IDs."""
   id: SearchValueInput
 
-  """Find in-store locations with a given name."""
+  """Find in-store locations with a given name (case-insensitive)."""
   name: SearchTextValueInput
 
-  """Find in-store locations with a given internal name."""
+  """Find in-store locations with a given internal name (case-insensitive)."""
   internalName: SearchTextValueInput
 
   """Find in-store locations with a given address."""
@@ -3985,7 +4008,7 @@ input InStoreLocationInput {
   address: InStoreLocationAddressInput!
 
   """The coordinates of this location."""
-  geoCoordinates: GeoCoordinatesInput!
+  geoCoordinates: GeoCoordinatesInput
 
   """The PayPal account ID to which this Location will be added."""
   payerId: ID
@@ -5121,6 +5144,9 @@ type Mutation {
 
   """Creates a new In-Store Location to associate Readers."""
   createInStoreLocation(input: CreateInStoreLocationInput!): CreateInStoreLocationPayload
+
+  """Delete an In-Store Location."""
+  deleteInStoreLocation(input: DeleteInStoreLocationInput!): DeleteInStoreLocationPayload
 
   """Updates an In-Store Location."""
   updateInStoreLocation(input: UpdateInStoreLocationInput!): UpdateInStoreLocationPayload
@@ -7060,7 +7086,9 @@ type Product {
 
 """Available product names."""
 enum ProductCode {
+  ADD_SURCHARGE_MID
   FASTLANE
+  IN_PERSON
 }
 
 """Product enablement state."""
@@ -9384,7 +9412,7 @@ enum ThreeDSecureAuthenticationStatus {
   AUTHENTICATE_SUCCESSFUL
   AUTHENTICATE_SUCCESSFUL_ISSUER_NOT_PARTICIPATING @deprecated(reason: "No longer applicable.")
   AUTHENTICATE_UNABLE_TO_AUTHENTICATE
-  AUTHENTICATION_BYPASSED
+  AUTHENTICATION_BYPASSED @deprecated(reason: "No longer applicable.")
   AUTHENTICATION_UNAVAILABLE
   CHALLENGE_REQUIRED
   DATA_ONLY_SUCCESSFUL
@@ -9960,12 +9988,20 @@ input ThreeDSecureMerchantInitiatedRequestInput {
 
   """Information about the customer-initiated 3DS."""
   priorAuthentication: ThreeDSecurePriorAuthenticationInput!
+
+  """
+  Directory server name of the merchant on whose behalf the customer-initiated
+  3DS was performed. Required when requestType is
+  `PAYMENT_WITH_MULTIPLE_MERCHANTS`.
+  """
+  merchantOnRecordName: String
 }
 
 """The 3D Secure Merchant Initiated Request Type."""
 enum ThreeDSecureMerchantInitiatedRequestType {
   DELAYED_SHIPMENT
   INSTALLMENT
+  PAYMENT_WITH_MULTIPLE_MERCHANTS
   RECURRING
   SPLIT_SHIPMENT
 }
@@ -11574,7 +11610,7 @@ input UpdateInStoreLocationInput {
   location: InStoreLocationUpdateInput!
 }
 
-"""Top-level fields returned when creating an in-store location."""
+"""Top-level fields returned when updating an in-store location."""
 type UpdateInStoreLocationPayload {
   """
   An identifier used to reconcile requests and responses. 255 characters maximum.
