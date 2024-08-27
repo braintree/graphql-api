@@ -1,3 +1,47 @@
+# 08-27-2024
+* Add new enum 
+    * `AniNameResponseCode`
+    * `InStorePrintAlignment`
+    * `InStorePrintTextDecoration`
+    * `InStorePrintTextFontStyle`
+    * `InStorePrintTextFontWeight`
+    * `ThreeDSecurePriorAuthenticationMethod`
+* Add new input
+    * `CreateDisputeTextEvidencePayload`
+    * `CreateInStoreFirmwareUpdateScheduleInput
+    * `CreateOAuthClientSecretInput`
+    * `CreateProductRequestForMerchantInput`
+    * `DeleteOAuthClientSecretInput`
+    * `DisableOAuthClientSecretInput`
+    * `InStorePrintContentInput`
+    * `InStorePrintImageInput` 
+    * `InStorePrintTextInput`
+    * `InStoreReaderConditionInput`
+    * `RequestPrintFromInStoreReaderInput`
+    * `ThreeDSecurePriorAuthenticationDetailsInput`
+* Add new type
+    * `CreateInStoreFirmwareUpdateSchedulePayload`
+    * `CreateOAuthClientSecretPayload`
+    * `DeleteOAuthClientSecretPayload`
+    * `DisableOauthClientSecretPayload`
+    * `InStoreFirmwareUpdateSchedule`
+    * `OAuthClientSecret`
+    * `ProductRequestPayload`
+    * `RequestPrintInStoreContext`
+* Add new field
+    * `conditionsIn` on `InStoreReaderConditionInput`
+    * `finalCapture` on `PartialCaptureTransactionOptionsInput`
+    * `shippingTaxAmount` on `TransactionShipping`, `TransactionShippingInput`
+* Add new mutation
+    * `createInStoreFirmwareUpdateSchedule`
+    * `requestPrintFromInStoreReader`
+    * `createOAuthClientSecret`
+    * `disableOAuthClientSecret`
+    * `deleteOAuthClientSecret`
+    * `createProductRequestForMerchant`
+* Conditional change
+    * Make `conditionsIn` field of `InStoreLocationSearchInput` no longer required 
+
 # 07-15-2024
 * Add new input
     * `DeleteInStoreLocationInput`

@@ -235,6 +235,19 @@ A monetary amount, either a whole number or a number with exactly two or three d
 """
 scalar Amount
 
+"""
+Response codes for name verification if the processor supports the account information inquiry.
+"""
+enum AniNameResponseCode {
+  MATCH
+  NOT_SUPPORTED
+  NOT_VERIFIED
+  NO_INPUT
+  NO_MATCH
+  PARTIAL_MATCH
+  RETRY
+}
+
 """Configuration for Apple Pay on iOS."""
 type ApplePayConfiguration {
   """The environment being used for Apple Pay."""
@@ -1285,6 +1298,36 @@ type CreateDisputeTextEvidencePayload {
   evidence: DisputeTextEvidence
 }
 
+"""Input fields for creating an in-store firmware update schedule."""
+input CreateInStoreFirmwareUpdateScheduleInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """A list of reader IDs for which the firmware update will be scheduled."""
+  readerIds: [ID!]!
+
+  """
+  The date and time for updating the firmware on the reader(s).  If no timezone is provided, it will be assumed to be UTC.
+  """
+  scheduledAt: Timestamp!
+
+  """The title of the schedule. 255 characters maximum."""
+  title: String
+}
+
+"""Top-level fields returned when creating a firmware update schedule."""
+type CreateInStoreFirmwareUpdateSchedulePayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """An in-store firmware update schedule."""
+  schedule: InStoreFirmwareUpdateSchedule
+}
+
 """Input fields for creating an in store location."""
 input CreateInStoreLocationInput {
   """
@@ -1329,6 +1372,25 @@ type CreateNonInstantLocalPaymentContextPayload {
 
   """Details about the local payment context."""
   paymentContext: LocalPaymentContext
+}
+
+"""Input fields for creating a new OAuth client secret."""
+input CreateOAuthClientSecretInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+}
+
+"""Details about OAuth client secret created for merchant."""
+type CreateOAuthClientSecretPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The client secret value."""
+  secret: String
 }
 
 """Top-level input field for creating a PayPal Billing Agreement Token."""
@@ -1487,6 +1549,17 @@ type CreatePayPalOneTimePaymentPayload {
 
   """The PayPal payment ID / order ID."""
   paymentId: String
+}
+
+"""Input fields for requesting access to a product."""
+input CreateProductRequestForMerchantInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Code of product to be requested."""
+  productCode: ProductCode!
 }
 
 """
@@ -2309,6 +2382,25 @@ type DeleteInStoreLocationPayload {
   clientMutationId: String
 }
 
+"""Input fields for deleting an OAuth client secret."""
+input DeleteOAuthClientSecretInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The secret value to be deleted."""
+  secret: String!
+}
+
+"""Details about OAuth client secret delete operation."""
+type DeleteOAuthClientSecretPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+}
+
 """
 Top-level input fields for deleting a payment method referenced by a single-use token.
 """
@@ -2378,6 +2470,28 @@ input DetachedRefundInput {
   the original transaction if possible.
   """
   descriptor: TransactionDescriptorInput
+}
+
+"""Input fields for disabling an OAuth client secret."""
+input DisableOAuthClientSecretInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The secret value to be disabled."""
+  secret: String!
+}
+
+"""Details about OAuth client secret disable operation."""
+type DisableOAuthClientSecretPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """OAuth Client Secret details."""
+  oauthClientSecret: OAuthClientSecret
 }
 
 """Input to disable a Product for a Merchant."""
@@ -3838,6 +3952,28 @@ input InStoreDisplayItemInput {
   amount: Amount
 }
 
+"""An in-store firmware update schedule."""
+type InStoreFirmwareUpdateSchedule {
+  """Unique identifier."""
+  id: String!
+
+  """A list of reader IDs for which the firmware update will be scheduled."""
+  readerIds: [ID!]
+
+  """
+  The date and time to update the firmware on the reader(s). Please note that
+  the update time is approximate, there might be a few minutes delay from the
+  time specified.
+  """
+  scheduledAt: Timestamp
+
+  """The date and time indicating when the schedule was created."""
+  createdAt: Timestamp
+
+  """The title of the schedule."""
+  title: String
+}
+
 """An in-store location."""
 type InStoreLocation implements Node {
   """Unique identifier."""
@@ -4029,7 +4165,7 @@ type InStoreLocationSearchConnection {
 """Input fields for searching in-store locations."""
 input InStoreLocationSearchInput {
   """Find in-store locations which meet any of the specified conditions."""
-  conditionsIn: [InStoreLocationConditionInput!]!
+  conditionsIn: [InStoreLocationConditionInput!]
 }
 
 """Fields required to update an in-store location."""
@@ -4063,6 +4199,87 @@ enum InStorePaymentInitiator {
   InStoreAuthorizationInput only.
   """
   ESTIMATED
+}
+
+"""The alignment of the content when printed on the in-store reader."""
+enum InStorePrintAlignment {
+  CENTER
+  LEFT
+  RIGHT
+}
+
+"""Input fields for content to be printed on the in-store reader."""
+input InStorePrintContentInput {
+  """The text content to be printed."""
+  text: InStorePrintTextInput
+
+  """The image content to be printed."""
+  image: InStorePrintImageInput
+}
+
+"""Input fields for image content to be printed on the in-store reader."""
+input InStorePrintImageInput {
+  """
+  The base64-encoded string representation of the image. The image must be in
+  PNG format and cannot exceed 76,800 bytes in size.
+  """
+  value: String!
+
+  """
+  A boolean flag indicating whether this is the last item on the current line.
+  Defaults to `true`. Also, it offers the option for the caller to print two or
+  more items side-by-side.
+  """
+  endOfLineFlag: Boolean
+
+  """The alignment of the image on the printed paper. Defaults to `CENTER`."""
+  alignment: InStorePrintAlignment
+}
+
+"""The decoration of the text on an in-store reader."""
+enum InStorePrintTextDecoration {
+  LINE_THROUGH
+  NORMAL
+  OVERLINE
+  UNDERLINE
+}
+
+"""The font style of the text on an in-store reader."""
+enum InStorePrintTextFontStyle {
+  ITALIC
+  NORMAL
+}
+
+"""The font weight of the text on an in-store reader."""
+enum InStorePrintTextFontWeight {
+  BOLD
+  NORMAL
+}
+
+"""Input fields for text content to be printed on the in-store reader."""
+input InStorePrintTextInput {
+  """The text value to be printed."""
+  value: String!
+
+  """
+  A boolean flag indicating whether this is the last item on the current line. Defaults to `true`.
+  """
+  endOfLineFlag: Boolean
+
+  """The alignment of the text on the printed paper. Defaults to `CENTER`."""
+  alignment: InStorePrintAlignment
+
+  """The decoration of the text. Defaults to `NORMAL`."""
+  textDecoration: InStorePrintTextDecoration
+
+  """The font weight of the text. Defaults to `NORMAL`."""
+  fontWeight: InStorePrintTextFontWeight
+
+  """The font style of the text. Defaults to `NORMAL`."""
+  fontStyle: InStorePrintTextFontStyle
+
+  """The font size of the text. Defaults to `24`."""
+  fontSize: Int
 }
 
 """An in-store payment card reader."""
@@ -4099,6 +4316,41 @@ type InStoreReader implements Node {
 enum InStoreReaderAuthorizationMode {
   CARD
   ISSUER
+}
+
+"""
+Input fields for searching an in-store reader. If multiple fields are specified,
+only readers that meet all of the specified criteria will be returned.
+"""
+input InStoreReaderConditionInput {
+  """Find in-store readers with a given ID or IDs."""
+  id: SearchValueInput
+
+  """
+  Find in-store readers with a given name. Note: Field is case insensitive.
+  """
+  name: SearchTextValueInput
+
+  """Find in-store readers with a given reader status."""
+  status: ReaderStatus
+
+  """
+  Find in-store readers with a given software version. Note: Field is case insensitive.
+  """
+  softwareVersion: SearchTextValueInput
+
+  """
+  Find in-store readers with a given model. Note: Field is case insensitive.
+  """
+  model: SearchTextValueInput
+
+  """
+  Find in-store readers with a given serial number. Note: Field is case insensitive.
+  """
+  serialNumber: SearchTextValueInput
+
+  """Find in-store readers with a given location."""
+  location: [InStoreLocationConditionInput!]
 }
 
 """A paginated list of in-store readers."""
@@ -4169,6 +4421,9 @@ input InStoreReaderSearchInput {
 
   """Find in-store readers with reader status."""
   readerStatus: ReaderStatus
+
+  """Find in-store readers which meet any of the specified conditions."""
+  conditionsIn: [InStoreReaderConditionInput!]
 }
 
 """Fields that are reader specific for pairing a reader."""
@@ -5157,6 +5412,9 @@ type Mutation {
   """Updates an In-Store Reader."""
   updateInStoreReader(input: UpdateInStoreReaderInput!): InStoreReaderPayload
 
+  """Creates a schedule to request firmware updates on In-Store Readers."""
+  createInStoreFirmwareUpdateSchedule(input: CreateInStoreFirmwareUpdateScheduleInput!): CreateInStoreFirmwareUpdateSchedulePayload
+
   """Request an in-store reader to begin the charge flow."""
   requestChargeFromInStoreReader(input: RequestChargeFromInStoreReaderInput!): InStoreContextPayload
 
@@ -5217,6 +5475,12 @@ type Mutation {
   """
   requestTextPromptFromInStoreReader(input: RequestTextPromptFromInStoreReaderInput!): InStoreContextPayload
 
+  """
+  Request an in-store reader to print content. Only supported on the Verifone
+  V400m device using payment application version >= 5.5.0.
+  """
+  requestPrintFromInStoreReader(input: RequestPrintFromInStoreReaderInput!): InStoreContextPayload
+
   """Create a Venmo payment context."""
   createVenmoPaymentContext(input: CreateVenmoPaymentContextInput!): VenmoPaymentContextPayload
 
@@ -5235,6 +5499,33 @@ type Mutation {
   """
   createNonInstantLocalPaymentContext(input: CreateNonInstantLocalPaymentContextInput!): CreateNonInstantLocalPaymentContextPayload
 
+  """
+  Create an OAuth client secret.
+  To call this mutation you must obtain an OAuth Access Token with scope MANAGE_OAUTH_CLIENT_SECRETS,
+  the associated merchant must have [IP or hostname restrictions](https://developer.paypal.com/braintree/articles/risk-and-security/allowlisting)
+  enabled and you must send your request from a host
+  that is allowed by the merchant's allowed hosts list.
+  """
+  createOAuthClientSecret(input: CreateOAuthClientSecretInput!): CreateOAuthClientSecretPayload
+
+  """
+  Disable an OAuth client secret.
+  To call this mutation you must obtain an OAuth Access Token with scope MANAGE_OAUTH_CLIENT_SECRETS,
+  the associated merchant must have [IP or hostname restrictions](https://developer.paypal.com/braintree/articles/risk-and-security/allowlisting)
+  enabled and you must send your request from a host
+  that is allowed by the merchant's allowed hosts list.
+  """
+  disableOAuthClientSecret(input: DisableOAuthClientSecretInput!): DisableOAuthClientSecretPayload
+
+  """
+  Delete a disabled OAuth client secret.
+  To call this mutation you must obtain an OAuth Access Token with scope MANAGE_OAUTH_CLIENT_SECRETS,
+  the associated merchant must have [IP or hostname restrictions](https://developer.paypal.com/braintree/articles/risk-and-security/allowlisting)
+  enabled and you must send your request from a host
+  that is allowed by the merchant's allowed hosts list.
+  """
+  deleteOAuthClientSecret(input: DeleteOAuthClientSecretInput!): DeleteOAuthClientSecretPayload
+
   """Enable product for calling merchant."""
   enableProductForMerchant(input: EnableProductForMerchantInput!): EnableProductForMerchantPayload
 
@@ -5245,6 +5536,9 @@ type Mutation {
   Creates a package tracker record for Pay with PayPal transactions. Your account must be enabled to use this feature.
   """
   createTransactionPackageTracking(input: CreateTransactionPackageTrackingInput!): CreateTransactionPackageTrackingPayload
+
+  """Create a request for access to a specified product."""
+  createProductRequestForMerchant(input: CreateProductRequestForMerchantInput!): ProductRequestPayload
 }
 
 """Means by which customers by their bills."""
@@ -5465,6 +5759,15 @@ type OAuthApplication {
   name: String
 }
 
+"""OAuth Client Secret details."""
+type OAuthClientSecret {
+  """Masked client secret value."""
+  maskedSecret: String
+
+  """True if secret is disabled."""
+  disabled: Boolean
+}
+
 """OAuth access token type."""
 enum OAuthTokenType {
   BEARER
@@ -5596,6 +5899,11 @@ input PartialCaptureTransactionOptionsInput {
   *Required for Level 3 processing*.
   """
   discountAmount: String
+
+  """
+  Input to specify current partial capture is the final one for parent authorized transaction.
+  """
+  finalCapture: Boolean
 
   """
   Line items for this transaction. Up to 249 line items may be specified.
@@ -7100,6 +7408,17 @@ enum ProductEnablementStatus {
   PROVISIONING
 }
 
+"""Payload for requesting access to a product."""
+type ProductRequestPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Code of product to be requested."""
+  productCode: ProductCode
+}
+
 """Input for selecting products to be returned."""
 input ProductsInput {
   """Products to be returned."""
@@ -7931,6 +8250,41 @@ type RequestNonPciCardDataInStoreContext implements Node & InStoreContextResult 
 
   """The non-pci data read from the card by the in-store reader."""
   cardData: NonPciCardData
+}
+
+"""
+Input fields for initiating a request to print content on an in-store reader.
+"""
+input RequestPrintFromInStoreReaderInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of the Reader to request printing content from."""
+  readerId: ID!
+
+  """
+  Contents to be printed on the in-store reader. The `contents` field must not exceed 122,880 bytes in size.
+  """
+  contents: [InStorePrintContentInput!]!
+}
+
+"""Reference object for an in-store reader print content."""
+type RequestPrintInStoreContext implements Node & InStoreContextResult {
+  """A unique ID for this print content request."""
+  id: ID!
+
+  """The reader to which the print request was sent."""
+  reader: InStoreReader
+
+  """
+  The status of the context created when the print content was requested.
+  """
+  status: InStoreContextStatus!
+
+  """The list of errors for the failed context."""
+  errors: [InStoreContextError!]
 }
 
 """Input fields for beginning the in-store refund flow."""
@@ -10058,12 +10412,44 @@ input ThreeDSecurePassThroughInput {
   directoryServerTransactionId: String
 }
 
+"""
+The authentication details of the customer-initiated 3DS performed externally.
+"""
+input ThreeDSecurePriorAuthenticationDetailsInput {
+  """The Directory Server Transaction ID of the customer-initiated 3DS."""
+  dsTransactionId: String
+
+  """
+  The Access Control Server Transaction ID of the customer-initiated 3DS.
+  """
+  acsTransactionId: String
+
+  """Mechanism used to authenticate the customer-initiated 3DS."""
+  authenticationMethod: ThreeDSecurePriorAuthenticationMethod
+
+  """DateTime of the customer-initiated 3DS."""
+  authenticationTime: Timestamp
+}
+
 """Information about the customer-initiated 3DS."""
 input ThreeDSecurePriorAuthenticationInput {
   """
   The authenticationId of the customer-initiated 3DS performed at Braintree. 255 characters maximum.
   """
   authenticationId: String
+
+  """
+  The authentication details of the customer-initiated 3DS performed externally. To be sent in lieu of authenticationId.
+  """
+  authenticationDetails: ThreeDSecurePriorAuthenticationDetailsInput
+}
+
+"""The 3D Secure Prior Authentication Method."""
+enum ThreeDSecurePriorAuthenticationMethod {
+  AVS_VERIFIED
+  CHALLENGE
+  FRICTIONLESS
+  OTHER_ISSUER_METHOD
 }
 
 """A raw 3D Secure PARes or VARes response code (e.g. 'Y')."""
@@ -11304,6 +11690,9 @@ type TransactionShipping {
 
   """Shipment package trackers for PayPal transactions."""
   packageTrackers: [TransactionPackageTracker!]
+
+  """Shipping tax amount on the entire transaction."""
+  shippingTaxAmount: Amount
 }
 
 """Information related to shipping a physical product."""
@@ -11331,6 +11720,13 @@ input TransactionShippingInput {
 
   """The shipping method."""
   shippingMethod: TransactionShippingMethod
+
+  """
+  Shipping tax amount on the entire transaction.
+  
+  *Required for Level 3 processing*.
+  """
+  shippingTaxAmount: String
 }
 
 """Shipping method."""
