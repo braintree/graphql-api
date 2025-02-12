@@ -1,3 +1,77 @@
+# 02-12-2025
+* Add new field
+    * `phone` to `Address`, `AddressInput`
+    * `recurringBillingPlan` to `CreatePayPalBillingAgreementInput`
+    * `payerEmail` to `CreatePayPalOneTimePaymentInput`
+    * `recipientEmail` to `EmailAddress`
+    * `shippingCallbackUrl` to `CreatePayPalOneTimePaymentInput`
+    * `blikAliases` on `PayPalLocalPaymentOriginDetails`
+    * `recipientEmail`, `recipientPhone` on `PayPalTransactionDetails`
+    * `achReturnCode` on `UsBankAccountDetails`
+    * `failOnDuplicatePaymentMethodForCustomer` on `VaultCreditCardInput`
+* Add new query
+    * `customerRecommendations`
+* Deprecate
+    * `phoneNumber` on `Address`
+    * `samsungPay` on `ClientConfiguration
+    * `BOLETOBANCARIO` value on `LocalPaymentMethodType`, `NonInstantLocalPaymentMethodType`
+    * `tokenizeSamsungPayCard` mutation
+    * `TokenizeSamsungPayCardInput` input
+    * `TokenizeSamsungPayCardPayload` type
+    * `SamsungPayCardDetails` type
+    * `SamsungPayConfiguration` type
+    * `SamsungPayOriginDetails` type
+    * `SamsungPayEnviornment` enum
+    * `SamsungPayCardInput` input
+    * `SAMSUNG_PAY` on `PaymentMethodOriginType`
+    * `CREDIT_CARD_VIA_SAMSUNG_PAY`, `BOLETOBANCARIO_VIA_PAYPAL` on `PaymentMethodSnapshotSearchType`
+* Add new input
+    * `CreateCustomerSessionInput`
+    * `CustomerRecommendationsInput`
+    * `CustomerSessionInput`
+    * `PayPalRecurringBillingCycleInput`
+    * `PayPalRecurringBillingFrequencyIntervalInput`
+    * `PayPalRecurringBillingOneTimeChargesInput`
+    * `PayPalRecurringBillingPlanInput`
+    * `PayPalRecurringBillingPlanMetadataInput`
+    * `PayPalRecurringBillingPricingSchemeInput`
+    * `PayPalRecurringBillingProductInput`
+    * `UpdateCustomerSessionInput`
+* Add new union
+    * `CustomerRecommendations`
+* Add new type
+    * `CustomerRecommendationsPayload`
+    * `CustomerSessionPayload`
+    * `LocalPaymentBlikAlias`
+    * `PaymentOptions`
+    * `PaymentRecomendations`
+    * `Phone`
+* Add new enum
+    * `FrequencyUnit`
+    * `PayPalRecurringBillingPlan`
+    * `PayPalRecurringBillingPricingModel`
+    * `RecommendationPaymentOption`
+    * `Recommendations`
+* Add new enum value
+    * `DELAYED_SHIPMENT`, `PAYMENT_WITH_MULTIPLE_MERCHANTS`, `SPLIT_SHIPMENT` on `ThreeDSecureAuthenticationTransactionType`
+    * `BANCOMATPAY`, `MBWAY` to `LocalPaymentMethodType`,
+    * `BANCOMATPAY_VIA_PAYPAL`, `MBWAY_VIA_PAYPAL` to `PaymentMethodSnapshotSearchType`
+* Add new mutation
+    * `createCustomerSession`
+    * `updateCustomerSession`
+* Remove
+    * `CreateInStoreFirmwareUpdateScheduleInput`
+    * `CreateUnStoreFirmwareUpdateSchedulePayload`
+    * `email` field from `CreatePayPalOneTimePaymentInput`
+    * `InStoreFirmwareUpdateSchedule`
+    * `geoCoordinates` field from `InStoreLocationInput`, `InStoreLocationUpdateInput`
+    * `locationId`, `softwareVersion`, `readerStatus` fields from `InStoreReaderPayload`
+    * `taxInfo` field from `LocalPaymentPayerInfoInput`
+    * `createInStoreFirmwareUpdateSchedule` mutation
+    * `TaxInfoInput` input
+    * `merchantAccountId` field from `UpdateCreditcardBillingAddressInput`, `VerifyCreditCardInput`
+    * `lineItems` field from `VenmoPaysheetTransactionDetailsInput`
+
 # 08-27-2024
 * Add new enum 
     * `AniNameResponseCode`

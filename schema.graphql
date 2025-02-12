@@ -139,7 +139,10 @@ type Address {
   countryCode: CountryCode
 
   """Phone number."""
-  phoneNumber: String
+  phoneNumber: String @deprecated(reason: "Use `phone` instead")
+
+  """Phone number."""
+  phone: Phone
 }
 
 """Input fields for an Address."""
@@ -200,6 +203,9 @@ input AddressInput {
   *Required in the shipping address for Level 3 processing*.
   """
   countryCode: CountryCode
+
+  """ Phone associated with the address."""
+  phone: PhoneInput
 
   """
   Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
@@ -1061,8 +1067,10 @@ type ClientConfiguration {
   """Configuration for PayPal."""
   paypal: PayPalConfiguration
 
-  """Configuration for Samsung Pay."""
-  samsungPay: SamsungPayConfiguration
+  """
+  Deprecated: Samsung pay is no longer supported. Configuration for Samsung Pay.
+  """
+  samsungPay: SamsungPayConfiguration @deprecated(reason: "Samsung pay is no longer supported.")
 
   """Configuration for UnionPay cards."""
   unionPay: UnionPayConfiguration
@@ -1242,6 +1250,26 @@ type CreateCustomerPayload {
   customer: Customer
 }
 
+"""Customer session creation request."""
+input CreateCustomerSessionInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The customer session identifier."""
+  sessionId: String
+
+  """Merchant Account ID."""
+  merchantAccountId: ID
+
+  """Customer identifying information."""
+  customer: CustomerSessionInput
+
+  """The domain name of the user's browser."""
+  domain: String
+}
+
 """Top-level input fields for adding file evidence to a dispute."""
 input CreateDisputeFileEvidenceInput {
   """
@@ -1296,36 +1324,6 @@ type CreateDisputeTextEvidencePayload {
 
   """The evidence object created."""
   evidence: DisputeTextEvidence
-}
-
-"""Input fields for creating an in-store firmware update schedule."""
-input CreateInStoreFirmwareUpdateScheduleInput {
-  """
-  An identifier used to reconcile requests and responses. 255 characters maximum.
-  """
-  clientMutationId: String
-
-  """A list of reader IDs for which the firmware update will be scheduled."""
-  readerIds: [ID!]!
-
-  """
-  The date and time for updating the firmware on the reader(s).  If no timezone is provided, it will be assumed to be UTC.
-  """
-  scheduledAt: Timestamp!
-
-  """The title of the schedule. 255 characters maximum."""
-  title: String
-}
-
-"""Top-level fields returned when creating a firmware update schedule."""
-type CreateInStoreFirmwareUpdateSchedulePayload {
-  """
-  An identifier used to reconcile requests and responses. 255 characters maximum.
-  """
-  clientMutationId: String
-
-  """An in-store firmware update schedule."""
-  schedule: InStoreFirmwareUpdateSchedule
 }
 
 """Input fields for creating an in store location."""
@@ -1430,6 +1428,9 @@ input CreatePayPalBillingAgreementInput {
   """
   offerPayPalCredit: Boolean
 
+  """Billing plan for recurring payments."""
+  recurringBillingPlan: PayPalRecurringBillingPlanInput
+
   """PayPal Risk correlation ID (also known as the Client Metadata ID)."""
   paypalRiskCorrelationId: ID
 
@@ -1483,11 +1484,6 @@ input CreatePayPalOneTimePaymentInput {
   """
   cancelUrl: URL!
 
-  """
-  Email of the payer. This will prepopulate the input field in the PayPal approval login page.
-  """
-  email: EmailAddress
-
   """The payment intent."""
   intent: PayPalIntent!
 
@@ -1498,6 +1494,11 @@ input CreatePayPalOneTimePaymentInput {
   Indicates whether PayPal Pay Later should be offered in the PayPal approval flow.
   """
   offerPayLater: Boolean
+
+  """
+  Email of the payer. This will prepopulate the input field in the PayPal approval login page.
+  """
+  payerEmail: EmailAddress
 
   """PayPal Risk correlation ID (also known as the Client Metadata ID)."""
   paypalRiskCorrelationId: ID
@@ -1519,6 +1520,11 @@ input CreatePayPalOneTimePaymentInput {
   billingAgreementDescription: String
 
   """
+  Recipient email address. This field is used when the buyer is different from the recipient of the product.
+  """
+  recipientEmail: EmailAddress
+
+  """
   URL for redirect back to merchant app on the client indicating successful approval.
   """
   returnUrl: URL!
@@ -1535,6 +1541,11 @@ input CreatePayPalOneTimePaymentInput {
   intent `ORDER` payments.
   """
   shippingOptions: [PayPalShippingOptionInput!]
+
+  """
+  URL for redirecting back to the merchant app to update a customer shipping address.
+  """
+  shippingCallbackUrl: URL
 }
 
 """Top-level fields returned from setting up a PayPal One-Time Payment."""
@@ -2243,6 +2254,33 @@ input CustomerInput {
   taxIdentifiers: [CustomerTaxIdentifierInput!]
 }
 
+"""A union of all possible customer recommendations."""
+union CustomerRecommendations = PaymentRecommendations
+
+"""Input fields for searching customer recommendations."""
+input CustomerRecommendationsInput {
+  """The ID of the customer session to access customer session information."""
+  sessionId: String!
+
+  """Merchant Account ID."""
+  merchantAccountId: ID
+
+  """Customer identifying information."""
+  customer: CustomerSessionInput
+
+  """Recommendations categories."""
+  recommendations: [Recommendations!]
+}
+
+"""Customer recommendations information."""
+type CustomerRecommendationsPayload {
+  """Flag to indicate whether customer is in paypal network."""
+  isInPayPalNetwork: Boolean
+
+  """The recommendations of the customer."""
+  recommendations: CustomerRecommendations
+}
+
 """Input fields for searching for customers."""
 input CustomerSearchInput {
   """Find customers with an id or ids."""
@@ -2265,6 +2303,41 @@ input CustomerSearchInput {
 
   """Find customers with a given phone number."""
   phoneNumber: SearchTextInput
+}
+
+"""Customer identifying information for session."""
+input CustomerSessionInput {
+  """Customer email address."""
+  email: EmailAddress
+
+  """Customer phone number."""
+  phone: PhoneInput
+
+  """Internal identifier used for DFP identification."""
+  deviceFingerprintId: String
+
+  """True if PayPal app is installed on device.Defaults to false."""
+  paypalAppInstalled: Boolean
+
+  """True if Venmo app is installed on device.Defaults to false."""
+  venmoAppInstalled: Boolean
+
+  """
+  User agent from the request originating from the customer's device. This will
+  be used to identify the customer's operating system and browser versions.
+  """
+  userAgent: String
+}
+
+"""Customer session response."""
+type CustomerSessionPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Customer session identifier."""
+  sessionId: String
 }
 
 """The customer's tax identifer for a given tax jurisdiction."""
@@ -3367,6 +3440,16 @@ enum FraudServiceProvider {
   KOUNT
 }
 
+"""
+The unit of time for the interval which the payment is charged in a recurring billing plan.
+"""
+enum FrequencyUnit {
+  DAY
+  MONTH
+  WEEK
+  YEAR
+}
+
 """Accompanying information for a gateway rejected transaction."""
 type GatewayRejectedEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
@@ -3952,28 +4035,6 @@ input InStoreDisplayItemInput {
   amount: Amount
 }
 
-"""An in-store firmware update schedule."""
-type InStoreFirmwareUpdateSchedule {
-  """Unique identifier."""
-  id: String!
-
-  """A list of reader IDs for which the firmware update will be scheduled."""
-  readerIds: [ID!]
-
-  """
-  The date and time to update the firmware on the reader(s). Please note that
-  the update time is approximate, there might be a few minutes delay from the
-  time specified.
-  """
-  scheduledAt: Timestamp
-
-  """The date and time indicating when the schedule was created."""
-  createdAt: Timestamp
-
-  """The title of the schedule."""
-  title: String
-}
-
 """An in-store location."""
 type InStoreLocation implements Node {
   """Unique identifier."""
@@ -4143,9 +4204,6 @@ input InStoreLocationInput {
   """The address of the in-store Location."""
   address: InStoreLocationAddressInput!
 
-  """The coordinates of this location."""
-  geoCoordinates: GeoCoordinatesInput
-
   """The PayPal account ID to which this Location will be added."""
   payerId: ID
 
@@ -4178,9 +4236,6 @@ input InStoreLocationUpdateInput {
 
   """The address of the location."""
   address: InStoreLocationAddressUpdateInput
-
-  """The coordinates of this location."""
-  geoCoordinates: GeoCoordinatesInput
 
   """The PayPal account ID to which this location will be added."""
   payerId: ID
@@ -4413,15 +4468,6 @@ type InStoreReaderPayload {
 
 """Input fields for searching for in-store readers."""
 input InStoreReaderSearchInput {
-  """Find in-store readers with location ID or IDs."""
-  locationId: SearchValueInput
-
-  """Find in-store readers with software version."""
-  softwareVersion: SearchSoftwareVersionInput
-
-  """Find in-store readers with reader status."""
-  readerStatus: ReaderStatus
-
   """Find in-store readers which meet any of the specified conditions."""
   conditionsIn: [InStoreReaderConditionInput!]
 }
@@ -4712,6 +4758,15 @@ input LocalPaymentAddressInput {
   countryCode: CountryCode
 }
 
+"""BLIK alias for BLIK OneClick Local Payment transaction details."""
+type LocalPaymentBlikAlias {
+  """BLIK OneClick alias key."""
+  key: String
+
+  """BLIK OneClick alias label."""
+  label: String
+}
+
 """The LocalPayment object."""
 type LocalPaymentContext implements Node & PaymentContext {
   """Unique identifier for the payment context."""
@@ -4781,13 +4836,15 @@ type LocalPaymentDetails {
 """A value identifying the type of regional payment method."""
 enum LocalPaymentMethodType {
   ALIPAY
+  BANCOMATPAY
   BANCONTACT
   BLIK
-  BOLETOBANCARIO
+  BOLETOBANCARIO @deprecated(reason: "Boleto Bancário is no longer supported.")
   EPS
   GIROPAY
   GRABPAY
   IDEAL
+  MBWAY
   MULTIBANCO
   MYBANK
   OXXO
@@ -4823,11 +4880,6 @@ input LocalPaymentPayerInfoInput {
 
   """The payer's billing address."""
   billingAddress: LocalPaymentAddressInput
-
-  """
-  The payer's tax information. This is only required for Boleto Bancário payments.
-  """
-  taxInfo: TaxInfoInput
 }
 
 """Mandate type for SEPA Direct Debit Account."""
@@ -5281,7 +5333,7 @@ type Mutation {
   """
   Tokenize Samsung Pay card fields and return a payload that includes a single-use payment method.
   """
-  tokenizeSamsungPayCard(input: TokenizeSamsungPayCardInput!): TokenizeSamsungPayCardPayload
+  tokenizeSamsungPayCard(input: TokenizeSamsungPayCardInput!): TokenizeSamsungPayCardPayload @deprecated(reason: "Samsung pay is no longer supported.")
 
   """
   Tokenize US bank account fields and return a payload that includes a single-use payment method.
@@ -5412,9 +5464,6 @@ type Mutation {
   """Updates an In-Store Reader."""
   updateInStoreReader(input: UpdateInStoreReaderInput!): InStoreReaderPayload
 
-  """Creates a schedule to request firmware updates on In-Store Readers."""
-  createInStoreFirmwareUpdateSchedule(input: CreateInStoreFirmwareUpdateScheduleInput!): CreateInStoreFirmwareUpdateSchedulePayload
-
   """Request an in-store reader to begin the charge flow."""
   requestChargeFromInStoreReader(input: RequestChargeFromInStoreReaderInput!): InStoreContextPayload
 
@@ -5539,6 +5588,12 @@ type Mutation {
 
   """Create a request for access to a specified product."""
   createProductRequestForMerchant(input: CreateProductRequestForMerchantInput!): ProductRequestPayload
+
+  """Creates a customer session with customer information."""
+  createCustomerSession(input: CreateCustomerSessionInput!): CustomerSessionPayload
+
+  """Updates a customer session with customer information."""
+  updateCustomerSession(input: UpdateCustomerSessionInput!): CustomerSessionPayload
 }
 
 """Means by which customers by their bills."""
@@ -5723,6 +5778,7 @@ input NonInstantLocalPaymentContextInput {
 
 """A value identifying the type of non-instant regional payment method."""
 enum NonInstantLocalPaymentMethodType {
+  """Deprecated: Boleto Bancário is no longer supported."""
   BOLETOBANCARIO
   MULTIBANCO
   OXXO
@@ -6198,6 +6254,8 @@ enum PaymentMethodOriginType {
   META_CHECKOUT
   NETWORK_TOKEN
   PAYPAL
+
+  """Deprecated: Samsung is no longer supported."""
   SAMSUNG_PAY
   VISA_CHECKOUT
 }
@@ -6216,8 +6274,11 @@ from which a customer provided that payment method.
 """
 enum PaymentMethodSnapshotSearchType {
   ALIPAY_VIA_PAYPAL
+  BANCOMATPAY_VIA_PAYPAL
   BANCONTACT_VIA_PAYPAL
   BLIK_VIA_PAYPAL
+
+  """Deprecated: Boleto Bancário is no longer supported."""
   BOLETOBANCARIO_VIA_PAYPAL
   CREDIT_CARD
   CREDIT_CARD_VIA_APPLE_PAY
@@ -6225,6 +6286,8 @@ enum PaymentMethodSnapshotSearchType {
   CREDIT_CARD_VIA_MASTERPASS
   CREDIT_CARD_VIA_META_CHECKOUT
   CREDIT_CARD_VIA_NETWORK_TOKEN
+
+  """Deprecated: Samsung is no longer supported."""
   CREDIT_CARD_VIA_SAMSUNG_PAY
   CREDIT_CARD_VIA_VISA_CHECKOUT
   EPS_VIA_PAYPAL
@@ -6232,6 +6295,7 @@ enum PaymentMethodSnapshotSearchType {
   GRABPAY_VIA_PAYPAL
   IDEAL_VIA_PAYPAL
   LOCAL_PAYMENT
+  MBWAY_VIA_PAYPAL
   MULTIBANCO_VIA_PAYPAL
   MYBANK_VIA_PAYPAL
   OXXO_VIA_PAYPAL
@@ -6292,6 +6356,15 @@ type PaymentNetworkResponse {
   message: String
 }
 
+"""Customer payment option recommendation."""
+type PaymentOptions {
+  """The payment option type."""
+  paymentOption: RecommendationPaymentOption
+
+  """Recommended priority of the payment option."""
+  recommendedPriority: Int
+}
+
 """
 The input mode used on the payment reader to facilitate an in-store transaction.
 """
@@ -6302,6 +6375,12 @@ enum PaymentReaderInputMode {
   MAGSTRIPE_FALLBACK
   MANUAL_KEY_ENTRY
   VAULT
+}
+
+"""The payment recommendations of the customer."""
+type PaymentRecommendations {
+  """A set of payment options."""
+  paymentOptions: [PaymentOptions!]
 }
 
 """Input fields for searching for any type of Payment."""
@@ -6952,6 +7031,9 @@ type PayPalLocalPaymentOriginDetails {
 
   """The fee charged by PayPal for the transaction."""
   transactionFee: MonetaryAmount
+
+  """List of BLIK aliases for BLIK OneClick type of local payment."""
+  blikAliases: [LocalPaymentBlikAlias!]
 }
 
 """PayPal local payment specific refund details."""
@@ -7039,6 +7121,129 @@ type PayPalQualifyingFinancingOption {
   Indicates whether the financing option's credit fee is funded by PayPal.
   """
   paypalSubsidized: Boolean
+}
+
+"""The billing cycle that is a part of a recurring billing plan."""
+input PayPalRecurringBillingCycleInput {
+  """Whether the cycle is or is not a trial period."""
+  trial: Boolean
+
+  """The pricing scheme for the billing cycle."""
+  pricingScheme: PayPalRecurringBillingPricingSchemeInput
+
+  """The frequency interval of the payments towards the plan."""
+  frequencyInterval: PayPalRecurringBillingFrequencyIntervalInput
+
+  """The order that this cycle runs among other billing cycles."""
+  billingCycleSequence: Int!
+
+  """Start date for the billing cycle."""
+  startDate: Date
+
+  """
+  The number of times the billing cycle will be executed. Zero indicates infinite.
+  """
+  numberOfExecutions: Int
+}
+
+"""The frequency interval of payments in a recurring billing cycle."""
+input PayPalRecurringBillingFrequencyIntervalInput {
+  """The unit of time for the interval which the payment is charged."""
+  billingFrequencyUnit: FrequencyUnit
+
+  """The amount of time of the interval which the next payment is charged."""
+  billingFrequency: Int
+}
+
+"""Charges due at the initial checkout for a recurring billing plan."""
+input PayPalRecurringBillingOneTimeChargesInput {
+  """The one-time setup fee."""
+  oneTimeFeeAmount: Amount
+
+  """The shipping amount for the product."""
+  shippingAmount: Amount
+}
+
+"""
+The type of recurring billing plan associated with the billing agreement.
+"""
+enum PayPalRecurringBillingPlan {
+  INSTALLMENT
+  RECURRING
+  SUBSCRIPTION
+  UNSCHEDULED
+}
+
+"""Billing plan for recurring payments."""
+input PayPalRecurringBillingPlanInput {
+  """The type of recurring billing plan."""
+  planType: PayPalRecurringBillingPlan!
+
+  """Additional properties of the recurring billing plan."""
+  planMetadata: PayPalRecurringBillingPlanMetadataInput
+}
+
+"""Additional properties of a recurring billing plan."""
+input PayPalRecurringBillingPlanMetadataInput {
+  """The name of the billing plan to be displayed at checkout."""
+  name: String
+
+  """
+  The optional product included or associated with the recurring payment.
+  """
+  product: PayPalRecurringBillingProductInput
+
+  """
+  Array of billing cycles. At most two trial cycles and one regular cycle.
+  """
+  billingCycles: [PayPalRecurringBillingCycleInput!]!
+
+  """Charges due at initial checkout."""
+  oneTimeCharges: PayPalRecurringBillingOneTimeChargesInput
+
+  """
+  The total amount associated with the billing cycle at the time of checkout.
+  """
+  totalAmount: Amount!
+
+  """The tax amount for the billing cycle at the time of checkout."""
+  taxAmount: Amount
+
+  """The currency code for the entire billing plan."""
+  currencyCode: CurrencyCodeAlpha!
+}
+
+"""The type of pricing model used for recurring billing."""
+enum PayPalRecurringBillingPricingModel {
+  AUTO_RELOAD
+  FIXED
+  VARIABLE
+}
+
+"""The pricing scheme for a recurring billing cycle."""
+input PayPalRecurringBillingPricingSchemeInput {
+  """The type of pricing model used."""
+  pricingModel: PayPalRecurringBillingPricingModel
+
+  """The recurring charge amount."""
+  price: Amount
+
+  """
+  The reload trigger threshold condition amount when the customer is charged.
+  """
+  reloadThresholdAmount: Amount
+}
+
+"""The optional product included in a recurring billing plan."""
+input PayPalRecurringBillingProductInput {
+  """The description of the product."""
+  description: String
+
+  """The quantity of the product included."""
+  quantity: Float
+
+  """The unit price of the product."""
+  price: Amount
 }
 
 """PayPal-specific refund details."""
@@ -7159,6 +7364,12 @@ type PayPalTransactionDetails {
 
   """The application used by the payer to scan the QR code."""
   appUsedForScanning: PayPalRetailAppUsedForScanning
+
+  """Recipient email."""
+  recipientEmail: EmailAddress
+
+  """Recipient phone."""
+  recipientPhone: Phone
 }
 
 """Top-level output field from creating a PayPal transaction."""
@@ -7273,6 +7484,31 @@ type PerformThreeDSecureLookupPayload {
 
   """A single-use payment method."""
   paymentMethod: PaymentMethod
+}
+
+"""
+The phone number in its international [E.164 numbering plan format](https://www.itu.int/rec/T-REC-E.164/en).
+"""
+type Phone {
+  """
+  The country calling code (CC), in its canonical international [E.164 numbering
+  plan format](https://www.itu.int/rec/T-REC-E.164/en). The combined length of
+  the CC and the national number must not be greater than 15 digits. The
+  national number consists of a national destination code (NDC) and subscriber number (SN).
+  """
+  countryPhoneCode: String
+
+  """
+  The phone number, in its canonical international [E.164 numbering plan
+  format](https://www.itu.int/rec/T-REC-E.164/en). The combined length of the
+  country calling code (CC) and the national number must not be greater than 15
+  digits. The national number consists of a national destination code (NDC) and
+  subscriber number (SN).
+  """
+  phoneNumber: String
+
+  """The extension number."""
+  extensionNumber: String
 }
 
 """
@@ -7469,12 +7705,26 @@ type Query {
 
   """Retrieve a paginated list of all in-store locations."""
   inStoreLocations(first: Int, after: String): InStoreLocationConnection
+
+  """Fetch customer recommendations based on customer session information."""
+  customerRecommendations(input: CustomerRecommendationsInput!): CustomerRecommendationsPayload
 }
 
 """Indicates the status of a Reader."""
 enum ReaderStatus {
   OFFLINE
   ONLINE
+}
+
+"""Payment option for Recommendations."""
+enum RecommendationPaymentOption {
+  PAYPAL
+  VENMO
+}
+
+"""Allowed Recommendations categories."""
+enum Recommendations {
+  PAYMENT_RECOMMENDATIONS
 }
 
 """The type of recurring payment a transaction represents."""
@@ -8659,7 +8909,11 @@ type Role {
   rights: [Right!]
 }
 
-"""Details about a Samsung Pay card."""
+"""
+Deprecated: Samsung pay is no longer supported.
+
+Details about a Samsung Pay card.
+"""
 type SamsungPayCardDetails {
   """The display name of the card brand, e.g. "Visa" or "American Express"."""
   brand: String
@@ -8684,7 +8938,11 @@ type SamsungPayCardDetails {
   sourceCardLast4: CreditCardLast4
 }
 
-"""Input fields for a Samsung Pay card."""
+"""
+Deprecated: Samsung pay is no longer supported.
+
+Input fields for a Samsung Pay card.
+"""
 input SamsungPayCardInput {
   """
   A one-time-use string generated by the token requester to validate the transaction.
@@ -8712,7 +8970,11 @@ input SamsungPayCardInput {
   sourceCardLast4: CreditCardLast4!
 }
 
-"""Configuration for Samsung Pay on Android."""
+"""
+Deprecated: Samsung Pay is no longer supported.
+
+Configuration for Samsung Pay on Android.
+"""
 type SamsungPayConfiguration {
   """A string used to identify the merchant to the customer."""
   displayName: String
@@ -8730,13 +8992,21 @@ type SamsungPayConfiguration {
   supportedCardBrands: [CreditCardBrandCode!]
 }
 
-"""The environment being used for Samsung Pay."""
+"""
+Deprecated: Samsung pay is no longer supported.
+
+The environment being used for Samsung Pay.
+"""
 enum SamsungPayEnvironment {
   PRODUCTION
   SANDBOX
+  production
+  sandbox
 }
 
 """
+Deprecated: Samsung pay is no longer supported.
+
 Additional information about the payment method specific to Samsung Pay.
 """
 type SamsungPayOriginDetails {
@@ -9300,16 +9570,17 @@ input SearchTextValueInput {
 }
 
 """
-Input fields for searching by timestamp. These ranges are precise to the minute;
-the results of searching for an object created between 12/17/2015 17:00 and
-12/17/2015 17:00 (i.e., the same minute) will include objects created at
-12/17/2015 17:00:59. If no timezone is provided, it will be assumed to be UTC.
+Input fields for searching by timestamp. These ranges have the following
+properties: The lower bound is inclusive, the upper bound is exclusive, and one
+minute is always added to the upper bound. As an example, the results of
+searching for an object created between 12/17/2015 17:00 and 12/17/2015 18:00
+will include objects created at the following times: 17:00:00, 17:35:24, and 18:00:59.
 """
 input SearchTimestampInput {
   """Timestamp is greater than or equal to this value."""
   greaterThanOrEqualTo: Timestamp
 
-  """Timestamp is less than or equal to this value."""
+  """Timestamp is less than this value."""
   lessThanOrEqualTo: Timestamp
 }
 
@@ -9597,15 +9868,6 @@ type SubmittedForSettlementEvent implements PaymentStatusEvent {
   userName: String
 }
 
-"""Input fields for local payment tax information."""
-input TaxInfoInput {
-  """The payer's tax identifier value."""
-  identifier: String!
-
-  """The payer's tax identifier type."""
-  type: TaxInfoType!
-}
-
 """The type of tax identifier."""
 enum TaxInfoType {
   BR_CNPJ
@@ -9802,10 +10064,13 @@ enum ThreeDSecureAuthenticationStatusIndicator {
 enum ThreeDSecureAuthenticationTransactionType {
   ADD_CARD
   CARDHOLDER_VERIFICATION
+  DELAYED_SHIPMENT
   INSTALLMENT
   MAINTAIN_CARD
   PAYMENT
+  PAYMENT_WITH_MULTIPLE_MERCHANTS
   RECURRING
+  SPLIT_SHIPMENT
 }
 
 """Indicates whether the card is enrolled in a 3D Secure program."""
@@ -10656,7 +10921,11 @@ type TokenizePayPalOneTimePaymentPayload {
   paymentMethod: PaymentMethod
 }
 
-"""Top-level input field for tokenizing a Samsung Pay card."""
+"""
+Deprecated: Samsung pay is no longer supported.
+
+Top-level input field for tokenizing a Samsung Pay card.
+"""
 input TokenizeSamsungPayCardInput {
   """
   An identifier used to reconcile requests and responses. 255 characters maximum.
@@ -10667,7 +10936,11 @@ input TokenizeSamsungPayCardInput {
   samsungPayCard: SamsungPayCardInput!
 }
 
-"""Top-level fields returned from a tokenized Samsung Pay card."""
+"""
+Deprecated: Samsung pay is no longer supported.
+
+Top-level fields returned from a tokenized Samsung Pay card.
+"""
 type TokenizeSamsungPayCardPayload {
   """
   An identifier used to reconcile requests and responses. 255 characters maximum.
@@ -11804,11 +12077,6 @@ input UpdateCreditCardBillingAddressInput {
   billingAddress: AddressInput
 
   """
-  ID of the merchant account that will be used when verifying the credit card with the new billing address.
-  """
-  merchantAccountId: ID
-
-  """
   Input fields that specify options for verifying the credit card with the new
   billing address. By default, a verification will be performed. If the
   verification fails, the update will not be performed.
@@ -11955,6 +12223,23 @@ type UpdateCustomerPayload {
 
   """Information about the customer that was updated."""
   customer: Customer
+}
+
+"""Customer session update request."""
+input UpdateCustomerSessionInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The customer session identifier."""
+  sessionId: String!
+
+  """Merchant Account ID."""
+  merchantAccountId: ID
+
+  """Customer identifying information."""
+  customer: CustomerSessionInput
 }
 
 """
@@ -12171,6 +12456,9 @@ type UsBankAccountDetails {
 
   """NACHA-mandated proof of acceptance of ACH terms."""
   achMandate: UsBankAccountAchMandate
+
+  """The ACH return code, if applicable."""
+  achReturnCode: String
 }
 
 """The name of the owner of a personal US bank account."""
@@ -12481,9 +12769,16 @@ input VaultCreditCardInput {
   """
   If this option is passed and the same payment method has already been added to
   the Vault for any customer, the request will fail. This option will be ignored
-  for Apple pay, Google pay, and Samsung pay payment methods.
+  for Apple pay and Google pay payment methods.
   """
   failOnDuplicatePaymentMethod: Boolean
+
+  """
+  If this option is passed and the same payment method has already been added to
+  the Vault for the same customer, the request will fail. This option will be
+  ignored for Apple pay and Google pay payment methods.
+  """
+  failOnDuplicatePaymentMethodForCustomer: Boolean
 }
 
 """
@@ -13140,11 +13435,6 @@ input VenmoPaysheetTransactionDetailsInput {
   totalAmount: Amount!
 
   """
-  The list of line items belonging to the transaction. Can include up to 249 line items.
-  """
-  lineItems: [PayPalLineItemInput!]
-
-  """
   The list of line items belonging to the pay sheet. Can include up to 249 line items.
   """
   venmoPaysheetLineItems: [VenmoPaysheetLineItemInput!]
@@ -13330,9 +13620,6 @@ input VerifyCreditCardInput {
 
   """ID of the payment method to be verified."""
   paymentMethodId: ID!
-
-  """ID of the merchant account to use when verifying the credit card."""
-  merchantAccountId: ID
 
   """Input fields for verifying a credit card."""
   options: CreditCardVerificationOptionsInput
