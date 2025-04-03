@@ -4,6 +4,9 @@ directive @specifiedBy(
   url: String!
 ) on SCALAR
 
+"""Indicates an Input Object is a OneOf Input Object."""
+directive @oneOf on INPUT_OBJECT
+
 """Top-level input fields for accepting a dispute."""
 input AcceptDisputeInput {
   """
@@ -291,6 +294,11 @@ type ApplePayOriginDetails {
   Number. This BIN may differ from the BIN of the customer's actual card.
   """
   bin: String
+
+  """
+  The Merchant Payment Account Number (MPAN), a unique identifier for the customer's card.
+  """
+  merchantTokenIdentifier: String
 }
 
 """The environment being used for Apple Pay."""
@@ -615,6 +623,9 @@ type BinRecord {
   A code representing any special program from the card issuer the card is part of.
   """
   productId: String
+
+  """Whether or not the prepaid card is reloadable."""
+  prepaidReloadable: BinRecordValue
 }
 
 """
@@ -1446,6 +1457,11 @@ input CreatePayPalBillingAgreementInput {
 
   """Product attributes input for PayPal billing agreement."""
   paypalProductAttributes: PayPalProductAttributesInput
+
+  """
+  A unique identifier which can be used to manage shopper context across merchant's shopping pages.
+  """
+  customerSessionId: String
 }
 
 """
@@ -1546,6 +1562,11 @@ input CreatePayPalOneTimePaymentInput {
   URL for redirecting back to the merchant app to update a customer shipping address.
   """
   shippingCallbackUrl: URL
+
+  """
+  A unique identifier which can be used to manage shopper context across merchant's shopping pages.
+  """
+  customerSessionId: String
 }
 
 """Top-level fields returned from setting up a PayPal One-Time Payment."""
@@ -3395,6 +3416,9 @@ type FailedEvent implements PaymentStatusEvent {
 type FastlaneConfiguration {
   """Whether or not Fastlane is enabled for the merchant."""
   enabled: Boolean
+
+  """Configuration for Tokens on Demand."""
+  tokensOnDemand: TokensOnDemandConfiguration
 }
 
 """Top-level input fields for finalizing a dispute."""
@@ -3518,6 +3542,44 @@ enum GatewayRejectionReason {
   TOKEN_ISSUANCE
   TOO_MANY_CONFIRMATION_ATTEMPTS
   UNION_PAY_ENROLLMENT_REQUIRED
+}
+
+"""Input for generating a URL for editing a funding instrument details."""
+input GenerateEditFundingInstrumentUrlInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The vaulted billing agreement id."""
+  vaultedBillingAgreementId: ID!
+
+  """URL for redirecting back to merchant app or website on the client."""
+  returnUrl: URL!
+
+  """
+  URL for redirect back to merchant app on the client indicating unsuccessful approval.
+  """
+  cancelUrl: URL!
+
+  """PayPal Risk correlation ID (also known as the Client Metadata ID)."""
+  paypalRiskCorrelationId: ID
+}
+
+"""Details for editing a funding instrument."""
+type GenerateEditFundingInstrumentUrlPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The Billing Agreement token."""
+  billingAgreementToken: ID!
+
+  """
+  The URL to which a customer should be redirected to edit the funding instrument details.
+  """
+  approvalUrl: URL!
 }
 
 """Input to generate a list of exchange rate quotes."""
@@ -5594,6 +5656,9 @@ type Mutation {
 
   """Updates a customer session with customer information."""
   updateCustomerSession(input: UpdateCustomerSessionInput!): CustomerSessionPayload
+
+  """Generates an edit funding instrument URL."""
+  generateEditFundingInstrumentUrl(input: GenerateEditFundingInstrumentUrlInput!): GenerateEditFundingInstrumentUrlPayload
 }
 
 """Means by which customers by their bills."""
@@ -6661,6 +6726,14 @@ type PayPalAccountDetails {
   Payer's selected financing option at the time of creating a transaction.
   """
   selectedFinancingOption: SelectedPayPalFinancingOptionDetails
+
+  """Customer's Funding Instrument information."""
+  fundingSourceDescription: String
+
+  """
+  The ID which can be used for editing the funding instrument for this PayPal account.
+  """
+  vaultedBillingAgreementId: String
 }
 
 """Input for identifying a PayPal account."""
@@ -6827,6 +6900,9 @@ input PayPalExperienceProfileInput {
   flow. Default is Continue flow if the field is not provided.
   """
   userAction: PayPalUserAction
+
+  """Indicates the contact information preferred by the customers."""
+  contactPreference: PayPalUserContactPreference
 }
 
 """Possible identifiers for credit products provided via PayPal."""
@@ -7395,6 +7471,22 @@ type PayPalTransactionPayload {
 enum PayPalUserAction {
   COMMIT
   CONTINUE
+}
+
+"""PayPal User Contact Preference types."""
+enum PayPalUserContactPreference {
+  """Default Option. No contact information provided by the customer."""
+  NO_CONTACT_INFO
+
+  """
+  Merchant has pre-filled contact information (email/phone) that cannot be modified by the customer.
+  """
+  RETAIN_CONTACT_INFO
+
+  """
+  Merchant allows the customer to provide or update contact information (email/phone).
+  """
+  UPDATE_CONTACT_INFO
 }
 
 """
@@ -10042,6 +10134,7 @@ enum ThreeDSecureAuthenticationStatus {
   LOOKUP_NOT_ENROLLED
   LOOKUP_SERVER_ERROR
   MPI_SERVER_ERROR
+  SKIPPED_DUE_TO_ADAPTIVE_AUTHENTICATION
   SKIPPED_DUE_TO_RULE
   UNSUPPORTED_ACCOUNT_TYPE
   UNSUPPORTED_CARD
@@ -10730,6 +10823,14 @@ An [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Times) timestamp with micro
 """
 scalar Timestamp
 
+"""Configuration for Token Exchange."""
+type TokenExchangeConfiguration {
+  """
+  Whether or not Direct Network Tokenization is enabled for the merchant.
+  """
+  enabled: Boolean
+}
+
 """Top-level input fields for tokenizing a credit card."""
 input TokenizeCreditCardInput {
   """
@@ -10989,6 +11090,15 @@ input TokenizeUsBankLoginInput {
 
   """Input fields for a US bank login."""
   usBankLogin: UsBankLoginInput!
+}
+
+"""Configuration for Tokens on Demand."""
+type TokensOnDemandConfiguration {
+  """Whether or not Tokens on Demand is enabled for the merchant."""
+  enabled: Boolean
+
+  """Configuration for Token Exchange."""
+  tokenExchange: TokenExchangeConfiguration
 }
 
 """A charge on a payment method."""

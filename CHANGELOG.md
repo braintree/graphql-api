@@ -1,3 +1,26 @@
+# 04-03-2025
+* Add new directive
+    * `oneOf`
+* Add new field
+    * `merchantTokenIdentifier` on `ApplePayOriginDetails`
+    * `prepaidReloadable` on `BinRecord`
+    * `customerSessionId` on `CreatePayPalBillingAgreementInput`, `CreatePayPalOneTimePaymentInput`
+    * `tokensOnDemand` on `FastlaneConfiguration`
+    * `fundingSourceDescription`, `vaultedBillingAgreementId` on `PayPalAccountDetails`
+    * `contactPreference` on `PayPalExperienceProfileInput`
+* Add new input
+    * `GenerateEditFundingInstrumentUrlInput`
+* Add new type
+    * `TokenExchangeConfiguration`
+    * `TokensOnDemandConfiguration`
+    * `GenerateEditFundingInstrumentUrlPayload`
+* Add new mutation
+    * `generateEditFundingInstrumentUrl`
+* Add new enum
+    * `PayPalUserContactPreference`
+* Add new enum value
+    * `SKIPPED_DUE_TO_ADAPTIVE_AUTHENTICATION` on `ThreeDSecureAuthenticationStatus`
+
 # 02-12-2025
 * Add new field
     * `phone` to `Address`, `AddressInput`
