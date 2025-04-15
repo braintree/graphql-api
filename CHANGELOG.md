@@ -1,3 +1,13 @@
+# 04-15-2025
+* Add new input
+    * `PayPalBillingAgreementDetailsInput`
+* Add new type
+    * `PayPalBillingAgreementDetailsPayload`
+* Add new enum
+    * `PayPalBillingAgreementStatus`
+* Add new query
+    * `paypalBillingAgreementDetails`
+ 
 # 04-03-2025
 * Add new directive
     * `oneOf`

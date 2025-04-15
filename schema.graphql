@@ -6775,6 +6775,24 @@ enum PayPalBillingAgreementChargePattern {
   THRESHOLD_PREPAID
 }
 
+"""Input fields for getting the billing agreement details."""
+input PayPalBillingAgreementDetailsInput {
+  """The billing agreement token."""
+  billingAgreementToken: ID!
+
+  """Merchant Account ID."""
+  merchantAccountId: ID
+}
+
+"""The details of the billing agreement."""
+type PayPalBillingAgreementDetailsPayload {
+  """The Billing Agreement token."""
+  billingAgreementToken: ID
+
+  """The status of the billing agreement."""
+  status: PayPalBillingAgreementStatus
+}
+
 """Controls the experience in a PayPal billing agreement approval flow."""
 input PayPalBillingAgreementExperienceProfileInput {
   """Merchant brand name to be displayed on the PayPal approval pages."""
@@ -6804,6 +6822,15 @@ input PayPalBillingAgreementExperienceProfileInput {
 input PayPalBillingAgreementInput {
   """The Billing Agreement token."""
   billingAgreementToken: ID!
+}
+
+"""The status of the billing agreement."""
+enum PayPalBillingAgreementStatus {
+  """The token has been created and requires approval."""
+  APPROVAL_REQUIRED
+
+  """The token has been approved by the consumer."""
+  APPROVED
 }
 
 """Configuration for PayPal."""
@@ -7800,6 +7827,9 @@ type Query {
 
   """Fetch customer recommendations based on customer session information."""
   customerRecommendations(input: CustomerRecommendationsInput!): CustomerRecommendationsPayload
+
+  """Returns the details of the billing agreement."""
+  paypalBillingAgreementDetails(input: PayPalBillingAgreementDetailsInput!): PayPalBillingAgreementDetailsPayload
 }
 
 """Indicates the status of a Reader."""
