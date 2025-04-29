@@ -1,3 +1,7 @@
+# 04-29-2025
+* Add new field
+    * `returnUrl` to `TokenizePayPalBillingAgreementPayload`
+
 # 04-15-2025
 * Add new input
     * `PayPalBillingAgreementDetailsInput`

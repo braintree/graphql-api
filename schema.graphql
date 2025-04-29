@@ -11023,6 +11023,11 @@ type TokenizePayPalBillingAgreementPayload {
 
   """A single-use payment method."""
   paymentMethod: PaymentMethod
+
+  """
+  The URL to which the merchant should redirect the user after tokenizing the PayPal Billing Agreement.
+  """
+  returnUrl: URL
 }
 
 """Top-level input fields for tokenizing a PayPal account."""
