@@ -1,3 +1,96 @@
+# 08-12-2025
+* Add new enum
+    * `AccountInformationInquiry`
+    * `PayPalAppSwitchOsType`
+    * `PayPalAppSwitchReturnFlow`
+    * `PayPalBillingAgreementExperienceStatus`
+    * `PayPalBillingAgreementUserAction`
+    * `PayPalOrderExperienceStatus`
+    * `PayPalOrderStatus`
+    * `ProductEnablementStatus` values `DISABLING`, `ENABLING`
+    * `TransactionTransferType`
+* Add new input
+    * `AuthorizeInStoreCreditCardInput`
+    * `ChargeInStoreCreditCardInput`
+    * `CreateOfflineDeclinedTransactionInput`
+    * `CreateTransactionRiskContextInput`
+    * `EmvCardInput`
+    * `InStoreCreditCardRefundOptionsInput`
+    * `InStoreCreditCardTransactionOptionsInput`
+    * `MagstripeCardInput`
+    * `PaymentFacilitatorInput`
+    * `PaymentReaderMetadataInput`
+    * `PayPalAmountBreakDownInput`
+    * `PayPalAppSwitchContextInput`
+    * `PayPalAppSwitchMobileWebInput`
+    * `PayPalAppSwitchNativeAppInput`
+    * `PayPalOrderDetailsInput`
+    * `PayPalTransactionRiskContextDataFieldInput`
+    * `PayPalTransactionRiskContextInput`
+    * `RefundInStoreCreditCardInput`
+    * `ReverseEmvTransactionInput`
+    * `SubMerchantDetailsInput`
+    * `TokenizeEmvCardInput`
+    * `TokenizeMagstripeCardInput`
+    * `UpdateEmvCaptureDataInput`
+* Add new type
+    * `PayPalOrderDetailsPayload`
+    * `TokenizeEmvCardPayload`
+    * `TokenizeMagstripeCardPayload`
+    * `TransactionRiskContextPayload`
+* Add new mutation
+    * `authorizeInStoreCreditCard`
+    * `chargeInStoreCreditCard`
+    * `createOfflineDeclinedTransaction`
+    * `createTransactionRiskContext`
+    * `refundInStoreCreditCard`
+    * `reverseEmvTransaction`
+    * `tokenizeEmvCard`
+    * `tokenizeMagstripeCard`
+    * `updateEmvCaptureData`
+* Add new query
+    * `paypalOrderDetails`
+* Add new field
+    * `business`, `consumer`, `corporate`, `purchase` to `BinRecord`
+    * `achMandate`, `achMandateAcceptedAt` to `ChargeUsBankAccountInput`
+    * `appSwitchContext`, `amountBreakDown`, `recurringBillingPlan` to `CreatePayPalOneTimePaymentInput`
+    * `appSwitchContext` to `CreatePayPalBillingAgreementInput`
+    * `launchPayPalApp` to `CreatePayPalBillingAgreementPayload`, `CreatePayPalOneTimePaymentPayload`
+    * `experienceStatus` to `PayPalBillingAgreementDetailsPayload`
+    * `remainingFileEvidenceStorage` to `Dispute`
+    * `userAction` to `PayPalBillingAgreementExperienceProfileInput`
+    * `statusDetails` to `Product`
+    * `upcomingRetryDate` to `Transaction`
+    * `cardinalSongbirdUrl`, `cardinalSongbirdIdentityHash` to `ThreeDSecureConfiguration`
+    * `acceptPartialAuthorization`, `paymentFacilitator` to `TransactionInput`
+    * `achMandate`, `achMandateAcceptedAt` to `VaultUsBankAccountInput`
+* Add new enum value
+    * `ESTIMATED_MOTO` to `PaymentInitiator`
+    * `NETWORK_TOKENS`, `SMART_RETRIES` to `ProductCode`
+* Remove
+    * `CreateCustomerSessionInput` input
+    * `CustomerRecommendations` union
+    * `CustomerRecommendationsInput` input
+    * `CustomerRecommendationsPayload` type
+    * `CustomerSessionInput` input
+    * `CustomerSessionPayload` type
+    * `PaymentOptions` type
+    * `PaymentRecommendations` type
+    * `RecommendationPaymentOption` enum
+    * `Recommendations` enum
+    * `UpdateCustomerSessionInput` input
+    * `createCustomerSession` mutation
+    * `updateCustomerSession` mutation
+    * `customerRecommendations` query
+    * `MANUAL_KEY_ENTRY` from `PaymentReaderInputMode` enum
+* Update type
+    * Make `cryptogram` nullable on `NetworkTokenInput`
+    * Change `quantity` from `Float` to `Int` on `PayPalRecurringBillingProductInput`
+* Deprecate
+    * `acceptanceText` on `UsBankAccountAchMandate`
+    * `authenticationResponse` on `ThreeDSecurePassThroughInput`
+    * `clientMetadataId` on `TransactionRiskContextPayload`
+
 # 04-29-2025
 * Add new field
     * `returnUrl` to `TokenizePayPalBillingAgreementPayload`

@@ -64,6 +64,12 @@ input AccountCreationStatusSearchInput {
   in: [AccountCreationStatus!]
 }
 
+"""An enumeration controlling the account information inquiry service."""
+enum AccountInformationInquiry {
+  """Sends AII data to the processor."""
+  SEND_DATA
+}
+
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
 """
@@ -490,6 +496,27 @@ type AuthorizedEvent implements PaymentStatusEvent {
 }
 
 """
+Top-level input fields for creating an in-store transaction by authorizing a credit card.
+"""
+input AuthorizeInStoreCreditCardInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of a credit card payment method to be authorized."""
+  paymentMethodId: ID!
+
+  """Input fields related to the in-store credit card being authorized."""
+  options: InStoreCreditCardTransactionOptionsInput
+
+  """
+  Input fields for the authorization, with details that will define the resulting transaction.
+  """
+  transaction: TransactionInput!
+}
+
+"""
 Top-level input fields for creating a transaction by authorizing a payment method.
 """
 input AuthorizePaymentMethodInput {
@@ -626,6 +653,18 @@ type BinRecord {
 
   """Whether or not the prepaid card is reloadable."""
   prepaidReloadable: BinRecordValue
+
+  """Whether or not the card is business."""
+  business: BinRecordValue
+
+  """Whether or not the card is consumer."""
+  consumer: BinRecordValue
+
+  """Whether or not the card is corporate."""
+  corporate: BinRecordValue
+
+  """Whether or not the card is purchase."""
+  purchase: BinRecordValue
 }
 
 """
@@ -899,6 +938,27 @@ input ChargeCreditCardInput {
 }
 
 """
+Top-level input fields for creating an in-store transaction by charging a credit card.
+"""
+input ChargeInStoreCreditCardInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of a credit card payment method to be charged."""
+  paymentMethodId: ID!
+
+  """Input fields for creating an in-store credit card transaction."""
+  options: InStoreCreditCardTransactionOptionsInput
+
+  """
+  Input fields for the charge, with details that will define the resulting transaction.
+  """
+  transaction: TransactionInput!
+}
+
+"""
 Top-level input fields for creating a transaction by charging a payment method.
 """
 input ChargePaymentMethodInput {
@@ -975,6 +1035,14 @@ input ChargeUsBankAccountInput {
   Input fields for the charge, with details that will define the resulting transaction.
   """
   transaction: TransactionInput!
+
+  """
+  Language used to prove that you have the customer's explicit permission to debit their bank account.
+  """
+  achMandate: String
+
+  """The date and time when the ACH mandate was accepted by the customer."""
+  achMandateAcceptedAt: Timestamp
 }
 
 """Input fields for creating a transaction with a US bank account."""
@@ -1261,26 +1329,6 @@ type CreateCustomerPayload {
   customer: Customer
 }
 
-"""Customer session creation request."""
-input CreateCustomerSessionInput {
-  """
-  An identifier used to reconcile requests and responses. 255 characters maximum.
-  """
-  clientMutationId: String
-
-  """The customer session identifier."""
-  sessionId: String
-
-  """Merchant Account ID."""
-  merchantAccountId: ID
-
-  """Customer identifying information."""
-  customer: CustomerSessionInput
-
-  """The domain name of the user's browser."""
-  domain: String
-}
-
 """Top-level input fields for adding file evidence to a dispute."""
 input CreateDisputeFileEvidenceInput {
   """
@@ -1402,6 +1450,25 @@ type CreateOAuthClientSecretPayload {
   secret: String
 }
 
+"""
+Top-level input fields for creating a transaction in declined state if the
+transaction was already declined offline by an EMV chip card.
+"""
+input CreateOfflineDeclinedTransactionInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of a payment method to be charged."""
+  paymentMethodId: ID!
+
+  """
+  Input fields for the transaction, with details that will define the resulting declined transaction.
+  """
+  transaction: TransactionInput!
+}
+
 """Top-level input field for creating a PayPal Billing Agreement Token."""
 input CreatePayPalBillingAgreementInput {
   """
@@ -1462,6 +1529,11 @@ input CreatePayPalBillingAgreementInput {
   A unique identifier which can be used to manage shopper context across merchant's shopping pages.
   """
   customerSessionId: String
+
+  """
+  Context information for enabling App Switch to the PayPal app during checkout.
+  """
+  appSwitchContext: PayPalAppSwitchContextInput
 }
 
 """
@@ -1478,6 +1550,9 @@ type CreatePayPalBillingAgreementPayload {
 
   """The URL for getting user approval of the PayPal Billing Agreement."""
   approvalUrl: URL
+
+  """Indicates app switch eligibility."""
+  launchPayPalApp: Boolean
 }
 
 """Top-level input field for creating a PayPal One-Time Payment."""
@@ -1567,6 +1642,17 @@ input CreatePayPalOneTimePaymentInput {
   A unique identifier which can be used to manage shopper context across merchant's shopping pages.
   """
   customerSessionId: String
+
+  """
+  Context information for enabling app switch to the PayPal app during checkout.
+  """
+  appSwitchContext: PayPalAppSwitchContextInput
+
+  """The amount breakdown for this transaction."""
+  amountBreakDown: PayPalAmountBreakDownInput
+
+  """Billing plan for recurring payments."""
+  recurringBillingPlan: PayPalRecurringBillingPlanInput
 }
 
 """Top-level fields returned from setting up a PayPal One-Time Payment."""
@@ -1581,6 +1667,9 @@ type CreatePayPalOneTimePaymentPayload {
 
   """The PayPal payment ID / order ID."""
   paymentId: String
+
+  """Indicates app switch eligibility."""
+  launchPayPalApp: Boolean
 }
 
 """Input fields for requesting access to a product."""
@@ -1644,6 +1733,25 @@ type CreateTransactionPackageTrackingPayload {
 
   """The representing of the transaction for which the tracker was added."""
   transaction: Transaction
+}
+
+"""Top-level input fields for creating a transaction risk context."""
+input CreateTransactionRiskContextInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  PayPal Risk correlation ID (also known as the Client Metadata ID). If this is
+  not passed, one is generated downstream and is returned in the response.
+  """
+  paypalRiskCorrelationId: ID
+
+  """
+  Input fields setting the transaction context for risk assessment purposes.
+  """
+  riskContext: PayPalTransactionRiskContextInput!
 }
 
 """Top-level input field for generating a PayPal access token."""
@@ -2275,33 +2383,6 @@ input CustomerInput {
   taxIdentifiers: [CustomerTaxIdentifierInput!]
 }
 
-"""A union of all possible customer recommendations."""
-union CustomerRecommendations = PaymentRecommendations
-
-"""Input fields for searching customer recommendations."""
-input CustomerRecommendationsInput {
-  """The ID of the customer session to access customer session information."""
-  sessionId: String!
-
-  """Merchant Account ID."""
-  merchantAccountId: ID
-
-  """Customer identifying information."""
-  customer: CustomerSessionInput
-
-  """Recommendations categories."""
-  recommendations: [Recommendations!]
-}
-
-"""Customer recommendations information."""
-type CustomerRecommendationsPayload {
-  """Flag to indicate whether customer is in paypal network."""
-  isInPayPalNetwork: Boolean
-
-  """The recommendations of the customer."""
-  recommendations: CustomerRecommendations
-}
-
 """Input fields for searching for customers."""
 input CustomerSearchInput {
   """Find customers with an id or ids."""
@@ -2324,41 +2405,6 @@ input CustomerSearchInput {
 
   """Find customers with a given phone number."""
   phoneNumber: SearchTextInput
-}
-
-"""Customer identifying information for session."""
-input CustomerSessionInput {
-  """Customer email address."""
-  email: EmailAddress
-
-  """Customer phone number."""
-  phone: PhoneInput
-
-  """Internal identifier used for DFP identification."""
-  deviceFingerprintId: String
-
-  """True if PayPal app is installed on device.Defaults to false."""
-  paypalAppInstalled: Boolean
-
-  """True if Venmo app is installed on device.Defaults to false."""
-  venmoAppInstalled: Boolean
-
-  """
-  User agent from the request originating from the customer's device. This will
-  be used to identify the customer's operating system and browser versions.
-  """
-  userAgent: String
-}
-
-"""Customer session response."""
-type CustomerSessionPayload {
-  """
-  An identifier used to reconcile requests and responses. 255 characters maximum.
-  """
-  clientMutationId: String
-
-  """Customer session identifier."""
-  sessionId: String
 }
 
 """The customer's tax identifer for a given tax jurisdiction."""
@@ -2742,6 +2788,11 @@ type Dispute implements Node {
 
   """The pre-dispute program of the dispute."""
   preDisputeProgram: PreDisputeProgram
+
+  """
+  The remaining storage available for file evidence on a dispute in bytes.
+  """
+  remainingFileEvidenceStorage: Int
 }
 
 """A paginated list of disputes."""
@@ -3129,6 +3180,12 @@ maxLength: 254
 pattern: <code>^.+@[^\"\\-].+$</code>.
 """
 scalar EmailAddress
+
+"""Input fields for an EMV card."""
+input EmvCardInput {
+  """EMV data."""
+  emvData: String
+}
 
 """
 Additional information about an integrated circuit card (ICC) payment method supplied by an in-store payment reader.
@@ -4078,6 +4135,22 @@ enum InStoreContextStatus {
   PROCESSING
 }
 
+"""Input fields for creating an in-store credit card refund."""
+input InStoreCreditCardRefundOptionsInput {
+  """The refund date and time as reported by the in-store payment terminal."""
+  paymentInitiatedAt: Timestamp
+}
+
+"""
+Input fields for creating an in-store transaction by authorizing or charging a credit card.
+"""
+input InStoreCreditCardTransactionOptionsInput {
+  """
+  The transaction date and time as reported by the in-store payment terminal.
+  """
+  paymentInitiatedAt: Timestamp
+}
+
 """Input fields for an individual display item on an in-store reader."""
 input InStoreDisplayItemInput {
   """The display item type to be displayed on the in-store reader."""
@@ -4944,6 +5017,12 @@ input LocalPaymentPayerInfoInput {
   billingAddress: LocalPaymentAddressInput
 }
 
+"""Input fields for a magstripe card."""
+input MagstripeCardInput {
+  """Magstripe data."""
+  magstripeData: String
+}
+
 """Mandate type for SEPA Direct Debit Account."""
 enum MandateType {
   ONE_OFF
@@ -5238,9 +5317,17 @@ type Mutation {
   authorizeCreditCard(input: AuthorizeCreditCardInput!): TransactionPayload
 
   """
+  Authorize an in-store credit card and return a payload that includes details of the resulting transaction.
+  """
+  authorizeInStoreCreditCard(input: AuthorizeInStoreCreditCardInput!): TransactionPayload
+
+  """
   Capture an authorized transaction and return a payload that includes details of the transaction.
   """
   captureTransaction(input: CaptureTransactionInput!): TransactionPayload
+
+  """Updates EMV data necessary to capture an EMV contact transaction."""
+  updateEmvCaptureData(input: UpdateEmvCaptureDataInput!): TransactionPayload
 
   """
   Charge any payment method and return a payload that includes details of the resulting transaction.
@@ -5274,6 +5361,11 @@ type Mutation {
   chargeCreditCard(input: ChargeCreditCardInput!): TransactionPayload
 
   """
+  Charge an in-store credit card and return a payload that includes details of the resulting transaction.
+  """
+  chargeInStoreCreditCard(input: ChargeInStoreCreditCardInput!): TransactionPayload
+
+  """
   Vault payment information from a single-use payment method and return a
   payload that includes a new multi-use payment method. When vaulting a credit
   card, by default, this mutation will also verify that card before vaulting.
@@ -5294,6 +5386,11 @@ type Mutation {
   vaultCreditCard(input: VaultCreditCardInput!): VaultPaymentMethodPayload
 
   """
+  Create an EMV chip declined transaction and return a payload that includes details of the created transaction.
+  """
+  createOfflineDeclinedTransaction(input: CreateOfflineDeclinedTransactionInput!): TransactionPayload
+
+  """
   Refund a settled transaction and return a payload that includes details of the refund.
   """
   refundTransaction(input: RefundTransactionInput!): RefundTransactionPayload
@@ -5302,6 +5399,11 @@ type Mutation {
   Reverse a transaction and return a payload that includes either the voided transaction or a refund.
   """
   reverseTransaction(input: ReverseTransactionInput!): ReverseTransactionPayload
+
+  """
+  Reverse an EMV card declined transaction and return a payload that includes the voided transaction.
+  """
+  reverseEmvTransaction(input: ReverseEmvTransactionInput!): TransactionPayload
 
   """Reverse a refund and return a payload that includes voided refund."""
   reverseRefund(input: ReverseRefundInput!): RefundTransactionPayload
@@ -5315,6 +5417,12 @@ type Mutation {
   for more information regarding eligibility and configuration.
   """
   refundCreditCard(input: RefundCreditCardInput!): RefundCreditCardPayload
+
+  """
+  Create a detached refund (unassociated with any previous Braintree payment) to
+  an in-store credit card and return a payload that includes details of the refund.
+  """
+  refundInStoreCreditCard(input: RefundInStoreCreditCardInput!): RefundCreditCardPayload
 
   """
   Create a detached refund (unassociated with any previous Braintree payment) to
@@ -5381,6 +5489,16 @@ type Mutation {
   Tokenize credit card fields and return a payload that includes a single-use payment method.
   """
   tokenizeCreditCard(input: TokenizeCreditCardInput!): TokenizeCreditCardPayload
+
+  """
+  Tokenize magstripe credit card fields and return a payload that includes a single-use payment method.
+  """
+  tokenizeMagstripeCard(input: TokenizeMagstripeCardInput!): TokenizeMagstripeCardPayload
+
+  """
+  Tokenize EMV credit card fields and return a payload that includes a single-use payment method.
+  """
+  tokenizeEmvCard(input: TokenizeEmvCardInput!): TokenizeEmvCardPayload
 
   """
   Tokenize a credit card's CVV and return a payload that includes a single-use payment method.
@@ -5605,6 +5723,9 @@ type Mutation {
   """
   generateExchangeRateQuote(input: GenerateExchangeRateQuoteInput!): ExchangeRateQuotePayload
 
+  """Create a transaction context for risk assessment purposes."""
+  createTransactionRiskContext(input: CreateTransactionRiskContextInput!): TransactionRiskContextPayload
+
   """
   Creates a non-instant local payment context. Your account must be enabled to use this feature.
   """
@@ -5650,12 +5771,6 @@ type Mutation {
 
   """Create a request for access to a specified product."""
   createProductRequestForMerchant(input: CreateProductRequestForMerchantInput!): ProductRequestPayload
-
-  """Creates a customer session with customer information."""
-  createCustomerSession(input: CreateCustomerSessionInput!): CustomerSessionPayload
-
-  """Updates a customer session with customer information."""
-  updateCustomerSession(input: UpdateCustomerSessionInput!): CustomerSessionPayload
 
   """Generates an edit funding instrument URL."""
   generateEditFundingInstrumentUrl(input: GenerateEditFundingInstrumentUrlInput!): GenerateEditFundingInstrumentUrlPayload
@@ -5718,9 +5833,10 @@ input NameInput {
 """Input fields for a network tokenized card."""
 input NetworkTokenInput {
   """
-  A one-time-use string generated by the token requester to validate the transaction.
+  A one-time-use string generated by the token requester to validate the
+  transaction. This input is required when the origin it not NETWORK_TOKEN.
   """
-  cryptogram: String!
+  cryptogram: String
 
   """
   A two-digit string that should be passed along in the authorization message.
@@ -6170,6 +6286,17 @@ interface PaymentContext {
   updatedAt: Timestamp!
 }
 
+"""Details of the payment facilitator."""
+input PaymentFacilitatorInput {
+  """
+  Unique identifier for the Payment Facilitator given by the Card Schemes.
+  """
+  id: ID!
+
+  """Details of the sub-merchant."""
+  subMerchantDetails: SubMerchantDetailsInput!
+}
+
 """
 The initiator of the payment. Payment can either be merchant-initiated or customer-initiated.
 """
@@ -6179,6 +6306,12 @@ enum PaymentInitiator {
   amount of the transaction is not known at the time of authorization.
   """
   ESTIMATED
+
+  """
+  Transactions that are initiated by the customer via the merchant by mail or
+  telephone when the final amount of the transaction is not known at the time of authorization.
+  """
+  ESTIMATED_MOTO
 
   """
   Transactions for subsequent installment payments. (e.g. when the customer
@@ -6421,15 +6554,6 @@ type PaymentNetworkResponse {
   message: String
 }
 
-"""Customer payment option recommendation."""
-type PaymentOptions {
-  """The payment option type."""
-  paymentOption: RecommendationPaymentOption
-
-  """Recommended priority of the payment option."""
-  recommendedPriority: Int
-}
-
 """
 The input mode used on the payment reader to facilitate an in-store transaction.
 """
@@ -6438,14 +6562,30 @@ enum PaymentReaderInputMode {
   CONTACTLESS
   MAGSTRIPE
   MAGSTRIPE_FALLBACK
-  MANUAL_KEY_ENTRY
   VAULT
 }
 
-"""The payment recommendations of the customer."""
-type PaymentRecommendations {
-  """A set of payment options."""
-  paymentOptions: [PaymentOptions!]
+"""
+Metadata about the payment reader facilitating an in-store transaction.
+"""
+input PaymentReaderMetadataInput {
+  """
+  The input mode used on the payment reader to facilitate an in-store transaction.
+  """
+  inputMode: PaymentReaderInputMode!
+
+  """The device identifier for the payment reader."""
+  deviceId: ID
+
+  """The ID of the store that the transaction was processed in."""
+  storeId: ID
+
+  """
+  A flag used to indicate that the payment method was approved offline due to
+  connectivity issues on the payment reader. Defaults to `false` when the
+  payment method was approved online.
+  """
+  deferredAuthorization: Boolean
 }
 
 """Input fields for searching for any type of Payment."""
@@ -6743,6 +6883,108 @@ input PayPalAccountInput {
 }
 
 """
+Input fields used to specify the breakdown of a transaction's total amount.
+"""
+input PayPalAmountBreakDownInput {
+  """
+  The total amount for all the line items, including charges from billing plan, before any discounts or taxes.
+  """
+  itemTotal: Amount
+
+  """The amount charged for the shipping."""
+  shipping: Amount
+
+  """The handling charges applied to the transaction."""
+  handling: Amount
+
+  """The total tax applied to the transaction."""
+  taxTotal: Amount
+
+  """The insurance cost associated with the transaction."""
+  insurance: Amount
+
+  """The discount applied to the shipping for the transaction."""
+  shippingDiscount: Amount
+
+  """The total discount applied to the transaction."""
+  discount: Amount
+}
+
+"""
+Input fields for enabling app switch from a merchant app directly to the PayPal app.
+"""
+input PayPalAppSwitchContextInput {
+  """
+  Specifies details when the payment flow originates from a native mobile application.
+  """
+  nativeApp: PayPalAppSwitchNativeAppInput
+
+  """
+  Specifies details when the payment flow originates from a mobile web browser.
+  """
+  mobileWeb: PayPalAppSwitchMobileWebInput
+}
+
+"""
+Input fields describing the mobile web environment initiating the checkout.
+"""
+input PayPalAppSwitchMobileWebInput {
+  """
+  User Agent of the buyer's browser, used to detect device and browser details.
+  """
+  buyerUserAgent: String
+
+  """
+  Type of the return flow from the PayPal app back to the merchant website after payment approval.
+  """
+  returnFlow: PayPalAppSwitchReturnFlow
+}
+
+"""
+Input fields describing the native application initiating the checkout.
+"""
+input PayPalAppSwitchNativeAppInput {
+  """OS of the buyer's device initiating the flow."""
+  osType: PayPalAppSwitchOsType
+
+  """OS version running on the buyer's device."""
+  osVersion: String
+
+  """
+  The universal merchant app URL used to redirect the buyer back to merchant's
+  native app, either a Universal Link on iOS or an App Link on Android.
+  """
+  appUrl: URL
+}
+
+"""OS type of the buyer's device."""
+enum PayPalAppSwitchOsType {
+  """Google Android OS."""
+  ANDROID
+
+  """Apple OS typically found in Apple mobile devices."""
+  IOS
+
+  """Any other OS type."""
+  OTHER
+}
+
+"""
+Specifies how the buyer should be returned to the merchant website after approving the payment in the PayPal app.
+"""
+enum PayPalAppSwitchReturnFlow {
+  """
+  Buyer is automatically redirected back to the merchant site after approval.
+  """
+  AUTO
+
+  """
+  Buyer will be prompted to manually navigate back to the merchant's site after approval.
+  """
+  MANUAL
+}
+
+"""
 Expected business/pricing model for a billing agreement (Charge Patterns).
 """
 enum PayPalBillingAgreementChargePattern {
@@ -6791,6 +7033,9 @@ type PayPalBillingAgreementDetailsPayload {
 
   """The status of the billing agreement."""
   status: PayPalBillingAgreementStatus
+
+  """The current status of the PayPal checkout process during approval."""
+  experienceStatus: PayPalBillingAgreementExperienceStatus
 }
 
 """Controls the experience in a PayPal billing agreement approval flow."""
@@ -6816,6 +7061,36 @@ input PayPalBillingAgreementExperienceProfileInput {
   when shipping address is provided by merchant.
   """
   shippingAddressEditable: Boolean
+
+  """
+  Presents the customer with either the Continue or Setup Now flow. Default is Continue flow if the field is not provided.
+  """
+  userAction: PayPalBillingAgreementUserAction
+}
+
+"""
+Represents the current status of the buyer's PayPal approval experience during the billing agreement flow.
+"""
+enum PayPalBillingAgreementExperienceStatus {
+  """
+  Payer has approved saving PayPal as a payment method. Please continue with creating a vaulted payment method token.
+  """
+  APPROVED
+
+  """
+  Payer canceled the payment method approval by closing the window or clicking cancel.
+  """
+  CANCELED
+
+  """
+  Saving PayPal wallet in the vault initiated. User is on the review page before approval.
+  """
+  IN_PROGRESS
+
+  """
+  Payer is not logged in to approve saving PayPal as a payment method. Approval via PayPal is still pending.
+  """
+  NOT_STARTED
 }
 
 """Input fields for a PayPal account to be vaulted."""
@@ -6831,6 +7106,12 @@ enum PayPalBillingAgreementStatus {
 
   """The token has been approved by the consumer."""
   APPROVED
+}
+
+"""User action type for PayPal billing agreements."""
+enum PayPalBillingAgreementUserAction {
+  CONTINUE
+  SETUP_NOW
 }
 
 """Configuration for PayPal."""
@@ -7155,11 +7436,85 @@ input PayPalOneTimePaymentInput {
 
   """The PayPal payment ID. This ID is prefixed with "PAYID-"."""
   paymentId: ID!
+}
+
+"""Input fields for fetching the PayPal order status."""
+input PayPalOrderDetailsInput {
+  """The PayPal order ID."""
+  orderId: ID!
+
+  """Merchant Account ID."""
+  merchantAccountId: ID
+}
+
+"""Information about a PayPal order."""
+type PayPalOrderDetailsPayload {
+  """The status of the PayPal order."""
+  status: PayPalOrderStatus
+
+  """The PayPal ID of the PayPal account."""
+  payerId: String
 
   """
-  The PayPal payment token, also known as an Express Checkout token. This token is prefixed with "EC-".
+  The current status of the PayPal checkout process in the order lifecycle.
   """
-  paymentToken: ID!
+  experienceStatus: PayPalOrderExperienceStatus
+}
+
+"""
+Represents the stages of the PayPal checkout experience throughout the order lifecycle.
+"""
+enum PayPalOrderExperienceStatus {
+  """Order is approved. User has completed the checkout process."""
+  APPROVED
+
+  """
+  PayPal checkout is canceled (by closing the checkout window or clicking cancel) before the order approval.
+  """
+  CANCELED
+
+  """
+  PayPal checkout initiated. User is on the checkout page for order review before approval.
+  """
+  IN_PROGRESS
+
+  """PayPal checkout process has not yet begun."""
+  NOT_STARTED
+}
+
+"""Information about a PayPal order."""
+enum PayPalOrderStatus {
+  """
+  The customer approved the order through the PayPal wallet or another form of guest or unbranded payment.
+  """
+  APPROVED
+
+  """
+  The intent of the order was completed and a 'payments' resource was created.
+  """
+  COMPLETED
+
+  """The order was created."""
+  CREATED
+
+  """
+  Some of the lineItems within the order could not be successfully authorized or captured.
+  """
+  PARTIALLY_COMPLETED
+
+  """The order requires an action from the payer."""
+  PAYER_ACTION_REQUIRED
+
+  """
+  The order was confirmed and the payer's action was completed but order approval processing from PayPal is pending.
+  """
+  PENDING_APPROVAL
+
+  """The order was saved and persisted."""
+  SAVED
+
+  """All purchase units in the order are voided."""
+  VOIDED
 }
 
 """Input fields for a PayPal account receiving transaction funds."""
@@ -7343,7 +7698,7 @@ input PayPalRecurringBillingProductInput {
   description: String
 
   """The quantity of the product included."""
-  quantity: Float
+  quantity: Int
 
   """The unit price of the product."""
   price: Amount
@@ -7492,6 +7847,27 @@ type PayPalTransactionPayload {
   created alongside the transaction. Otherwise, this will be null.
   """
   billingAgreementWithPurchasePaymentMethod: PaymentMethod
+}
+
+"""A key-value pair for a PayPal SetTransactionContext field."""
+input PayPalTransactionRiskContextDataFieldInput {
+  """
+  The name of the field. Must correspond exactly to the PayPal key/field name.
+  """
+  name: String
+
+  """The value of the field. Maximum 4000 characters."""
+  value: String
+}
+
+"""
+Input fields setting the PayPal transaction context for risk assessment. In
+order to use this, your PayPal account must be set up to use the PayPal
+SetTransactionContext feature.
+"""
+input PayPalTransactionRiskContextInput {
+  """Provide a maximum of 100 fields."""
+  fields: [PayPalTransactionRiskContextDataFieldInput!]
 }
 
 """PayPal User action type."""
@@ -7745,6 +8121,9 @@ type Product {
 
   """Enablement status of product."""
   status: ProductEnablementStatus!
+
+  """List of details regarding the status of the product."""
+  statusDetails: [String!]
 }
 
 """Available product names."""
@@ -7752,13 +8131,17 @@ enum ProductCode {
   ADD_SURCHARGE_MID
   FASTLANE
   IN_PERSON
+  NETWORK_TOKENS
+  SMART_RETRIES
 }
 
 """Product enablement state."""
 enum ProductEnablementStatus {
   AVAILABLE
   DISABLED
+  DISABLING
   ENABLED
+  ENABLING
   NOT_AVAILABLE
   PROVISIONING
 }
@@ -7825,28 +8208,17 @@ type Query {
   """Retrieve a paginated list of all in-store locations."""
   inStoreLocations(first: Int, after: String): InStoreLocationConnection
 
-  """Fetch customer recommendations based on customer session information."""
-  customerRecommendations(input: CustomerRecommendationsInput!): CustomerRecommendationsPayload
-
   """Returns the details of the billing agreement."""
   paypalBillingAgreementDetails(input: PayPalBillingAgreementDetailsInput!): PayPalBillingAgreementDetailsPayload
+
+  """Returns the details of the PayPal order."""
+  paypalOrderDetails(input: PayPalOrderDetailsInput!): PayPalOrderDetailsPayload
 }
 
 """Indicates the status of a Reader."""
 enum ReaderStatus {
   OFFLINE
   ONLINE
-}
-
-"""Payment option for Recommendations."""
-enum RecommendationPaymentOption {
-  PAYPAL
-  VENMO
-}
-
-"""Allowed Recommendations categories."""
-enum Recommendations {
-  PAYMENT_RECOMMENDATIONS
 }
 
 """The type of recurring payment a transaction represents."""
@@ -8041,6 +8413,25 @@ input RefundInput {
   Only allowed for Custom Actions transactions.
   """
   lineItems: [TransactionLineItemInput!]
+}
+
+"""
+Top-level input fields for creating a detached refund on an in-store credit card.
+"""
+input RefundInStoreCreditCardInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of the credit card to be refunded."""
+  paymentMethodId: ID!
+
+  """Input fields containing details about the refund."""
+  refund: DetachedRefundInput!
+
+  """Input fields for creating an in-store credit card refund."""
+  options: InStoreCreditCardRefundOptionsInput
 }
 
 """A union of all possible payment method refund details."""
@@ -8912,6 +9303,22 @@ type RequestVaultInStoreContext implements Node & InStoreContextResult {
 
   """The verification that was run on the payment method prior to vaulting."""
   verification: Verification
+}
+
+"""Input fields for reversing an EMV card declined transaction."""
+input ReverseEmvTransactionInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The ID of the transaction to reverse."""
+  transactionId: ID!
+
+  """
+  EMV data received from a payment reader to be included as part of the reversal.
+  """
+  emvData: String!
 }
 
 """Input fields for reversing a refund."""
@@ -9962,6 +10369,26 @@ type SettlingEvent implements PaymentStatusEvent {
   terminal: Boolean
 }
 
+"""Details of the sub-merchants of PayFac and Marketplaces merchants."""
+input SubMerchantDetailsInput {
+  """
+  Id of the sub-merchant. Unique ID given by the Payment Facilitator (PayFac).
+  """
+  id: ID!
+
+  """Legal Business name of the sub-merchant."""
+  legalName: String!
+
+  """
+  Tax identification number of the sub-merchant, Tax ID (CNPJ (14 characters)
+  for companies and CPF (11 characters) for individual).
+  """
+  taxId: String!
+
+  """Address of the sub-merchant."""
+  address: AddressInput!
+}
+
 """
 Accompanying information for a transaction that is submitted for settlement.
 This status indicates that the transaction is scheduled to be settled.
@@ -10232,6 +10659,14 @@ type ThreeDSecureConfiguration {
   Authentication information for initializing Cardinal's songbird.js library.
   """
   cardinalAuthenticationJWT: String
+
+  """The URL of the songbird javascript SDK used for 3D Secure."""
+  cardinalSongbirdUrl: String
+
+  """
+  Value to use for the integrity attribute when loading the songbird SDK used for 3D Secure.
+  """
+  cardinalSongbirdIdentityHash: String
 }
 
 """3D Secure information for the payment method."""
@@ -10782,7 +11217,11 @@ input ThreeDSecurePassThroughInput {
   """
   version: ThreeDSecureVersion
 
-  """The 3D Secure authentication response status code."""
+  """
+  Deprecated: This field is no longer used with 3D Secure 2 authentications.
+  
+  The 3D Secure authentication response status code.
+  """
   authenticationResponse: ThreeDSecureStatusCode
 
   """The 3D Secure directory server response."""
@@ -10974,6 +11413,56 @@ payment method.
 type TokenizedCvv {
   """Unique identifier for the tokenized CVV."""
   id: ID!
+}
+
+"""Top-level input fields for tokenizing an EMV card."""
+input TokenizeEmvCardInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Input fields for an EMV card."""
+  emvCard: EmvCardInput!
+
+  """Metadata from the payment reader."""
+  paymentReaderMetadata: PaymentReaderMetadataInput!
+}
+
+"""Top-level fields returned from a tokenized EMV card."""
+type TokenizeEmvCardPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """A single-use payment method."""
+  paymentMethod: PaymentMethod
+}
+
+"""Top-level input fields for tokenizing a magstripe card."""
+input TokenizeMagstripeCardInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Input fields for a magstripe card."""
+  magstripeCard: MagstripeCardInput!
+
+  """Metadata from the payment reader."""
+  paymentReaderMetadata: PaymentReaderMetadataInput!
+}
+
+"""Top-level fields returned from a tokenized magstripe card."""
+type TokenizeMagstripeCardPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """A single-use payment method."""
+  paymentMethod: PaymentMethod
 }
 
 """Top-level input field for tokenizing a network token."""
@@ -11307,6 +11796,9 @@ type Transaction implements Node & Payment {
   """
   retriedTransactions: [Transaction!]
 
+  """The date an upcoming retry will be submitted, formatted `YYYY-MM-DD`."""
+  upcomingRetryDate: Date
+
   """Installment details associated with the transaction."""
   installmentDetails: TransactionInstallmentDetails
 
@@ -11639,6 +12131,14 @@ input TransactionInput {
   Industry data information. Only one of the three sub-input fields can be provided.
   """
   industry: TransactionIndustryInput
+
+  """
+  Controls whether to allow partial authorizations (or "partial approvals") for this transaction. Defaults to false.
+  """
+  acceptPartialAuthorization: Boolean
+
+  """Details of the Payment Facilitator (mandatory for PayFac Merchants)."""
+  paymentFacilitator: PaymentFacilitatorInput
 }
 
 """Transaction Installment information."""
@@ -11981,6 +12481,24 @@ Otherwise, the transaction will be voided and a Transaction object will be retur
 """
 union TransactionReversal = Refund | Transaction
 
+"""Top-level fields returned from a transaction risk context."""
+type TransactionRiskContextPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  The identifier of the transaction risk context, to be used as the Client Metadata ID.
+  """
+  clientMetadataId: ID @deprecated(reason: "Use `paypalRiskCorrelationId` for clientMetadataId instead.")
+
+  """
+  The identifier of the transaction risk context, to be used as the Client Metadata ID.
+  """
+  paypalRiskCorrelationId: ID
+}
+
 """Input fields for searching for transactions."""
 input TransactionSearchInput {
   """Find transactions with an ID or IDs."""
@@ -12187,6 +12705,24 @@ input TransactionTaxInput {
   taxExempt: Boolean
 }
 
+"""Indicates the transfer type for AFT and SDWO transactions."""
+enum TransactionTransferType {
+  """Moving funds between their own accounts."""
+  ACCOUNT_TO_ACCOUNT
+
+  """Paying a bill (identified/unidentified)."""
+  BOLETO_TICKET
+
+  """Movement of funds across the accounts."""
+  FUND_TRANSFER
+
+  """Transferring funds to another user."""
+  PERSON_TO_PERSON
+
+  """Loading funds into a wallet."""
+  WALLET_TRANSFER
+}
+
 """Configuration for UnionPay cards."""
 type UnionPayConfiguration {
   """The Braintree merchant account ID with UnionPay processing enabled."""
@@ -12370,23 +12906,6 @@ type UpdateCustomerPayload {
   customer: Customer
 }
 
-"""Customer session update request."""
-input UpdateCustomerSessionInput {
-  """
-  An identifier used to reconcile requests and responses. 255 characters maximum.
-  """
-  clientMutationId: String
-
-  """The customer session identifier."""
-  sessionId: String!
-
-  """Merchant Account ID."""
-  merchantAccountId: ID
-
-  """Customer identifying information."""
-  customer: CustomerSessionInput
-}
-
 """
 Input for creating or updating custom fields on a transaction or a refund.
 """
@@ -12420,6 +12939,20 @@ type UpdateCustomFieldsPayload {
   fields are [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
   """
   customFields: [CustomField!]
+}
+
+"""Input fields for storing EMV data required for capture requests."""
+input UpdateEmvCaptureDataInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The transaction id."""
+  transactionId: ID!
+
+  """EMV data."""
+  emvData: String!
 }
 
 """Input fields for updating an in-store location."""
@@ -12529,8 +13062,8 @@ scalar URL
 
 """Details about the customer's acceptance of ACH terms."""
 type UsBankAccountAchMandate {
-  """The text the customer agreed to when setting up ACH."""
-  acceptanceText: String
+  """Deprecated, The text the customer agreed to when setting up ACH."""
+  acceptanceText: String @deprecated(reason: "Acceptance text no longer returned.")
 
   """Date and time when the text terms were accepted."""
   acceptedAt: Timestamp
@@ -13180,6 +13713,14 @@ input VaultUsBankAccountInput {
   This option makes the specified payment method the default for the customer.
   """
   makeDefault: Boolean
+
+  """
+  Language used to prove that you have the customer's explicit permission to debit their bank account.
+  """
+  achMandate: String
+
+  """The date and time when the ACH mandate was accepted by the customer."""
+  achMandateAcceptedAt: Timestamp
 }
 
 """Details about a Venmo Account."""
