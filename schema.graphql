@@ -285,6 +285,21 @@ type ApplePayConfiguration {
   supportedCardBrands: [CreditCardBrandCode!]
 }
 
+"""Apple Pay payment token details."""
+input ApplePaymentTokenInput {
+  """The base64-encoded Apple Pay payment token data."""
+  paymentData: String!
+
+  """The name of the card as it appears in the Apple Pay Wallet."""
+  paymentInstrumentName: String
+
+  """The payment Network for the card."""
+  paymentNetwork: String!
+
+  """A unique transaction identifier provided by Apple."""
+  transactionIdentifier: String
+}
+
 """Additional information about the payment method specific to Apple Pay."""
 type ApplePayOriginDetails {
   """
@@ -305,6 +320,27 @@ type ApplePayOriginDetails {
   The Merchant Payment Account Number (MPAN), a unique identifier for the customer's card.
   """
   merchantTokenIdentifier: String
+
+  """The last two digits of the device primary account number."""
+  dpanLastTwo: String
+
+  """Indicates whether this is a device token."""
+  isDeviceToken: Boolean
+
+  """
+  The last four digits of the card number. For network tokenized payments, this
+  is the last four digits of the source card(FPAN).For other payment methods,
+  this is the last four digits of the virtual card(DPAN).
+  """
+  last4: String
+}
+
+"""
+Top-level fields returned when retrieving Apple Pay registered domains.
+"""
+type ApplePayRegisteredDomainsPayload {
+  """A list of domains that have been registered with Apple for Apple Pay."""
+  registeredDomains: [String!]
 }
 
 """The environment being used for Apple Pay."""
@@ -1035,14 +1071,6 @@ input ChargeUsBankAccountInput {
   Input fields for the charge, with details that will define the resulting transaction.
   """
   transaction: TransactionInput!
-
-  """
-  Language used to prove that you have the customer's explicit permission to debit their bank account.
-  """
-  achMandate: String
-
-  """The date and time when the ACH mandate was accepted by the customer."""
-  achMandateAcceptedAt: Timestamp
 }
 
 """Input fields for creating a transaction with a US bank account."""
@@ -1052,6 +1080,14 @@ input ChargeUsBankAccountOptionsInput {
   was authorized. Most internet-based sales should use the `WEB` code.
   """
   standardEntryClassCode: ACHStandardEntryClassCode
+
+  """
+  Language used to prove that you have the customer's explicit permission to debit their bank account.
+  """
+  achMandate: String
+
+  """The date and time when the ACH mandate was accepted by the customer."""
+  achMandateAcceptedAt: Timestamp
 }
 
 """
@@ -1170,6 +1206,9 @@ type ClientConfiguration {
   A list of challenges that are required by the current merchant to process a given credit card.
   """
   challenges: [Challenge!]
+
+  """Configuration for Open Banking."""
+  openBanking: OpenBankingConfiguration
 }
 
 """The client configuration environment being used."""
@@ -1222,7 +1261,15 @@ input ClientTokenInput {
   customerId: ID
 
   """
+  The version of the client token to generate. The default value is 2. Current
+  supported versions are 1, 2, and 3. Please check your client-side SDKs in use
+  before changing this value.
+  """
+  version: Int
+
+  """
   Some services require a list of domains that are allowed to use this token.
+  Must be domain names as defined by the Domain Name System (DNS), e.g. "example.com".
   """
   domains: [String!]
 }
@@ -1281,6 +1328,34 @@ An [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
 country code. Braintree only accepts [specific alpha-2 values](https://developers.braintreepayments.com/reference/general/countries#list-of-countries).
 """
 scalar CountryCodeAlpha2
+
+"""Input fields for creating an Apple Pay web session."""
+input CreateApplePayWebSessionInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The domain name requesting the Apple Pay session."""
+  domainName: String!
+
+  """The display name to show in the Apple Pay sheet."""
+  displayName: String!
+
+  """The validation URL from Apple Pay."""
+  validationUrl: String!
+}
+
+"""Payload returned when creating an Apple Pay web session."""
+type CreateApplePayWebSessionPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The Apple Pay session identifier."""
+  merchantSessionIdentifier: String
+}
 
 """Top-level input field for generating a client token."""
 input CreateClientTokenInput {
@@ -1963,7 +2038,7 @@ input CreditCardFraudToolsOptionsInput {
   skipAvs: Boolean
 
   """
-  Skip [advanced fraud checks](https://developers.braintreepayments.com/guides/advanced-fraud-management-tools/overview).
+  Skip [advanced fraud checks](https://developer.paypal.com/braintree/docs/guides/premium-fraud-management-tools/overview/).
   """
   skipAdvancedFraudChecking: Boolean
 }
@@ -3518,6 +3593,7 @@ enum FraudServiceProvider {
   FRAUD_PROTECTION
   FRAUD_PROTECTION_ADVANCED
   FRAUD_PROTECTION_ENTERPRISE
+  FRAUD_PROTECTION_LITE
   KOUNT
 }
 
@@ -3727,6 +3803,13 @@ type GooglePayOriginDetails {
   Number. This BIN may differ from the BIN of the customer's actual card.
   """
   bin: String
+
+  """
+  The last four digits of the card number. For network tokenized payments, this
+  is the last four digits of the source card(FPAN).For other payment methods,
+  this is the last four digits of the virtual card(DPAN).
+  """
+  last4: String
 }
 
 """Details about a Hyperwallet account."""
@@ -5774,6 +5857,20 @@ type Mutation {
 
   """Generates an edit funding instrument URL."""
   generateEditFundingInstrumentUrl(input: GenerateEditFundingInstrumentUrlInput!): GenerateEditFundingInstrumentUrlPayload
+
+  """Registers one or more domains for Apple Pay."""
+  registerApplePayDomains(input: RegisterApplePayDomainsInput!): RegisterApplePayDomainsPayload
+
+  """
+  Tokenize Apple Pay card fields and return a payload that includes a single-use payment method.
+  """
+  tokenizeApplePayCard(input: TokenizeApplePayCardInput!): TokenizeApplePayCardPayload
+
+  """Creates an Apple Pay web session for domain validation."""
+  createApplePayWebSession(input: CreateApplePayWebSessionInput!): CreateApplePayWebSessionPayload
+
+  """Unregisters a domain from Apple Pay."""
+  unregisterApplePayDomain(input: UnregisterApplePayDomainInput!): UnregisterApplePayDomainPayload
 }
 
 """Means by which customers by their bills."""
@@ -6008,6 +6105,20 @@ type OAuthClientSecret {
 """OAuth access token type."""
 enum OAuthTokenType {
   BEARER
+}
+
+"""Open Banking Configuration for Bank Account Instant Verification."""
+type OpenBankingConfiguration {
+  """A list of allowed business names."""
+  businessNames: [String!]
+
+  """
+  A list of allowed Internet domain names (e.g. example.com) allowed for use in return and cancel URLs.
+  """
+  allowListedDomains: [String!]
+
+  """The profile ID."""
+  profileId: String
 }
 
 """The owner's address type."""
@@ -7036,6 +7147,11 @@ type PayPalBillingAgreementDetailsPayload {
 
   """The current status of the PayPal checkout process during approval."""
   experienceStatus: PayPalBillingAgreementExperienceStatus
+
+  """
+  Custom fields related to a PayPal Billing Agreement (twenty [20] items maximum).
+  """
+  customFields: [PayPalCustomField!]
 }
 
 """Controls the experience in a PayPal billing agreement approval flow."""
@@ -7106,6 +7222,9 @@ enum PayPalBillingAgreementStatus {
 
   """The token has been approved by the consumer."""
   APPROVED
+
+  """The token has been consumed, e.g. the Billing Agreement was vaulted."""
+  CONSUMED
 }
 
 """User action type for PayPal billing agreements."""
@@ -7167,6 +7286,15 @@ type PayPalConfiguration {
 
   """For internal use only."""
   directBaseUrl: String @deprecated(reason: "This field is only included for internal testing purposes.")
+}
+
+"""Custom field related to a PayPal payment method."""
+type PayPalCustomField {
+  """The name of this custom field (maximum 40 characters)."""
+  name: String!
+
+  """The value for this custom field (maximum 4000 characters)."""
+  value: String!
 }
 
 """The environment being used for PayPal."""
@@ -8133,6 +8261,7 @@ enum ProductCode {
   IN_PERSON
   NETWORK_TOKENS
   SMART_RETRIES
+  VENMO
 }
 
 """Product enablement state."""
@@ -8213,6 +8342,9 @@ type Query {
 
   """Returns the details of the PayPal order."""
   paypalOrderDetails(input: PayPalOrderDetailsInput!): PayPalOrderDetailsPayload
+
+  """Retrieves a list of domains registered with Apple for Apple Pay."""
+  applePayRegisteredDomains: ApplePayRegisteredDomainsPayload
 }
 
 """Indicates the status of a Reader."""
@@ -8579,6 +8711,25 @@ type RefundUsBankAccountPayload {
 
   """The information about the created refund."""
   refund: Refund
+}
+
+"""Top-level Input fields for registering apple pay domains."""
+input RegisterApplePayDomainsInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """List of domains to register."""
+  domains: [String!]!
+}
+
+"""Top-level fields returned after registering an Apple Pay domain."""
+type RegisterApplePayDomainsPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
 }
 
 """Top-level fields returned for a report query."""
@@ -10241,6 +10392,13 @@ type SEPADirectDebitTransactionDetails {
   paymentId: String
 }
 
+"""The type of acknowledgement the servicing request has received."""
+enum ServicingRequestAcknowledgementType {
+  ACKNOWLEDGED
+  ACKNOWLEDGED_AND_WAIVED_WARNING
+  REVIEW_ONLY
+}
+
 """Accompanying information for a settled transaction."""
 type SettledEvent implements PaymentStatusEvent {
   """The new status of the transaction."""
@@ -11298,6 +11456,31 @@ type TokenExchangeConfiguration {
   Whether or not Direct Network Tokenization is enabled for the merchant.
   """
   enabled: Boolean
+}
+
+"""Top-level input fields for tokenizing an Apple Pay card."""
+input TokenizeApplePayCardInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Input fields for an Apple Pay payment token."""
+  applePaymentToken: ApplePaymentTokenInput!
+}
+
+"""Top-level fields returned from a tokenized Apple Pay card."""
+type TokenizeApplePayCardPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """A single-use payment method."""
+  paymentMethod: PaymentMethod
+
+  """Type of the payment method."""
+  type: String
 }
 
 """Top-level input fields for tokenizing a credit card."""
@@ -12729,6 +12912,27 @@ type UnionPayConfiguration {
   merchantAccountId: String
 }
 
+"""Input fields for unregistering a domain from Apple Pay."""
+input UnregisterApplePayDomainInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  Domain to unregister from Apple Pay. Must be a domain name as defined by the Domain Name System (DNS), e.g. "example.com".
+  """
+  domain: String!
+}
+
+"""Top-level field returned when unregistering a domain from Apple Pay."""
+type UnregisterApplePayDomainPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+}
+
 """The type of UPC(Universal Product Code)."""
 enum UpcType {
   UPC_2
@@ -13137,6 +13341,9 @@ type UsBankAccountDetails {
 
   """The ACH return code, if applicable."""
   achReturnCode: String
+
+  """The ACH reject reason, if applicable."""
+  achRejectReason: String
 }
 
 """The name of the owner of a personal US bank account."""
@@ -13225,6 +13432,11 @@ enum UsBankAccountVerificationMethod {
   Verification conducted independently by the merchant, not through Braintree.
   """
   INDEPENDENT_CHECK
+
+  """
+  Instant Verification at the point when payment method is charged or vaulted.
+  """
+  INSTANT_VERIFICATION
 
   """
   Verification by micro-deposits transferred to the bank account, which the

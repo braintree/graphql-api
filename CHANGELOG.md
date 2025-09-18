@@ -1,3 +1,15 @@
+# 09-18-2025
+* New mutation: 
+    * `registerApplePayDomains`
+* New query: 
+    * `applePayRegisteredDomains`
+* New types: 
+    * `OpenBankingConfiguration`
+    * `RegisterApplePayDomainsPayload`
+    * `ApplePayRegisteredDomainsPayload`
+* New input type:
+    * `RegisterApplePayDomainsInput`
+
 # 08-12-2025
 * Add new enum
     * `AccountInformationInquiry`
