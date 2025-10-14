@@ -476,6 +476,33 @@ input AuthorizeCreditCardInput {
   """
   clientMutationId: String
 
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
   """ID of a credit card payment method to be authorized."""
   paymentMethodId: ID!
 
@@ -540,6 +567,33 @@ input AuthorizeInStoreCreditCardInput {
   """
   clientMutationId: String
 
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
   """ID of a credit card payment method to be authorized."""
   paymentMethodId: ID!
 
@@ -561,6 +615,33 @@ input AuthorizePaymentMethodInput {
   """
   clientMutationId: String
 
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
   """ID of a payment method to be authorized."""
   paymentMethodId: ID!
 
@@ -578,6 +659,33 @@ input AuthorizePayPalAccountInput {
   An identifier used to reconcile requests and responses. 255 characters maximum.
   """
   clientMutationId: String
+
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
 
   """ID of a PayPal payment method to be authorized."""
   paymentMethodId: ID!
@@ -615,6 +723,33 @@ input AuthorizeVenmoAccountInput {
   An identifier used to reconcile requests and responses. 255 characters maximum.
   """
   clientMutationId: String
+
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
 
   """ID of a Venmo payment method to be authorized."""
   paymentMethodId: ID!
@@ -801,6 +936,33 @@ input CaptureTransactionInput {
   """
   clientMutationId: String
 
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
   """ID of the transaction to be captured."""
   transactionId: ID!
 
@@ -961,6 +1123,33 @@ input ChargeCreditCardInput {
   """
   clientMutationId: String
 
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
   """ID of a credit card payment method to be charged."""
   paymentMethodId: ID!
 
@@ -981,6 +1170,33 @@ input ChargeInStoreCreditCardInput {
   An identifier used to reconcile requests and responses. 255 characters maximum.
   """
   clientMutationId: String
+
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
 
   """ID of a credit card payment method to be charged."""
   paymentMethodId: ID!
@@ -1003,6 +1219,33 @@ input ChargePaymentMethodInput {
   """
   clientMutationId: String
 
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
   """ID of a payment method to be charged."""
   paymentMethodId: ID!
 
@@ -1020,6 +1263,33 @@ input ChargePayPalAccountInput {
   An identifier used to reconcile requests and responses. 255 characters maximum.
   """
   clientMutationId: String
+
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
 
   """The ID of an existing PayPal account."""
   paymentMethodId: ID!
@@ -1061,6 +1331,33 @@ input ChargeUsBankAccountInput {
   """
   clientMutationId: String
 
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
   """The ID of an existing US bank account."""
   paymentMethodId: ID!
 
@@ -1098,6 +1395,33 @@ input ChargeVenmoAccountInput {
   An identifier used to reconcile requests and responses. 255 characters maximum.
   """
   clientMutationId: String
+
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
 
   """The ID of an existing Venmo account."""
   paymentMethodId: ID!
@@ -6215,6 +6539,33 @@ input PartialCaptureTransactionInput {
   """
   clientMutationId: String
 
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
   """ID of the original authorized transaction to be partially captured."""
   transactionId: ID!
 
@@ -8489,6 +8840,33 @@ input RefundCreditCardInput {
   """
   clientMutationId: String
 
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a refund being created (in any status), then the
+  same refund in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
+  be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
   """ID of the credit card to be refunded."""
   paymentMethodId: ID!
 
@@ -8555,6 +8933,33 @@ input RefundInStoreCreditCardInput {
   An identifier used to reconcile requests and responses. 255 characters maximum.
   """
   clientMutationId: String
+
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a refund being created (in any status), then the
+  same refund in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
+  be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
 
   """ID of the credit card to be refunded."""
   paymentMethodId: ID!
@@ -8663,6 +9068,33 @@ input RefundTransactionInput {
   """
   clientMutationId: String
 
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a refund being created (in any status), then the
+  same refund in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
+  be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
   """The ID of a transaction to be refunded."""
   transactionId: ID!
 
@@ -8689,6 +9121,33 @@ input RefundUsBankAccountInput {
   An identifier used to reconcile requests and responses. 255 characters maximum.
   """
   clientMutationId: String
+
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a refund being created (in any status), then the
+  same refund in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
+  be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
 
   """ID of the US Bank Account to be refunded."""
   paymentMethodId: ID!
@@ -9463,6 +9922,33 @@ input ReverseEmvTransactionInput {
   """
   clientMutationId: String
 
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being created (in any status), then
+  the same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
   """The ID of the transaction to reverse."""
   transactionId: ID!
 
@@ -9479,6 +9965,33 @@ input ReverseRefundInput {
   """
   clientMutationId: String
 
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a refund being created (in any status), then the
+  same refund in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
+  be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
   """The ID of the refund to reverse."""
   refundId: ID!
 }
@@ -9489,6 +10002,34 @@ input ReverseTransactionInput {
   An identifier used to reconcile requests and responses. 255 characters maximum.
   """
   clientMutationId: String
+
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction or refund being created (in any
+  status), then the same transaction or refund in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction or refund is created, then no
+  duplication will be considered. Subsequent requests with the same
+  `apiRequestKey` will be treated as non-duplicate requests, just as if they
+  were the first request with that value.
+  """
+  apiRequestKey: String
 
   """The ID of the transaction to reverse."""
   transactionId: ID!
@@ -13436,7 +13977,7 @@ enum UsBankAccountVerificationMethod {
   """
   Instant Verification at the point when payment method is charged or vaulted.
   """
-  INSTANT_VERIFICATION
+  INSTANT_VERIFICATION_ACCOUNT_VALIDATION
 
   """
   Verification by micro-deposits transferred to the bank account, which the

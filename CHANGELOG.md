@@ -1,3 +1,25 @@
+# 10-14-2025
+* Add new field
+    * `apiRequestKey` to `AuthorizeCreditCardInput`
+    * `apiRequestKey` to `AuthorizeInStoreCreditCardInput`
+    * `apiRequestKey` to `AuthorizePaymentMethodInput`
+    * `apiRequestKey` to `AuthorizePayPalAccountInput`
+    * `apiRequestKey` to `AuthorizeVenmoAccountInput`
+    * `apiRequestKey` to `CaptureTransactionInput`
+    * `apiRequestKey` to `ChargeCreditCardInput`
+    * `apiRequestKey` to `ChargeInStoreCreditCardInput`
+    * `apiRequestKey` to `ChargePaymentMethodInput`
+    * `apiRequestKey` to `ChargePayPalAccountInput`
+    * `apiRequestKey` to `ChargeUsBankAccountInput`
+    * `apiRequestKey` to `ChargeVenmoAccountInput`
+    * `apiRequestKey` to `PartialCaptureTransactionInput`
+    * `apiRequestKey` to `RefundCreditCardInput`
+    * `apiRequestKey` to `RefundInStoreCreditCardInput`
+    * `apiRequestKey` to `RefundTransactionInput`
+    * `apiRequestKey` to `RefundUsBankAccountInput`
+* Update enum value
+    * `INSTANT_VERIFICATION` to `INSTANT_VERIFICATION_ACCOUNT_VALIDATION` in `UsBankAccountVerificationMethod`
+
 # 09-18-2025
 * New mutation: 
     * `registerApplePayDomains`
