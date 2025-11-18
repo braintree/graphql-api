@@ -1,3 +1,79 @@
+# 11-18-2025
+* Add new mutations:
+    * `voidTransaction`
+* Add new types:
+    * `VenmoAppSwitchContext`
+    * `VenmoAppSwitchMobileWeb`
+    * `VoidTransactionPayload`
+* Add new inputs:
+    * `VenmoAppSwitchContextInput`
+    * `VenmoAppSwitchMobileWebInput`
+    * `VoidTransactionInput`
+* Add new enum values:
+    * `FUND_DISBURSEMENT`, `PAYROLL_DISBURSEMENT`, `PREPAID_TOPUP` to `TransactionTransferType`
+* Add new fields:
+    * `apiRequestKey`, `transactionId` to `VoidTransactionInput`
+    * `appSwitchContext` to `CreateVenmoPaymentContextInput`, `VenmoPaymentContext`
+    * `buyerUserAgent` to `VenmoAppSwitchMobileWeb`, `VenmoAppSwitchMobileWebInput`
+    * `clientMutationId` to `VoidTransactionInput`, `VoidTransactionPayload`
+    * `isIncognito` to `VenmoAppSwitchMobileWeb`, `VenmoAppSwitchMobileWebInput`
+    * `merchantCategoryCode` to `TransactionInput`
+    * `merchantId`, `processorResponse` to `Refund`
+    * `mobileWeb` to `VenmoAppSwitchContext`, `VenmoAppSwitchContextInput`
+    * `paymentAccountReference` to `ApplePayOriginDetails`, `CreditCardDetails`, `GooglePayOriginDetails`
+    * `processorAuthorizationResponse` to `Refund`, `Transaction`
+    * `transaction` to `VoidTransactionPayload`
+* Deprecate:
+    * `selectedFinancingOption` on `PayPalAccountDetails`
+    * `selectedFinancingOption` on `PayPalTransactionDetails`
+    * `paypalFinancingOptions` on `Query`
+    * `processorResponse` on `Refund`
+* Remove:
+    * `amount` field from `CaptureTransactionInput`
+    * `ApplicationBankAccountPurpose` type
+    * `ApplicationStatus` type
+    * `authenticationResponse` field from `ThreeDSecurePassThroughInput`
+    * `chargebackProtectionLevel` field from `DisputeSearchInput`
+    * `countryCodeAlpha2` field from `AddressInput`
+    * `countryCodeAlpha3` field from `AddressInput`
+    * `countryCodeNumeric` field from `AddressInput`
+    * `countryName` field from `AddressInput`
+    * `createProductRequestForMerchant` mutation
+    * `CreateProductRequestForMerchantInput` type
+    * `currencyIsoCode` field from `MonetaryAmountSearchInput`
+    * `disableProductForMerchant` mutation
+    * `DisableProductForMerchantInput` type
+    * `DisableProductForMerchantPayload` type
+    * `email` field from `SearchPaymentPayPalDetailsInput`
+    * `enableProductForMerchant` mutation
+    * `EnableProductForMerchantInput` type
+    * `EnableProductForMerchantPayload` type
+    * `MerchantAccountApplication` type
+    * `merchantAccountId` field from `CreditCardVerificationOptionsInput`
+    * `MVVAcceptanceChannel` type
+    * `MVVRegistrationType` type
+    * `MVVUtilityType` type
+    * `OwnerAddressType` type
+    * `OwnerIDType` type
+    * `OwnerPhoneType` type
+    * `OwnerPosition` type
+    * `OwnerRole` type
+    * `payee` field from `AuthorizePayPalAccountOptionsInput`
+    * `payee` field from `ChargePayPalAccountOptionsInput`
+    * `Product` type
+    * `ProductCode` type
+    * `ProductEnablementStatus` type
+    * `ProductRequestPayload` type
+    * `products` field from `Merchant`
+    * `ProductsInput` type
+    * `reason` field from `RefundInput`
+    * `recurring` field from `TransactionInput`
+    * `RefundPolicy` type
+    * `selectedFinancingOption` field from `ChargePayPalAccountOptionsInput`
+    * `threeDSecurePassThrough` field from `TransactionInput`
+    * `userAgent` field from `ThreeDSecureLookupTransactionInformationInput`
+    * `verificationMerchantAccountId` field from `VaultPaymentMethodInput`
+
 # 10-14-2025
 * Add new field
     * `apiRequestKey` to `AuthorizeCreditCardInput`

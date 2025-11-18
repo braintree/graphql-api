@@ -213,36 +213,8 @@ input AddressInput {
   """
   countryCode: CountryCode
 
-  """ Phone associated with the address."""
+  """Phone associated with the address."""
   phone: PhoneInput
-
-  """
-  Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
-  
-  Country code for the address in ISO 3166-1 alpha-3 format.
-  """
-  countryCodeAlpha3: String
-
-  """
-  Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
-  
-  Country code for the address in ISO 3166-1 alpha-2 format.
-  """
-  countryCodeAlpha2: String
-
-  """
-  Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
-  
-  Country code for the address in ISO 3166-1 numeric format.
-  """
-  countryCodeNumeric: String
-
-  """
-  Deprecated: This field is included for supporting legacy clients. Please use `countryCode` instead.
-  
-  Country name for the address.
-  """
-  countryName: String
 }
 
 """
@@ -333,6 +305,11 @@ type ApplePayOriginDetails {
   this is the last four digits of the virtual card(DPAN).
   """
   last4: String
+
+  """
+  The payment account reference (PAR) value, a non-financial reference number for the card.
+  """
+  paymentAccountReference: String
 }
 
 """
@@ -368,19 +345,6 @@ type ApplePayWebConfiguration {
 
   """A list of card brands supported by the merchant for Apple Pay."""
   supportedCardBrands: [CreditCardBrandCode!]
-}
-
-"""The purpose of the merchant application bank account."""
-enum ApplicationBankAccountPurpose {
-  CHECKING
-  SAVINGS
-}
-
-"""The status of a merchant account application."""
-enum ApplicationStatus {
-  APPROVED
-  PROCESSING
-  REJECTED
 }
 
 """
@@ -710,9 +674,6 @@ input AuthorizePayPalAccountOptionsInput {
   Description of the transaction that is displayed to customers in PayPal email receipts.
   """
   description: String
-
-  """Deprecated: This field is no longer supported."""
-  payee: PayPalPayeeOptionsInput
 }
 
 """
@@ -965,18 +926,6 @@ input CaptureTransactionInput {
 
   """ID of the transaction to be captured."""
   transactionId: ID!
-
-  """
-  Deprecated: This field is included for supporting legacy clients. Please use `transaction.amount` instead.
-  
-  The amount to capture on the transaction. Must be greater than 0. You can't
-  capture more than the authorized amount unless your industry and processor
-  support settlement adjustment (capturing a certain percentage over the
-  authorized amount); [contact us for assistance](https://help.braintreepayments.com?issue=TransactionProcessingQuestion).
-  If you capture an amount that is less than what was authorized, the
-  transaction object will return the amount captured.
-  """
-  amount: Amount
 
   """
   Input fields for the capture, with details that will define the resulting transaction.
@@ -1314,12 +1263,6 @@ input ChargePayPalAccountOptionsInput {
   Description of the transaction that is displayed to customers in PayPal email receipts.
   """
   description: String
-
-  """Deprecated: This field is no longer supported."""
-  payee: PayPalPayeeOptionsInput
-
-  """Buyer selected PayPal financing option."""
-  selectedFinancingOption: SelectedPayPalFinancingOptionInput
 }
 
 """
@@ -2071,17 +2014,6 @@ type CreatePayPalOneTimePaymentPayload {
   launchPayPalApp: Boolean
 }
 
-"""Input fields for requesting access to a product."""
-input CreateProductRequestForMerchantInput {
-  """
-  An identifier used to reconcile requests and responses. 255 characters maximum.
-  """
-  clientMutationId: String
-
-  """Code of product to be requested."""
-  productCode: ProductCode!
-}
-
 """
 Input fields for creating an individual package tracker for a PayPal transaction.
 """
@@ -2218,6 +2150,9 @@ input CreateVenmoPaymentContextInput {
 
   """URL for redirecting back to merchant app or website on the client."""
   returnUrl: URL
+
+  """Venmo app switch context information."""
+  appSwitchContext: VenmoAppSwitchContextInput
 }
 
 """A code identifying the card brand."""
@@ -2339,6 +2274,11 @@ type CreditCardDetails {
 
   """Indicates whether the card on file is network tokenized."""
   cardOnFileNetworkTokenized: Boolean
+
+  """
+  The payment account reference (PAR) value, a non-financial reference number for the card.
+  """
+  paymentAccountReference: String
 }
 
 """
@@ -2492,9 +2432,6 @@ type CreditCardVerificationDetails {
 
 """Input fields that specify options for verifying the credit card."""
 input CreditCardVerificationOptionsInput {
-  """ID of the merchant account to use when verifying the credit card."""
-  merchantAccountId: ID
-
   """The type of account to be used when verifying a combo card."""
   accountType: CardAccountType
 
@@ -3033,28 +2970,6 @@ type DisableOAuthClientSecretPayload {
   oauthClientSecret: OAuthClientSecret
 }
 
-"""Input to disable a Product for a Merchant."""
-input DisableProductForMerchantInput {
-  """
-  An identifier used to reconcile requests and responses. 255 characters maximum.
-  """
-  clientMutationId: String
-
-  """Unique code of the product being disabled."""
-  code: ProductCode!
-}
-
-"""Payload from disabling a Product for a Merchant."""
-type DisableProductForMerchantPayload {
-  """
-  An identifier used to reconcile requests and responses. 255 characters maximum.
-  """
-  clientMutationId: String
-
-  """Product that was disabled."""
-  product: Product
-}
-
 """Details about the disbursement bank account."""
 type DisbursementBankAccount {
   """The last four digits of the bank account number."""
@@ -3416,13 +3331,6 @@ input DisputeSearchInput {
   """Find disputes based on a set of transaction criteria."""
   transaction: DisputeTransactionSearchInput
 
-  """
-  Deprecated: Please use `protectionLevel` instead.
-  
-  Find disputes with a given computed chargeback protection level.
-  """
-  chargebackProtectionLevel: SearchChargebackProtectionLevelInput
-
   """Find disputes with a given protection level."""
   protectionLevel: SearchDisputeProtectionLevelInput
 
@@ -3698,28 +3606,6 @@ type EmvCardOriginDetails implements InStoreReaderOriginDetails {
   An indicator of the conditions that caused the payment reader to attempt to make a processor request.
   """
   issuerActionCodeOnline: String
-}
-
-"""Input to enable a Product for a Merchant."""
-input EnableProductForMerchantInput {
-  """
-  An identifier used to reconcile requests and responses. 255 characters maximum.
-  """
-  clientMutationId: String
-
-  """Unique code of the product being enabled."""
-  code: ProductCode!
-}
-
-"""Payload from enabling a Product for a Merchant."""
-type EnableProductForMerchantPayload {
-  """
-  An identifier used to reconcile requests and responses. 255 characters maximum.
-  """
-  clientMutationId: String
-
-  """Product that was enabled."""
-  product: Product
 }
 
 """
@@ -4134,6 +4020,11 @@ type GooglePayOriginDetails {
   this is the last four digits of the virtual card(DPAN).
   """
   last4: String
+
+  """
+  The payment account reference (PAR) value, a non-financial reference number for the card.
+  """
+  paymentAccountReference: String
 }
 
 """Details about a Hyperwallet account."""
@@ -5479,9 +5370,6 @@ type Merchant {
   A paginated list of merchant accounts that belong to this merchant. Filtered by search criteria, if provided.
   """
   merchantAccounts(input: MerchantAccountSearchInput, first: Int, after: String): MerchantAccountConnection
-
-  """Detailed information about products available to the calling merchant."""
-  products(input: ProductsInput!): [Product!]
 }
 
 """Information about a merchant account associated with a merchant."""
@@ -5527,20 +5415,6 @@ type MerchantAccount {
 
   """The 3D Secure configuration for the merchant account."""
   threeDSecure: MerchantAccountThreeDSecureConfiguration
-}
-
-"""A record of a merchant account application."""
-type MerchantAccountApplication {
-  """
-  A unique ID for the account application. Can be used to query the status of the onboarding request in the future.
-  """
-  id: ID!
-
-  """Legacy unique ID."""
-  legacyId: ID!
-
-  """The status of the application."""
-  status: ApplicationStatus
 }
 
 """A paginated list of merchant accounts."""
@@ -5624,6 +5498,11 @@ type MerchantAdviceCodeResponse {
   message: String
 }
 
+"""
+An [ISO 18245](https://en.wikipedia.org/wiki/ISO_18245) Merchant Category Code. Four digits.
+"""
+scalar MerchantCategoryCode
+
 """Configuration for Meta Checkout."""
 type MetaCheckoutConfiguration {
   """The Meta Checkout partner id."""
@@ -5684,13 +5563,6 @@ input MonetaryAmountInput {
 input MonetaryAmountSearchInput {
   """Find transactions for a given amount."""
   value: SearchRangeInput
-
-  """
-  Deprecated: Please use `currencyCode` instead.
-  
-  Find transactions with a given currency.
-  """
-  currencyIsoCode: SearchTextInput
 
   """Find transactions with a given currency."""
   currencyCode: SearchTextInput
@@ -5801,6 +5673,11 @@ type Mutation {
   Refund a settled transaction and return a payload that includes details of the refund.
   """
   refundTransaction(input: RefundTransactionInput!): RefundTransactionPayload
+
+  """
+  Void a transaction and return a payload that includes details of the voided transaction.
+  """
+  voidTransaction(input: VoidTransactionInput!): VoidTransactionPayload
 
   """
   Reverse a transaction and return a payload that includes either the voided transaction or a refund.
@@ -6165,19 +6042,10 @@ type Mutation {
   """
   deleteOAuthClientSecret(input: DeleteOAuthClientSecretInput!): DeleteOAuthClientSecretPayload
 
-  """Enable product for calling merchant."""
-  enableProductForMerchant(input: EnableProductForMerchantInput!): EnableProductForMerchantPayload
-
-  """Disable product for calling merchant."""
-  disableProductForMerchant(input: DisableProductForMerchantInput!): DisableProductForMerchantPayload
-
   """
   Creates a package tracker record for Pay with PayPal transactions. Your account must be enabled to use this feature.
   """
   createTransactionPackageTracking(input: CreateTransactionPackageTrackingInput!): CreateTransactionPackageTrackingPayload
-
-  """Create a request for access to a specified product."""
-  createProductRequestForMerchant(input: CreateProductRequestForMerchantInput!): ProductRequestPayload
 
   """Generates an edit funding instrument URL."""
   generateEditFundingInstrumentUrl(input: GenerateEditFundingInstrumentUrlInput!): GenerateEditFundingInstrumentUrlPayload
@@ -6195,30 +6063,6 @@ type Mutation {
 
   """Unregisters a domain from Apple Pay."""
   unregisterApplePayDomain(input: UnregisterApplePayDomainInput!): UnregisterApplePayDomainPayload
-}
-
-"""Means by which customers by their bills."""
-enum MVVAcceptanceChannel {
-  FACE_TO_FACE
-  MAIL
-  PHONE
-  WEB
-}
-
-"""Supported MVV (Merchant Verification Value) programs."""
-enum MVVRegistrationType {
-  LOAN_VPP
-  TAX_DEBIT
-  UTIL_RATE
-  UTIL_VPP
-}
-
-"""Supported MVV (Merchant Verification Value) utility types."""
-enum MVVUtilityType {
-  ELECTRIC
-  GAS
-  TRASH
-  WATER
 }
 
 """The name of the party."""
@@ -6443,39 +6287,6 @@ type OpenBankingConfiguration {
 
   """The profile ID."""
   profileId: String
-}
-
-"""The owner's address type."""
-enum OwnerAddressType {
-  HOME
-  MAILING
-}
-
-"""The type of identity number provided for the owner."""
-enum OwnerIDType {
-  SOCIAL_SECURITY_NUMBER
-}
-
-"""The owner's phone type."""
-enum OwnerPhoneType {
-  HOME
-  MOBILE
-}
-
-"""The position that the owner holds in the business."""
-enum OwnerPosition {
-  BENEFICIAL_OWNER
-  CHAIRMAN
-  DIRECTOR
-  PARTNER
-  SECRETARY
-  TREASURER
-}
-
-"""The role that the owner holds in the business."""
-enum OwnerRole {
-  BENEFICIAL_OWNER
-  SIGNIFICANT_RESPONSIBILITY
 }
 
 """The page information for a connection."""
@@ -7327,7 +7138,7 @@ type PayPalAccountDetails {
   """
   Payer's selected financing option at the time of creating a transaction.
   """
-  selectedFinancingOption: SelectedPayPalFinancingOptionDetails
+  selectedFinancingOption: SelectedPayPalFinancingOptionDetails @deprecated(reason: "This field is no longer supported.")
 
   """Customer's Funding Instrument information."""
   fundingSourceDescription: String
@@ -7692,7 +7503,10 @@ input PayPalExperienceProfileInput {
   contactPreference: PayPalUserContactPreference
 }
 
-"""Possible identifiers for credit products provided via PayPal."""
+"""
+Deprecated: PayPalFinancingCreditProductIdentifier are no longer supported.
+Possible identifiers for credit products provided via PayPal.
+"""
 enum PayPalFinancingCreditProductIdentifier {
   """Brazil Credit Card Installments."""
   CREDIT_CARD_INSTALLMENTS_BR
@@ -7725,7 +7539,10 @@ enum PayPalFinancingCreditProductIdentifier {
   PAY_UPON_INVOICE_DE
 }
 
-"""PayPal financing options available for a transaction."""
+"""
+Deprecated: PayPalFinancingOption are no longer supported.
+PayPal financing options available for a transaction.
+"""
 type PayPalFinancingOption {
   """The credit product identifier."""
   creditProductIdentifier: PayPalFinancingCreditProductIdentifier
@@ -7734,7 +7551,10 @@ type PayPalFinancingOption {
   qualifyingFinancingOptions: [PayPalQualifyingFinancingOption!]
 }
 
-"""PayPal Financing option credit type."""
+"""
+Deprecated: PayPalFinancingOptionCreditType are no longer supported.
+PayPal Financing option credit type.
+"""
 enum PayPalFinancingOptionCreditType {
   INSTALLMENT
   NO_INTEREST
@@ -7743,6 +7563,7 @@ enum PayPalFinancingOptionCreditType {
 }
 
 """
+Deprecated: This input is no longer supported.
 Input fields for requesting information about PayPal financing options.
 """
 input PayPalFinancingOptionsInput {
@@ -7758,7 +7579,10 @@ input PayPalFinancingOptionsInput {
   countryCode: CountryCodeAlpha2!
 }
 
-"""PayPal financing options response payload."""
+"""
+Deprecated: PayPalFinancingOptionsPayload are no longer supported.
+PayPal financing options response payload.
+"""
 type PayPalFinancingOptionsPayload {
   """PayPal financing options."""
   financingOptions: [PayPalFinancingOption!]
@@ -8010,7 +7834,10 @@ input PayPalProductAttributesInput {
   paypalBillingAgreementChargePattern: PayPalBillingAgreementChargePattern
 }
 
-"""PayPal qualifying financing options for a product."""
+"""
+Deprecated: PayPalQualifyingFinancingOption are no longer supported.
+PayPal qualifying financing options for a product.
+"""
 type PayPalQualifyingFinancingOption {
   """APR percentage."""
   apr: Percentage
@@ -8297,7 +8124,7 @@ type PayPalTransactionDetails {
   origin: PaymentMethodOrigin
 
   """Buyer selected financing option at the time of creating a transaction."""
-  selectedFinancingOption: SelectedPayPalFinancingOptionDetails
+  selectedFinancingOption: SelectedPayPalFinancingOptionDetails @deprecated(reason: "This field is no longer supported.")
 
   """The application used by the payer to scan the QR code."""
   appUsedForScanning: PayPalRetailAppUsedForScanning
@@ -8590,59 +8417,6 @@ enum ProcessorDeclineType {
   SOFT
 }
 
-"""Represents a product that may be enabled."""
-type Product {
-  """Unique code of product."""
-  code: ProductCode!
-
-  """Display name of product."""
-  name: String!
-
-  """Enablement status of product."""
-  status: ProductEnablementStatus!
-
-  """List of details regarding the status of the product."""
-  statusDetails: [String!]
-}
-
-"""Available product names."""
-enum ProductCode {
-  ADD_SURCHARGE_MID
-  FASTLANE
-  IN_PERSON
-  NETWORK_TOKENS
-  SMART_RETRIES
-  VENMO
-}
-
-"""Product enablement state."""
-enum ProductEnablementStatus {
-  AVAILABLE
-  DISABLED
-  DISABLING
-  ENABLED
-  ENABLING
-  NOT_AVAILABLE
-  PROVISIONING
-}
-
-"""Payload for requesting access to a product."""
-type ProductRequestPayload {
-  """
-  An identifier used to reconcile requests and responses. 255 characters maximum.
-  """
-  clientMutationId: String
-
-  """Code of product to be requested."""
-  productCode: ProductCode
-}
-
-"""Input for selecting products to be returned."""
-input ProductsInput {
-  """Products to be returned."""
-  codes: [ProductCode!]!
-}
-
 """The top-level Query type. Queries are used to fetch data."""
 type Query {
   """Returns the literal string 'pong'."""
@@ -8683,7 +8457,7 @@ type Query {
   """
   Retrieve PayPal financing options that include payment installment plans.
   """
-  paypalFinancingOptions(input: PayPalFinancingOptionsInput!): PayPalFinancingOptionsPayload
+  paypalFinancingOptions(input: PayPalFinancingOptionsInput!): PayPalFinancingOptionsPayload @deprecated(reason: "This query is no longer supported.")
 
   """Retrieve a paginated list of all in-store locations."""
   inStoreLocations(first: Int, after: String): InStoreLocationConnection
@@ -8737,6 +8511,12 @@ type Refund implements Node & Payment {
 
   """The current status of this refund."""
   status: PaymentStatus
+
+  """Fields describing the payment processor response."""
+  processorResponse: TransactionAuthorizationProcessorResponse @deprecated(reason: "Use relevant events in `statusHistory` or `processorAuthorizationResponse` instead.")
+
+  """Fields describing the payment authorization processor response."""
+  processorAuthorizationResponse: TransactionAuthorizationProcessorResponse
 
   """
   The records of all statuses this refund has passed through, with additional
@@ -8809,6 +8589,9 @@ type Refund implements Node & Payment {
 
   """The refund date and time as reported by the in-store payment terminal."""
   paymentInitiatedAt: Timestamp
+
+  """The ID of the merchant that processed this refund."""
+  merchantId: String
 }
 
 """A paginated list of refunds."""
@@ -8911,13 +8694,6 @@ input RefundInput {
   description: String
 
   """
-  Deprecated: Please use `description` instead.
-  
-  Reason of the refund transaction. This field maps to the PayPal refund reason.
-  """
-  reason: String
-
-  """
   Line items for this refund. Up to 249 line items may be specified.
   
   Only allowed for Custom Actions transactions.
@@ -8973,13 +8749,6 @@ input RefundInStoreCreditCardInput {
 
 """A union of all possible payment method refund details."""
 union RefundPaymentMethodDetails = PayPalRefundDetails | PayPalLocalPaymentRefundDetails | SEPADirectDebitRefundDetails
-
-"""Supported refund policies."""
-enum RefundPolicy {
-  EXCHANGE_ONLY
-  NO_REFUND_OR_EXCHANGE
-  REFUND_CARDHOLDER
-}
 
 """Input fields for searching for refunds."""
 input RefundSearchInput {
@@ -10624,13 +10393,6 @@ input SearchPaymentPaymentMethodSnapshotInput {
 Input fields for searching for payments by payment method snapshot PayPal details criteria.
 """
 input SearchPaymentPayPalDetailsInput {
-  """
-  Deprecated: This field is no longer supported. Please use `payerEmail` instead.
-  
-  The email address of the PayPal payer.
-  """
-  email: SearchTextInput
-
   """The email address of the PayPal payer."""
   payerEmail: SearchTextInput
 
@@ -10855,7 +10617,10 @@ input SearchVerificationStatusInput {
   in: [VerificationStatus!]
 }
 
-"""Details about a selected financing option by a PayPal buyer."""
+"""
+Deprecated: SelectedPayPalFinancingOptionDetails are no longer supported.
+Details about a selected financing option by a PayPal buyer.
+"""
 type SelectedPayPalFinancingOptionDetails {
   """Total number of payments over which to finance the transaction."""
   term: Int
@@ -10872,7 +10637,10 @@ type SelectedPayPalFinancingOptionDetails {
   discountAmount: MonetaryAmount
 }
 
-"""Input fields indicating a selected financing option by a PayPal buyer."""
+"""
+Deprecated: SelectedPayPalFinancingOptionInput are no longer supported.
+Input fields indicating a selected financing option by a PayPal buyer.
+"""
 input SelectedPayPalFinancingOptionInput {
   """Total number of payments over which to finance the transaction."""
   term: Int!
@@ -11821,13 +11589,6 @@ input ThreeDSecureLookupTransactionInformationInput {
   """Tax amount."""
   taxAmount: Amount
 
-  """
-  Deprecated: Please use `ThreeDSecureLookupBrowserInformationInput.userAgent` instead.
-  
-  The exact content of the HTTP user agent header.
-  """
-  userAgent: String
-
   """Information about the cardholder's browser."""
   browserInformation: ThreeDSecureLookupBrowserInformationInput
 
@@ -11915,13 +11676,6 @@ input ThreeDSecurePassThroughInput {
   The version of 3D Secure authentication used for the transaction. Required on Visa and Mastercard authentications.
   """
   version: ThreeDSecureVersion
-
-  """
-  Deprecated: This field is no longer used with 3D Secure 2 authentications.
-  
-  The 3D Secure authentication response status code.
-  """
-  authenticationResponse: ThreeDSecureStatusCode
 
   """The 3D Secure directory server response."""
   directoryServerResponse: ThreeDSecureStatusCode
@@ -12417,7 +12171,10 @@ type Transaction implements Node & Payment {
   status: PaymentStatus
 
   """Fields describing the payment processor response."""
-  processorResponse: TransactionAuthorizationProcessorResponse @deprecated(reason: "Use relevant events in `statusHistory` instead.")
+  processorResponse: TransactionAuthorizationProcessorResponse @deprecated(reason: "Use relevant events in `statusHistory` or `processorAuthorizationResponse` instead.")
+
+  """Fields describing the payment authorization processor response."""
+  processorAuthorizationResponse: TransactionAuthorizationProcessorResponse
 
   """Risk data evaluated for this transaction."""
   riskData: RiskData
@@ -12746,11 +12503,6 @@ input TransactionInput {
   descriptor: TransactionDescriptorInput
 
   """
-  Deprecated: This field is included for supporting legacy clients. Please use `paymentInitiator` instead.
-  """
-  recurring: RecurringType
-
-  """
   The initiator of the payment. Payment can either be merchant-initiated or
   customer-initiated. If the transaction is an ecommerce transaction initiated
   by the customer, no value is passed.
@@ -12810,20 +12562,6 @@ input TransactionInput {
   lineItems: [TransactionLineItemInput!]
 
   """
-  Deprecated: This field is included for supporting legacy clients. This field
-  is specific to credit card payment methods only, and cannot be applied to
-  transactions with other payment method types. If you need to pass this field,
-  please use `authorizeCreditCard` or `chargeCreditCard`. See the
-  `CreditCardTransactionOptionsInput` type for details.
-  
-  Results of a merchant-performed 3D Secure authentication. You will only need
-  to use these fields if you've performed your own integration with a 3D Secure
-  MPI provider (e.g. Cardinal Centinel). Otherwise, Braintree's SDKs handle this
-  for you in our standard 3D Secure integration.
-  """
-  threeDSecurePassThrough: ThreeDSecurePassThroughInput
-
-  """
   When a single-use payment method is used to create this transaction, it can be
   automatically stored in the vault after transacting. If this field is left
   blank, the single-use payment method will not be vaulted.
@@ -12863,6 +12601,13 @@ input TransactionInput {
 
   """Details of the Payment Facilitator (mandatory for PayFac Merchants)."""
   paymentFacilitator: PaymentFacilitatorInput
+
+  """
+  Merchant Category Code (MCC) used to classify the type of business associated
+  with this transaction. Defaults to merchant account's configured MCC unless
+  explicitly overridden during transaction creation.
+  """
+  merchantCategoryCode: MerchantCategoryCode
 }
 
 """Transaction Installment information."""
@@ -13431,19 +13176,49 @@ input TransactionTaxInput {
 
 """Indicates the transfer type for AFT and SDWO transactions."""
 enum TransactionTransferType {
-  """Moving funds between their own accounts."""
+  """
+  Moving funds between a user's accounts at the same or a different financial
+  institution. This transfer type is available for both AFT and SDWO (Brazil only).
+  """
   ACCOUNT_TO_ACCOUNT
 
-  """Paying a bill (identified/unidentified)."""
+  """
+  Paying a bill (identified/unidentified). This transfer type is used for SDWO (Brazil only).
+  """
   BOLETO_TICKET
 
-  """Movement of funds across the accounts."""
+  """
+  Payout where a third party uses an Account Funding Transaction(AFT) to fund
+  the disbursement of an Original Credit Transaction(OCT). This transfer type is
+  used in AFT only.
+  """
+  FUND_DISBURSEMENT
+
+  """
+  Adding funds to or cashing out of a stored value digital wallet. This transfer type is used in AFT only.
+  """
   FUND_TRANSFER
 
-  """Transferring funds to another user."""
+  """
+  Payroll disbursement on behalf of a merchant, when done by a payroll provider. This transfer type is used in AFT only.
+  """
+  PAYROLL_DISBURSEMENT
+
+  """
+  Moving funds to another individual's non-merchant account.  This transfer type
+  is available for both AFT and SDWO (Brazil only).
+  """
   PERSON_TO_PERSON
 
-  """Loading funds into a wallet."""
+  """
+  Prepaid card load or top up, adding value to an eligible prepaid card or
+  funding a user's prepaid account. This transfer type is used in AFT only.
+  """
+  PREPAID_TOPUP
+
+  """
+  Adding value to a merchant's staged digital wallet. This transfer type is available for both AFT and SDWO (Brazil only).
+  """
   WALLET_TRANSFER
 }
 
@@ -13763,6 +13538,7 @@ input UpdateTransactionAmountInput {
 """
 Deprecated: `UpdateTransactionCustomFields` mutation is no longer supported,
 please use `UpdateCustomFields` mutation instead.
+
 Input for creating or updating custom fields on a transaction.
 """
 input UpdateTransactionCustomFieldsInput {
@@ -14319,13 +14095,6 @@ input VaultPaymentMethodInput {
   paymentMethodId: ID!
 
   """
-  Deprecated: This field is included for supporting legacy clients. Please use `verification.merchantAccountId` instead.
-  
-  ID of the merchant account to use when verifying the payment method.
-  """
-  verificationMerchantAccountId: ID
-
-  """
   Input fields that specify options for verifying the payment method before
   vaulting. Only applicable if the payment method is of a type that supports
   verification. For supported types, verification is performed by default. If
@@ -14483,6 +14252,42 @@ type VenmoAccountDetails {
 
   """The Venmo user ID."""
   venmoUserId: String
+}
+
+"""Output fields for Venmo app switch context information."""
+type VenmoAppSwitchContext {
+  """Output fields for Venmo app switch context information for mobile web."""
+  mobileWeb: VenmoAppSwitchMobileWeb
+}
+
+"""Input fields for the venmo app switch context information."""
+input VenmoAppSwitchContextInput {
+  """
+  Input fields for the Venmo app switch context information for mobile web.
+  """
+  mobileWeb: VenmoAppSwitchMobileWebInput
+}
+
+"""Output fields for Venmo app switch context information for mobile web."""
+type VenmoAppSwitchMobileWeb {
+  """User agent string from the customer's browser."""
+  buyerUserAgent: String
+
+  """
+  Indicates whether the transaction is being initiated in incognito/private browsing mode.
+  """
+  isIncognito: Boolean
+}
+
+"""Input fields for the venmo app switch information for mobile web."""
+input VenmoAppSwitchMobileWebInput {
+  """User agent string from the customer's browser."""
+  buyerUserAgent: String
+
+  """
+  Indicates whether the browser is being initiated in incognito/private browsing mode.
+  """
+  isIncognito: Boolean
 }
 
 """Configuration for Pay with Venmo."""
@@ -14657,6 +14462,9 @@ type VenmoPaymentContext implements Node & PaymentContext {
 
   """URL for redirecting back to merchant app on the client."""
   returnUrl: URL
+
+  """Venmo app switch context information."""
+  appSwitchContext: VenmoAppSwitchContext
 }
 
 """Top-level fields returned when creating a Venmo payment context."""
@@ -15188,6 +14996,55 @@ type VoidedEvent implements PaymentStatusEvent {
   User name of the person who performed an action that triggered the status change of the transaction.
   """
   userName: String
+}
+
+"""Input fields for voiding a transaction."""
+input VoidTransactionInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  An identifier to detect duplicate operations and prevent double-processing.
+  This can be used to protect from submitting a duplicate request; for instance,
+  after receiving an INTERNAL error where the ultimate state of the request is uncertain.
+  
+  If a request is made with a new `apiRequestKey`, it will be processed as
+  normal. If subsequent requests are made with the same `apiRequestKey`, and the
+  first request resulted in a transaction being voided (in any status), then the
+  same transaction in its current status will be returned.
+  
+  Subsequent requests with the same `apiRequestKey` must have the same input
+  values as the original request. Subsequent requests with the same
+  `apiRequestKey` must also be made after the initial request completes, and
+  before 30 days has elapsed since the initial request finished. If a subsequent
+  request is made while the first is in-flight or with different input values
+  than the original request, it will result in a `VALIDATION` error on the
+  subsequent request. If an `apiRequestKey` is reused after 30 days since its
+  first use, it will be treated as if it has not been used before.
+  
+  If an initial request is made with an `apiRequestKey`, but the request
+  receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
+  or `NOT_IMPLEMENTED` error, and no transaction is voided, then no duplication
+  will be considered. Subsequent requests with the same `apiRequestKey` will be
+  treated as non-duplicate requests, just as if they were the first request with that value.
+  """
+  apiRequestKey: String
+
+  """The ID of the transaction to void."""
+  transactionId: ID!
+}
+
+"""Top-level output field from voiding a transaction."""
+type VoidTransactionPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The transaction representing the charge on the payment method."""
+  transaction: Transaction
 }
 
 """A four-digit year."""
