@@ -348,7 +348,7 @@ type ApplePayWebConfiguration {
 }
 
 """
-Information about the [customer authentication regulation environment](https://developers.braintreepayments.com/guides/3d-secure/migration/javascript/v3#authentication-insight)
+Information about the [customer authentication regulation environment](https://developer.paypal.com/braintree/docs/guides/3d-secure/authentication-insight/javascript/v3)
 that applies to the payment method when processed with the provided merchant account.
 """
 type AuthenticationInsight {
@@ -1463,8 +1463,10 @@ type ClientConfiguration {
   """Configuration for Pay with Venmo."""
   venmo: VenmoConfiguration
 
-  """Configuration for Visa Checkout."""
-  visaCheckout: VisaCheckoutConfiguration
+  """
+  Deprecated: Visa Checkout is no longer supported. Configuration for Visa Checkout.
+  """
+  visaCheckout: VisaCheckoutConfiguration @deprecated(reason: "Visa Checkout is no longer supported.")
 
   """Configuration for Meta Checkout."""
   metaCheckout: MetaCheckoutConfiguration
@@ -1539,6 +1541,11 @@ input ClientTokenInput {
   Must be domain names as defined by the Domain Name System (DNS), e.g. "example.com".
   """
   domains: [String!]
+
+  """
+  Flag that prevents the same payment method from being stored multiple times for the same customer.
+  """
+  failOnDuplicatePaymentMethodForCustomer: Boolean
 }
 
 """Top-level input field for confirming micro-transfer values."""
@@ -1749,6 +1756,28 @@ type CreateInStoreLocationPayload {
   location: InStoreLocation
 }
 
+"""Top-level input fields for creating a local payment context."""
+input CreateLocalPaymentContextInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Input fields for creating a local payment context."""
+  paymentContext: LocalPaymentContextInput!
+}
+
+"""The result of a request to make a local payment context."""
+type CreateLocalPaymentContextPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Details about the local payment context."""
+  paymentContext: LocalPaymentContext
+}
+
 """
 Top-level input fields for creating a non-instant local payment context.
 """
@@ -1762,7 +1791,7 @@ input CreateNonInstantLocalPaymentContextInput {
   paymentContext: NonInstantLocalPaymentContextInput!
 }
 
-"""The result of a request to make a local payment context."""
+"""The result of a request to make a non-instant local payment context."""
 type CreateNonInstantLocalPaymentContextPayload {
   """
   An identifier used to reconcile requests and responses. 255 characters maximum.
@@ -1927,6 +1956,11 @@ input CreatePayPalOneTimePaymentInput {
   Indicates whether PayPal Pay Later should be offered in the PayPal approval flow.
   """
   offerPayLater: Boolean
+
+  """
+  Indicates whether PayPal Credit should be offered in the PayPal approval flow.
+  """
+  offerPayPalCredit: Boolean
 
   """
   Email of the payer. This will prepopulate the input field in the PayPal approval login page.
@@ -2151,6 +2185,9 @@ input CreateVenmoPaymentContextInput {
   """URL for redirecting back to merchant app or website on the client."""
   returnUrl: URL
 
+  """Venmo Risk correlation ID (also known as the Client Metadata ID)."""
+  venmoRiskCorrelationId: ID
+
   """Venmo app switch context information."""
   appSwitchContext: VenmoAppSwitchContextInput
 }
@@ -2217,6 +2254,16 @@ type CreditCardConfiguration {
 enum CreditCardCustomerLocation {
   INTERNATIONAL
   US
+}
+
+"""Input fields related to credit card detached refund processing."""
+input CreditCardDetachedRefundOptionsInput {
+  """
+  Merchant Category Code (MCC) used to classify the type of business associated
+  with this transaction. Defaults to merchant account's configured MCC unless
+  explicitly overridden during transaction creation.
+  """
+  merchantCategoryCode: MerchantCategoryCode
 }
 
 """Details about a credit card."""
@@ -3476,15 +3523,14 @@ A card brand-specific two-digit string describing the mode of the transaction.
 scalar ECommerceIndicator
 
 """
-The internationalized email address.<blockquote><strong>Note:</strong> Up to 64
-characters are allowed before and 255 characters are allowed after the
-<code>@</code> sign.
+The internationalized email address.
+**Note:** Up to 64 characters are allowed before and 255 characters are allowed after the `@` sign.
 However, the generally accepted maximum length for an email address is 254 characters.
-The pattern verifies that an unquoted <code>@</code> sign exists.</blockquote>
+The pattern verifies that an unquoted `@` sign exists.
 
 minLength: 3
 maxLength: 254
-pattern: <code>^.+@[^\"\\-].+$</code>.
+pattern: `^.+@[^\"\\-].+$`.
 """
 scalar EmailAddress
 
@@ -3608,10 +3654,24 @@ type EmvCardOriginDetails implements InStoreReaderOriginDetails {
   issuerActionCodeOnline: String
 }
 
+"""Top-level input fields used for risk evaluation of a transaction."""
+input EvaluateTransactionRiskInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """ID of a credit card payment method to be authorized."""
+  paymentMethodId: ID!
+
+  """Input fields used to define a transaction for risk evaluation."""
+  transaction: TransactionRiskEvaluateInput!
+}
+
 """
 A value with more than one decimal place, representing an exchange rate between currencies. For example, `0.93014065558374`.
 minLength: 3
-pattern: <code>^\\d+[.]\\d+$</code>
+pattern: `^\\d+[.]\\d+$`
 """
 scalar ExchangeRate
 
@@ -3687,6 +3747,19 @@ type ExchangeRateQuotePayload {
   Exchange rate quote details for each base and quote currency combination.
   """
   quotes: [ExchangeRateQuote!]
+}
+
+"""The name of the payment service provider processing the transaction."""
+enum ExternalProcessor {
+  ADYEN
+  AMAZON_PAY
+  AUTHORIZE_NET
+  CHASE
+  FISERV
+  NUVEI
+  SQUARE
+  STRIPE
+  WORLDPAY
 }
 
 """A credit card's assocation with an external vault."""
@@ -3803,6 +3876,7 @@ enum FraudServiceProvider {
   FRAUD_PROTECTION
   FRAUD_PROTECTION_ADVANCED
   FRAUD_PROTECTION_ENTERPRISE
+  FRAUD_PROTECTION_EXTERNAL
   FRAUD_PROTECTION_LITE
   KOUNT
 }
@@ -4437,6 +4511,13 @@ enum InStoreContextStatus {
 input InStoreCreditCardRefundOptionsInput {
   """The refund date and time as reported by the in-store payment terminal."""
   paymentInitiatedAt: Timestamp
+
+  """
+  Merchant Category Code (MCC) used to classify the type of business associated
+  with this transaction. Defaults to merchant account's configured MCC unless
+  explicitly overridden during transaction creation.
+  """
+  merchantCategoryCode: MerchantCategoryCode
 }
 
 """
@@ -5099,7 +5180,7 @@ code](https://www.loc.gov/standards/iso639-2/php/code_list.php), the optional
 code](https://developer.paypal.com/braintree/docs/reference/general/countries).
 maxLength: 10
 minLength: 2
-pattern: <code>^[a-z]{2}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}))?$</code>
+pattern: `^[a-z]{2}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}))?$`
 """
 scalar Language
 
@@ -5248,6 +5329,53 @@ type LocalPaymentContext implements Node & PaymentContext {
   orderId: String
 }
 
+"""Input fields for local payment context."""
+input LocalPaymentContextInput {
+  """
+  The order id of the eventual Braintree transaction and the order number of the
+  local payment context. Maximum 127 characters.
+  """
+  orderId: String
+
+  """The amount of the local payment."""
+  amount: MonetaryAmountInput!
+
+  """The type of local payment."""
+  type: LocalPaymentMethodType!
+
+  """
+  The country code of the local payment. For local payments supported in
+  multiple countries, this value may determine which banks are presented to the customer.
+  """
+  countryCode: CountryCode
+
+  """The language in which to localize the error-related strings."""
+  locale: Language
+
+  """
+  The URL where the customer is redirected to after the customer approves the payment.
+  """
+  returnUrl: String!
+
+  """
+  The URL where the customer is redirected to after the customer cancels the payment.
+  """
+  cancelUrl: String!
+
+  """
+  ID of the PayPal merchant account that will be used when charging this payment method.
+  """
+  merchantAccountId: ID
+
+  """The payer's information."""
+  payerInfo: LocalPaymentPayerInfoInput!
+
+  """
+  Overrides the default date at which the local payment context will expire. MULTIBANCO is not overridable.
+  """
+  expiryDate: Date
+}
+
 """Local payment specific details on a transaction."""
 type LocalPaymentDetails {
   """
@@ -5273,6 +5401,7 @@ enum LocalPaymentMethodType {
   BANCONTACT
   BLIK
   BOLETOBANCARIO @deprecated(reason: "Boleto Bancário is no longer supported.")
+  CRYPTO
   EPS
   GIROPAY
   GRABPAY
@@ -5307,6 +5436,9 @@ input LocalPaymentPayerInfoInput {
 
   """The payer's phone number."""
   phoneNumber: String
+
+  """The country code for the payer's phone number."""
+  phoneCountryCode: String
 
   """The payer's shipping address."""
   shippingAddress: LocalPaymentAddressInput
@@ -6016,6 +6148,11 @@ type Mutation {
   createNonInstantLocalPaymentContext(input: CreateNonInstantLocalPaymentContextInput!): CreateNonInstantLocalPaymentContextPayload
 
   """
+  Creates a local payment context. Your account must be enabled to use this feature.
+  """
+  createLocalPaymentContext(input: CreateLocalPaymentContextInput!): CreateLocalPaymentContextPayload
+
+  """
   Create an OAuth client secret.
   To call this mutation you must obtain an OAuth Access Token with scope MANAGE_OAUTH_CLIENT_SECRETS,
   the associated merchant must have [IP or hostname restrictions](https://developer.paypal.com/braintree/articles/risk-and-security/allowlisting)
@@ -6063,6 +6200,16 @@ type Mutation {
 
   """Unregisters a domain from Apple Pay."""
   unregisterApplePayDomain(input: UnregisterApplePayDomainInput!): UnregisterApplePayDomainPayload
+
+  """
+  Update a PayPal one-time payment with revised amount, line items, and shipping details.
+  """
+  updatePayPalOneTimePayment(input: UpdatePayPalOneTimePaymentInput!): UpdatePayPalOneTimePaymentPayload
+
+  """
+  Evaluates the risk of a transaction and return a payload that includes details of the risk evaluation.
+  """
+  evaluateTransactionRisk(input: EvaluateTransactionRiskInput!): TransactionRiskEvaluatePayload
 }
 
 """The name of the party."""
@@ -6728,7 +6875,9 @@ enum PaymentMethodOriginType {
 
   """Deprecated: Samsung is no longer supported."""
   SAMSUNG_PAY
-  VISA_CHECKOUT
+
+  """Deprecated: Visa Checkout is no longer supported."""
+  VISA_CHECKOUT @deprecated(reason: "Visa Checkout is no longer supported.")
 }
 
 """
@@ -6760,7 +6909,10 @@ enum PaymentMethodSnapshotSearchType {
 
   """Deprecated: Samsung is no longer supported."""
   CREDIT_CARD_VIA_SAMSUNG_PAY
-  CREDIT_CARD_VIA_VISA_CHECKOUT
+
+  """Deprecated: Visa Checkout is no longer supported."""
+  CREDIT_CARD_VIA_VISA_CHECKOUT @deprecated(reason: "Visa Checkout is no longer supported.")
+  CRYPTO_VIA_PAYPAL
   EPS_VIA_PAYPAL
   GIROPAY_VIA_PAYPAL
   GRABPAY_VIA_PAYPAL
@@ -8655,6 +8807,9 @@ input RefundCreditCardInput {
 
   """Input fields containing details about the refund."""
   refund: DetachedRefundInput!
+
+  """Input fields related to credit card detached refund processing."""
+  options: CreditCardDetachedRefundOptionsInput
 }
 
 """
@@ -9899,6 +10054,32 @@ type Role {
   rights: [Right!]
 }
 
+"""An role within an RoleSearchConnection."""
+type RoleConnectionEdge {
+  """
+  The role within the RoleSearchConnection. Used for requesting additional pages.
+  """
+  cursor: String
+
+  """The role."""
+  node: Role
+}
+
+"""A paginated list of searched merchant roles."""
+type RoleSearchConnection {
+  """A list of merchant roles."""
+  edges: [RoleConnectionEdge]
+
+  """Information about the page of roles contained in `edges`."""
+  pageInfo: PageInfo!
+}
+
+"""Input fields for searching for merchant roles."""
+input RoleSearchInput {
+  """Find merchant roles with an ID or IDs."""
+  id: SearchValueInput
+}
+
 """
 Deprecated: Samsung pay is no longer supported.
 
@@ -10081,6 +10262,11 @@ type Search {
   A paginated list of in-store locations that match any of the conditions in InStoreLocationSearchInput.
   """
   inStoreLocations(input: InStoreLocationSearchInput!, first: Int, after: String): InStoreLocationSearchConnection
+
+  """
+  A paginated list of roles that match any of the conditions in RoleSearchInput.
+  """
+  roles(input: RoleSearchInput!, first: Int, after: String): RoleSearchConnection
 }
 
 """Input fields for searching by address."""
@@ -11052,7 +11238,7 @@ enum ThreeDSecureAuthenticationStatus {
   EXEMPTION_TRA_SUCCESSFUL
   LOOKUP_BYPASSED
   LOOKUP_CARD_ERROR
-  LOOKUP_ENROLLED
+  LOOKUP_ENROLLED @deprecated(reason: "This was a 3DS1 status.")
   LOOKUP_ERROR
   LOOKUP_FAILED_ACS_ERROR
   LOOKUP_NOT_ENROLLED
@@ -11146,7 +11332,7 @@ type ThreeDSecureDetails {
   authentication: ThreeDSecureAuthentication
 
   """
-  Information about the [customer authentication regulation environment](https://developers.braintreepayments.com/guides/3d-secure/migration/javascript/v3#authentication-insight)
+  Information about the [customer authentication regulation environment](https://developer.paypal.com/braintree/docs/guides/3d-secure/authentication-insight/javascript/v3)
   that applies to the payment method when processed with the provided merchant
   account. This can be used to determine whether to perform 3D Secure
   authentication.
@@ -11820,7 +12006,7 @@ type TokenizeCreditCardPayload {
   paymentMethod: PaymentMethod
 
   """
-  Information about the [customer authentication regulation environment](https://developers.braintreepayments.com/guides/3d-secure/migration/javascript/v3#authentication-insight)
+  Information about the [customer authentication regulation environment](https://developer.paypal.com/braintree/docs/guides/3d-secure/authentication-insight/javascript/v3)
   that applies to the payment method when processed with the provided merchant
   account. This can be used to determine whether to perform 3D Secure
   authentication.
@@ -12175,6 +12361,9 @@ type Transaction implements Node & Payment {
 
   """Fields describing the payment authorization processor response."""
   processorAuthorizationResponse: TransactionAuthorizationProcessorResponse
+
+  """Fields describing the payment settlement processor response."""
+  processorSettlementResponse: TransactionSettlementProcessorResponse
 
   """Risk data evaluated for this transaction."""
   riskData: RiskData
@@ -12968,6 +13157,82 @@ type TransactionRiskContextPayload {
   paypalRiskCorrelationId: ID
 }
 
+"""Input fields used to define a transaction for risk evaluation."""
+input TransactionRiskEvaluateInput {
+  """Amount of a transaction under risk evaluation."""
+  amount: MonetaryAmountInput!
+
+  """The payment processor handling the transaction."""
+  externalProcessor: ExternalProcessor
+
+  """
+  Additional information about the transaction. On PayPal transactions, this
+  field maps to the PayPal invoice number. PayPal invoice numbers must be unique
+  in your PayPal business account. Maximum 255 characters or 127 for PayPal transactions.
+  """
+  orderId: String
+
+  """
+  Customer device information, which is sent directly for fraud analysis.
+  """
+  riskData: RiskDataInput
+
+  """
+  Collection of custom field/value pairs. You must [set up each custom field in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#creating-a-custom-field)
+  prior to passing it with a request.
+  """
+  customFields: [CustomFieldInput!]
+
+  """
+  The initiator of the payment. Payment can either be merchant-initiated or
+  customer-initiated. If the transaction is an ecommerce transaction initiated
+  by the customer, no value is passed.
+  """
+  paymentInitiator: PaymentInitiator
+
+  """
+  If charging a single-use payment method, optional ID of a customer to
+  associate the transaction with. If vaulting the single-use payment method,
+  this customer will be associated with the resulting multi-use payment method.
+  """
+  customerId: ID
+
+  """
+  Customer information to be stored on the transaction and used for fraud
+  protection. Use this if you wish to pass customer information on a transaction
+  without creating an independent stored customer record in the vault.
+  
+  This parameter can only be used if you do not pass `customerId`, and if you
+  are not using a vaulted/multi-use payment method. In other words, this field
+  is only valid when the transaction will not be associated with an existing customer.
+  """
+  customerDetails: TransactionCustomerDetailsInput
+
+  """Shipping address for the transaction."""
+  shippingAddress: AddressInput
+
+  """Billing address for the transaction."""
+  billingAddress: AddressInput
+
+  """
+  Line items for this transaction. Up to 249 line items may be specified.
+  
+  *Required for Level 3 processing*.
+  """
+  lineItems: [TransactionLineItemInput!]
+}
+
+"""Top-level output field from evaluating risk for a transaction."""
+type TransactionRiskEvaluatePayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Risk data evaluated for this transaction."""
+  riskData: RiskData
+}
+
 """Input fields for searching for transactions."""
 input TransactionSearchInput {
   """Find transactions with an ID or IDs."""
@@ -13077,6 +13342,12 @@ type TransactionSettlementProcessorResponse {
 
   """The processing bank's response to the provided billing street address."""
   avsStreetAddressResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `PaymentStatusEvent` instead.")
+
+  """The ACH return code, if applicable."""
+  achReturnCode: String
+
+  """The ACH reject reason, if applicable."""
+  achRejectReason: String
 }
 
 """Information related to shipping a physical product."""
@@ -13517,6 +13788,61 @@ input UpdateInStoreReaderInput {
   locationId: ID
 }
 
+"""Input fields for updating a PayPal one-time payment."""
+input UpdatePayPalOneTimePaymentInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The payment method ID of the PayPal payment to update."""
+  paymentMethodId: ID!
+
+  """Total amount for the payment."""
+  amount: MonetaryAmountInput
+
+  """The amount breakdown for this transaction."""
+  amountBreakdown: PayPalAmountBreakDownInput
+
+  """The line items for this payment."""
+  lineItems: [PayPalLineItemInput!]
+
+  """
+  List of shipping options offered by the payee or merchant to the payer to ship or pick up their items.
+  """
+  shippingOptions: [PayPalShippingOptionInput!]
+
+  """Shipping address."""
+  shippingAddress: AddressInput
+
+  """Custom field for merchant tracking."""
+  customField: String
+
+  """Description shown in PayPal emails."""
+  description: String
+
+  """
+  The PayPal invoice number. It must be unique in your PayPal business account
+  and can contain a maximum of 127 characters. If specified, transactions
+  created from the resulting payment method will have this orderId.
+  """
+  orderId: String
+
+  """Email address of the payee."""
+  payeeEmail: EmailAddress
+}
+
+"""The result of updating a PayPal one-time payment."""
+type UpdatePayPalOneTimePaymentPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The updated payment method containing the new payment method ID."""
+  paymentMethod: PaymentMethod
+}
+
 """Top-level input fields for a updating a transaction's amount."""
 input UpdateTransactionAmountInput {
   """
@@ -13577,7 +13903,7 @@ type UpdateTransactionCustomFieldsPayload {
 
 """
 A URL string
-pattern: <code>[a-zA-Z0-9+-.]:\\/\\/([-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.?[a-z]{2,4}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))?</code>
+pattern: `[a-zA-Z0-9+-.]:\\/\\/([-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.?[a-z]{2,4}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))?`
 """
 scalar URL
 
@@ -13657,10 +13983,10 @@ type UsBankAccountDetails {
   achMandate: UsBankAccountAchMandate
 
   """The ACH return code, if applicable."""
-  achReturnCode: String
+  achReturnCode: String @deprecated(reason: "Moved to Transaction level for semantic correctness. Check for processorSettlementResponse field in Transaction instead.")
 
   """The ACH reject reason, if applicable."""
-  achRejectReason: String
+  achRejectReason: String @deprecated(reason: "Moved to Transaction level for semantic correctness. Check for processorSettlementResponse field in Transaction instead.")
 }
 
 """The name of the owner of a personal US bank account."""
@@ -14463,6 +14789,9 @@ type VenmoPaymentContext implements Node & PaymentContext {
   """URL for redirecting back to merchant app on the client."""
   returnUrl: URL
 
+  """Venmo Risk Correlation ID (also known as the Client Metadata ID)."""
+  venmoRiskCorrelationId: ID
+
   """Venmo app switch context information."""
   appSwitchContext: VenmoAppSwitchContext
 }
@@ -14944,7 +15273,11 @@ type Viewer {
   rights: [Right!]
 }
 
-"""Configuration for Visa Checkout."""
+"""
+Deprecated: Visa Checkout is no longer supported.
+
+Configuration for Visa Checkout.
+"""
 type VisaCheckoutConfiguration {
   """The Visa Checkout API key."""
   apiKey: String
@@ -14960,6 +15293,8 @@ type VisaCheckoutConfiguration {
 }
 
 """
+Deprecated: Visa Checkout is no longer supported.
+
 Additional information about the payment method specific to Visa Checkout.
 """
 type VisaCheckoutOriginDetails {

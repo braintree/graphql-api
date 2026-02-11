@@ -1,3 +1,62 @@
+# 02-11-2026
+* Add new mutations:
+    * `createLocalPaymentContext`
+    * `evaluateTransactionRisk`
+    * `updatePayPalOneTimePayment`
+* Add new types:
+    * `CreateLocalPaymentContextPayload`
+    * `RoleConnectionEdge`
+    * `RoleSearchConnection`
+    * `TransactionRiskEvaluatePayload`
+    * `UpdatePayPalOneTimePaymentPayload`
+* Add new inputs:
+    * `CreateLocalPaymentContextInput`
+    * `CreditCardDetachedRefundOptionsInput`
+    * `EvaluateTransactionRiskInput`
+    * `LocalPaymentContextInput`
+    * `RoleSearchInput`
+    * `TransactionRiskEvaluateInput`
+    * `UpdatePayPalOneTimePaymentInput`
+* Add new enums:
+    * `ExternalProcessor`
+* Add new enum values:
+    * `ADYEN`, `AMAZON_PAY`, `AUTHORIZE_NET`, `CHASE`, `FISERV`, `NUVEI`, `SQUARE`, `STRIPE`, `WORLDPAY` to `ExternalProcessor`
+    * `FRAUD_PROTECTION_EXTERNAL` to `FraudServiceProvider`
+    * `CRYPTO` to `LocalPaymentMethodType`
+    * `CRYPTO_VIA_PAYPAL` to `PaymentMethodSnapshotSearchType`
+* Add new fields:
+    * `achRejectReason`, `achReturnCode` to `TransactionSettlementProcessorResponse`
+    * `amount` to `LocalPaymentContextInput`, `TransactionRiskEvaluateInput`, `UpdatePayPalOneTimePaymentInput`
+    * `amountBreakdown`, `customField`, `description`, `payeeEmail`, `shippingOptions` to `UpdatePayPalOneTimePaymentInput`
+    * `billingAddress`, `customFields`, `customerDetails`, `customerId`, `externalProcessor`, `paymentInitiator` to `TransactionRiskEvaluateInput`
+    * `cancelUrl`, `countryCode`, `expiryDate`, `locale`, `merchantAccountId`, `payerInfo`, `returnUrl`, `type` to `LocalPaymentContextInput`
+    * `clientMutationId` to `CreateLocalPaymentContextInput`, `CreateLocalPaymentContextPayload`, `EvaluateTransactionRiskInput`, `TransactionRiskEvaluatePayload`, `UpdatePayPalOneTimePaymentInput`, `UpdatePayPalOneTimePaymentPayload`
+    * `cursor`, `node` to `RoleConnectionEdge`
+    * `edges`, `pageInfo` to `RoleSearchConnection`
+    * `failOnDuplicatePaymentMethodForCustomer` to `ClientTokenInput`
+    * `id` to `RoleSearchInput`
+    * `lineItems` to `TransactionRiskEvaluateInput`, `UpdatePayPalOneTimePaymentInput`
+    * `merchantCategoryCode` to `CreditCardDetachedRefundOptionsInput`, `InStoreCreditCardRefundOptionsInput`
+    * `offerPayPalCredit` to `CreatePayPalOneTimePaymentInput`
+    * `options` to `RefundCreditCardInput`
+    * `orderId` to `LocalPaymentContextInput`, `TransactionRiskEvaluateInput`, `UpdatePayPalOneTimePaymentInput`
+    * `paymentContext` to `CreateLocalPaymentContextInput`, `CreateLocalPaymentContextPayload`
+    * `paymentMethod` to `UpdatePayPalOneTimePaymentPayload`
+    * `paymentMethodId` to `EvaluateTransactionRiskInput`, `UpdatePayPalOneTimePaymentInput`
+    * `phoneCountryCode` to `LocalPaymentPayerInfoInput`
+    * `processorSettlementResponse` to `Transaction`
+    * `riskData` to `TransactionRiskEvaluateInput`, `TransactionRiskEvaluatePayload`
+    * `roles` to `Search`
+    * `shippingAddress` to `TransactionRiskEvaluateInput`, `UpdatePayPalOneTimePaymentInput`
+    * `transaction` to `EvaluateTransactionRiskInput`
+    * `venmoRiskCorrelationId` to `CreateVenmoPaymentContextInput`, `VenmoPaymentContext`
+* Deprecate:
+    * `visaCheckout` on `ClientConfiguration`
+    * `VISA_CHECKOUT` on `PaymentMethodOriginType`
+    * `CREDIT_CARD_VIA_VISA_CHECKOUT` on `PaymentMethodSnapshotSearchType`
+    * `LOOKUP_ENROLLED` on `ThreeDSecureAuthenticationStatus`
+    * `achRejectReason`, `achReturnCode` on `UsBankAccountDetails`
+
 # 11-18-2025
 * Add new mutations:
     * `voidTransaction`
