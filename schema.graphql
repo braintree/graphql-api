@@ -88,6 +88,17 @@ enum ACHStandardEntryClassCode {
 }
 
 """
+The type of ACH transaction, indicating whether it is processed through the standard or same-day ACH network.
+"""
+enum ACHType {
+  """Same-day ACH processing."""
+  SAME_DAY
+
+  """Standard ACH processing."""
+  STANDARD
+}
+
+"""
 The authentication context class reference that indcates how a universal access token can be used.
 """
 enum ACRType {
@@ -1303,6 +1314,9 @@ input ChargeUsBankAccountInput {
 
   """The ID of an existing US bank account."""
   paymentMethodId: ID!
+
+  """The requested type of ACH transaction."""
+  achType: ACHType
 
   """Input fields related to the US bank account being charged."""
   options: ChargeUsBankAccountOptionsInput
@@ -3511,11 +3525,6 @@ enum DisputeType {
   PRE_ARBITRATION
   RETRIEVAL
 }
-
-"""
-An [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Durations) Duration that accepts Days, Hours, Minutes and Seconds.
-"""
-scalar Duration
 
 """
 A card brand-specific two-digit string describing the mode of the transaction.
@@ -6885,7 +6894,7 @@ A union of all possible payment method details as they were used in a
 transaction or verification. PaymentMethodSnapshot preserves values used to
 create a given transaction or verify a payment method at that moment in time.
 """
-union PaymentMethodSnapshot = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalTransactionDetails | VenmoAccountDetails | UsBankAccountDetails | LocalPaymentDetails | CreditCardTransactionDetails | SEPADirectDebitTransactionDetails
+union PaymentMethodSnapshot = CustomActionsPaymentMethodDetails | CreditCardDetails | PayPalTransactionDetails | VenmoAccountDetails | UsBankAccountDetails | LocalPaymentDetails | CreditCardTransactionDetails | SEPADirectDebitTransactionDetails | UsBankAccountTransactionDetails
 
 """
 A value identifying the type of payment method used for a transaction. For
@@ -7655,91 +7664,6 @@ input PayPalExperienceProfileInput {
   contactPreference: PayPalUserContactPreference
 }
 
-"""
-Deprecated: PayPalFinancingCreditProductIdentifier are no longer supported.
-Possible identifiers for credit products provided via PayPal.
-"""
-enum PayPalFinancingCreditProductIdentifier {
-  """Brazil Credit Card Installments."""
-  CREDIT_CARD_INSTALLMENTS_BR
-
-  """Mexico Credit Card Installments."""
-  CREDIT_CARD_INSTALLMENTS_MX
-
-  """United States Credit Card."""
-  CREDIT_CARD_US
-
-  """Germany PayPal Credit."""
-  PAYPAL_CREDIT_DE
-
-  """United Kingdom PayPal Credit."""
-  PAYPAL_CREDIT_UK
-
-  """United States PayPal Credit."""
-  PAYPAL_CREDIT_US
-
-  """France Pay Later."""
-  PAY_LATER_FR
-
-  """Great Britain Pay Later."""
-  PAY_LATER_GB
-
-  """United States Pay Later."""
-  PAY_LATER_US
-
-  """Germany Pay Upon Invoice."""
-  PAY_UPON_INVOICE_DE
-}
-
-"""
-Deprecated: PayPalFinancingOption are no longer supported.
-PayPal financing options available for a transaction.
-"""
-type PayPalFinancingOption {
-  """The credit product identifier."""
-  creditProductIdentifier: PayPalFinancingCreditProductIdentifier
-
-  """Financing options the transaction qualifies for."""
-  qualifyingFinancingOptions: [PayPalQualifyingFinancingOption!]
-}
-
-"""
-Deprecated: PayPalFinancingOptionCreditType are no longer supported.
-PayPal Financing option credit type.
-"""
-enum PayPalFinancingOptionCreditType {
-  INSTALLMENT
-  NO_INTEREST
-  PAY_UPON_INVOICE
-  SAME_AS_CASH
-}
-
-"""
-Deprecated: This input is no longer supported.
-Input fields for requesting information about PayPal financing options.
-"""
-input PayPalFinancingOptionsInput {
-  """
-  ID of an existing multi-use PayPal payment method to request financing options for.
-  """
-  paymentMethodId: ID!
-
-  """The transaction currency and total amount to finance."""
-  amount: MonetaryAmountInput!
-
-  """The financing country code."""
-  countryCode: CountryCodeAlpha2!
-}
-
-"""
-Deprecated: PayPalFinancingOptionsPayload are no longer supported.
-PayPal financing options response payload.
-"""
-type PayPalFinancingOptionsPayload {
-  """PayPal financing options."""
-  financingOptions: [PayPalFinancingOption!]
-}
-
 """The intent for PayPal payments."""
 enum PayPalIntent {
   """
@@ -7984,59 +7908,6 @@ input PayPalProductAttributesInput {
   Expected business/pricing model for a billing agreement (Charge Patterns).
   """
   paypalBillingAgreementChargePattern: PayPalBillingAgreementChargePattern
-}
-
-"""
-Deprecated: PayPalQualifyingFinancingOption are no longer supported.
-PayPal qualifying financing options for a product.
-"""
-type PayPalQualifyingFinancingOption {
-  """APR percentage."""
-  apr: Percentage
-
-  """Nominal rate percentage."""
-  nominalRate: Percentage
-
-  """Total number of payments over which to finance the transaction."""
-  term: Int
-
-  """The duration between each interval or payment."""
-  intervalDuration: Duration
-
-  """The country or region for the financing option."""
-  countryCode: CountryCodeAlpha2
-
-  """Credit type."""
-  creditType: PayPalFinancingOptionCreditType
-
-  """The minimum qualifying amount for a transaction."""
-  minimumAmount: MonetaryAmount
-
-  """The monthly interest rate for this financing option."""
-  monthlyInterestRate: Percentage
-
-  """The amount for transaction periodic payments."""
-  periodicPayment: MonetaryAmount
-
-  """The amount for transaction monthly payments."""
-  monthlyPayment: MonetaryAmount
-
-  """The discount amount on the transaction for this financing option."""
-  discountAmount: MonetaryAmount
-
-  """The discount percentage for this financing option."""
-  discountPercentage: Percentage
-
-  """The total interest cost for this financing option."""
-  totalInterest: MonetaryAmount
-
-  """The total amount for the transaction, including interest."""
-  totalCost: MonetaryAmount
-
-  """
-  Indicates whether the financing option's credit fee is funded by PayPal.
-  """
-  paypalSubsidized: Boolean
 }
 
 """The billing cycle that is a part of a recurring billing plan."""
@@ -8605,11 +8476,6 @@ type Query {
   different search that can be queried with its own input parameters.
   """
   search: Search
-
-  """
-  Retrieve PayPal financing options that include payment installment plans.
-  """
-  paypalFinancingOptions(input: PayPalFinancingOptionsInput!): PayPalFinancingOptionsPayload @deprecated(reason: "This query is no longer supported.")
 
   """Retrieve a paginated list of all in-store locations."""
   inStoreLocations(first: Int, after: String): InStoreLocationConnection
@@ -14035,6 +13901,22 @@ scalar UsBankAccountNumber
 enum UsBankAccountOwnershipType {
   BUSINESS
   PERSONAL
+}
+
+"""
+Details specific to a US bank account transaction.
+Available for PaymentMethodSnapshot when Braintree-Version is 2026-02-18 or later.
+For earlier versions, PaymentMethodSnapshot returns UsBankAccountDetails instead.
+"""
+type UsBankAccountTransactionDetails {
+  """The US bank account details."""
+  usBankAccount: UsBankAccountDetails
+
+  """The ACH type used for the transaction."""
+  achType: ACHType
+
+  """The ACH type that was originally requested for the transaction."""
+  requestedAchType: ACHType
 }
 
 """The type of US Bank Account."""

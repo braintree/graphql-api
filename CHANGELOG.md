@@ -1,3 +1,23 @@
+# 02-17-2026
+* Add new types:
+    * `UsBankAccountTransactionDetails`
+* Add new enums:
+    * `ACHType`
+* Add new enum values:
+    * `SAME_DAY`, `STANDARD` to `ACHType`
+* Add new fields:
+    * `achType` to `ChargeUsBankAccountInput`, `UsBankAccountTransactionDetails`
+    * `requestedAchType`, `usBankAccount` to `UsBankAccountTransactionDetails`
+* Remove:
+    * `Duration` type
+    * `PayPalFinancingCreditProductIdentifier` type
+    * `PayPalFinancingOption` type
+    * `PayPalFinancingOptionCreditType` type
+    * `paypalFinancingOptions` query
+    * `PayPalFinancingOptionsInput` type
+    * `PayPalFinancingOptionsPayload` type
+    * `PayPalQualifyingFinancingOption` type
+
 # 02-11-2026
 * Add new mutations:
     * `createLocalPaymentContext`
