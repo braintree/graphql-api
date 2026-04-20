@@ -1041,6 +1041,12 @@ type CardPresentOriginDetails implements InStoreReaderOriginDetails {
 
   """The ID of the terminal that was processed this transaction."""
   terminalId: String
+
+  """The ID of the payment reader that processed this transaction."""
+  readerId: String
+
+  """The ID of the store where this transaction was processed."""
+  storeId: String
 }
 
 """
@@ -2060,6 +2066,106 @@ type CreatePayPalOneTimePaymentPayload {
 
   """Indicates app switch eligibility."""
   launchPayPalApp: Boolean
+}
+
+"""
+Input for adding an add-on when creating a recurring billing subscription plan.
+"""
+input CreateRecurringBillingSubscriptionPlanAddOnInput {
+  """The ID of the add-on template to add to the plan."""
+  addOnId: ID!
+
+  """The amount for this add-on."""
+  amount: Amount
+
+  """The name of the add-on."""
+  name: String
+
+  """A description of the add-on."""
+  description: String
+
+  """
+  The number of times the billing cycle will be executed. Omit to inherit from the add-on template.
+  """
+  numberOfBillingCycles: Int
+}
+
+"""
+Input for adding a discount when creating a recurring billing subscription plan.
+"""
+input CreateRecurringBillingSubscriptionPlanDiscountInput {
+  """The ID of the discount template to add to the plan."""
+  discountId: ID!
+
+  """The amount for this discount."""
+  amount: Amount
+
+  """The name of the discount."""
+  name: String
+
+  """A description of the discount."""
+  description: String
+
+  """
+  The number of times the billing cycle will be executed. Omit to inherit from the discount template.
+  """
+  numberOfBillingCycles: Int
+}
+
+"""
+Top-level input fields for creating a recurring billing subscription plan.
+"""
+input CreateRecurringBillingSubscriptionPlanInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The name of the plan."""
+  name: String!
+
+  """A description of the plan."""
+  description: String
+
+  """The base price and currency for the plan."""
+  monetaryAmount: MonetaryAmountInput!
+
+  """Specifies the billing interval of the plan."""
+  billingFrequency: Int!
+
+  """
+  The day of the month subscriptions to this plan are billed. If not specified,
+  subscriptions will be billed on the day they are created. For example, a
+  subscription created on the 15th will bill on the 15th of each cycle. Valid
+  values are 1-28 and 31 (last day of month). Values 29 and 30 are not allowed;
+  use 31 instead.
+  """
+  billingDayOfMonth: Int
+
+  """
+  The number of times the billing cycle will be executed. Use 0 to indicate the plan never expires.
+  """
+  numberOfBillingCycles: Int!
+
+  """Trial period configuration for the plan."""
+  trial: RecurringBillingSubscriptionTrialInput
+
+  """
+  The collection of add-on and discount IDs to associate with this plan. These
+  reference existing add-on and discount templates. Ignored if either add-ons or
+  discounts are provided.
+  """
+  modificationIds: [ID!]
+
+  """
+  Operations for managing add-ons on this plan. Takes precedence over modificationIds.
+  """
+  addOns: [CreateRecurringBillingSubscriptionPlanAddOnInput!]
+
+  """
+  Operations for managing discounts on this plan. Takes precedence over modificationIds.
+  """
+  discounts: [CreateRecurringBillingSubscriptionPlanDiscountInput!]
 }
 
 """
@@ -3661,6 +3767,12 @@ type EmvCardOriginDetails implements InStoreReaderOriginDetails {
   An indicator of the conditions that caused the payment reader to attempt to make a processor request.
   """
   issuerActionCodeOnline: String
+
+  """The ID of the payment reader that processed this transaction."""
+  readerId: String
+
+  """The ID of the store where this transaction was processed."""
+  storeId: String
 }
 
 """Top-level input fields used for risk evaluation of a transaction."""
@@ -3758,6 +3870,29 @@ type ExchangeRateQuotePayload {
   quotes: [ExchangeRateQuote!]
 }
 
+"""Input fields for external Payment status."""
+input ExternalPaymentResponseInput {
+  """Status of the payment."""
+  status: ExternalPaymentStatus!
+
+  """Reason for the status of this payment."""
+  reason: String
+}
+
+"""The type of payment status returned by external processors."""
+enum ExternalPaymentStatus {
+  AUTHORIZED
+  DECLINED
+  FAILED
+  PENDING
+  REFUNDED
+  REJECTED
+  SETTLED
+  SUCCESS
+  UNKNOWN
+  VOIDED
+}
+
 """The name of the payment service provider processing the transaction."""
 enum ExternalProcessor {
   ADYEN
@@ -3769,6 +3904,15 @@ enum ExternalProcessor {
   SQUARE
   STRIPE
   WORLDPAY
+}
+
+"""Input fields for external processor response."""
+input ExternalProcessorResponseInput {
+  """AVS verification response code."""
+  avsResponseCode: AvsCvvResponseCode
+
+  """CVV verification response code."""
+  cvvResponseCode: AvsCvvResponseCode
 }
 
 """A credit card's assocation with an external vault."""
@@ -4976,6 +5120,12 @@ interface InStoreReaderOriginDetails {
 
   """The ID of the terminal that was processed this transaction."""
   terminalId: String
+
+  """The ID of the payment reader that processed this transaction."""
+  readerId: String
+
+  """The ID of the store where this transaction was processed."""
+  storeId: String
 }
 
 """Top-level fields returned for an in-store reader."""
@@ -5202,6 +5352,9 @@ enum LegacyIdType {
   MERCHANT_ACCOUNT_APPLICATION
   PAYMENT_CONTEXT
   PAYMENT_METHOD
+  RECURRING_BILLING_SUBSCRIPTION_PLAN
+  RECURRING_BILLING_SUBSCRIPTION_PLAN_ADD_ON
+  RECURRING_BILLING_SUBSCRIPTION_PLAN_DISCOUNT
   REFUND
   TRANSACTION
   US_BANK_ACCOUNT_VERIFICATION
@@ -5408,6 +5561,7 @@ enum LocalPaymentMethodType {
   ALIPAY
   BANCOMATPAY
   BANCONTACT
+  BIZUM
   BLIK
   BOLETOBANCARIO @deprecated(reason: "Boleto Bancário is no longer supported.")
   CRYPTO
@@ -5415,6 +5569,7 @@ enum LocalPaymentMethodType {
   GIROPAY
   GRABPAY
   IDEAL
+  KLARNA
   MBWAY
   MULTIBANCO
   MYBANK
@@ -5424,9 +5579,11 @@ enum LocalPaymentMethodType {
   PAY_UPON_INVOICE
   SATISPAY
   SEPA
+  SKRILL
   SOFORT
   SWISH
   TRUSTLY
+  TWINT
   VERKKOPANKKI
   VIPPS
   WECHAT_PAY
@@ -5506,6 +5663,9 @@ type Merchant {
 
   """The timezone that the merchant operates in."""
   timezone: String
+
+  """The country the merchant operates in."""
+  countryName: String
 
   """
   A paginated list of merchant accounts that belong to this merchant. Filtered by search criteria, if provided.
@@ -6219,6 +6379,22 @@ type Mutation {
   Evaluates the risk of a transaction and return a payload that includes details of the risk evaluation.
   """
   evaluateTransactionRisk(input: EvaluateTransactionRiskInput!): TransactionRiskEvaluatePayload
+
+  """Submit feedback of a transaction."""
+  submitTransactionFeedback(input: SubmitTransactionFeedbackInput!): SubmitFeedbackPayload
+
+  """Submit feedback of a dispute."""
+  submitDisputeFeedback(input: SubmitDisputeFeedbackInput!): SubmitFeedbackPayload
+
+  """
+  Creates a new recurring billing subscription plan template that subscriptions can be based upon.
+  """
+  createRecurringBillingSubscriptionPlan(input: CreateRecurringBillingSubscriptionPlanInput!): RecurringBillingSubscriptionPlanPayload
+
+  """
+  Updates an existing recurring billing subscription plan's metadata or default billing settings.
+  """
+  updateRecurringBillingSubscriptionPlan(input: UpdateRecurringBillingSubscriptionPlanInput!): RecurringBillingSubscriptionPlanPayload
 }
 
 """The name of the party."""
@@ -6905,6 +7081,7 @@ enum PaymentMethodSnapshotSearchType {
   ALIPAY_VIA_PAYPAL
   BANCOMATPAY_VIA_PAYPAL
   BANCONTACT_VIA_PAYPAL
+  BIZUM_VIA_PAYPAL
   BLIK_VIA_PAYPAL
 
   """Deprecated: Boleto Bancário is no longer supported."""
@@ -6926,6 +7103,7 @@ enum PaymentMethodSnapshotSearchType {
   GIROPAY_VIA_PAYPAL
   GRABPAY_VIA_PAYPAL
   IDEAL_VIA_PAYPAL
+  KLARNA_VIA_PAYPAL
   LOCAL_PAYMENT
   MBWAY_VIA_PAYPAL
   MULTIBANCO_VIA_PAYPAL
@@ -6938,9 +7116,11 @@ enum PaymentMethodSnapshotSearchType {
   SATISPAY_VIA_PAYPAL
   SEPA_DIRECT_DEBIT
   SEPA_VIA_PAYPAL
+  SKRILL_VIA_PAYPAL
   SOFORT_VIA_PAYPAL
   SWISH_VIA_PAYPAL
   TRUSTLY_VIA_PAYPAL
+  TWINT_VIA_PAYPAL
   US_BANK_ACCOUNT
   VENMO_ACCOUNT
   VERKKOPANKKI_VIA_PAYPAL
@@ -7087,6 +7267,9 @@ input PaymentSearchInput {
   Find payments by the ID of the store that the transaction was processed in.
   """
   storeId: SearchValueInput
+
+  """Find payments by the reader ID."""
+  readerId: SearchValueInput
 
   """Find payments by the shipping address."""
   shippingAddress: SearchAddressInput
@@ -8488,12 +8671,194 @@ type Query {
 
   """Retrieves a list of domains registered with Apple for Apple Pay."""
   applePayRegisteredDomains: ApplePayRegisteredDomainsPayload
+
+  """Retrieve all recurring billing subscription plans."""
+  recurringBillingSubscriptionPlans: RecurringBillingSubscriptionPlansPayload
+
+  """Retrieve all recurring billing subscription plan add-ons."""
+  recurringBillingSubscriptionPlanAddOns: RecurringBillingSubscriptionPlanAddOnsPayload
+
+  """Retrieve all recurring billing subscription plan discounts."""
+  recurringBillingSubscriptionPlanDiscounts: RecurringBillingSubscriptionPlanDiscountsPayload
 }
 
 """Indicates the status of a Reader."""
 enum ReaderStatus {
   OFFLINE
   ONLINE
+}
+
+"""
+A recurring billing subscription plan template that subscriptions can be based upon.
+"""
+type RecurringBillingSubscriptionPlan implements Node {
+  """The plan identifier."""
+  id: ID!
+
+  """The legacy plan identifier."""
+  legacyId: ID!
+
+  """The name of the plan."""
+  name: String!
+
+  """A description of the plan."""
+  description: String
+
+  """The base price and currency for this plan."""
+  price: MonetaryAmount!
+
+  """The billing interval of the plan in months."""
+  billingFrequency: Int!
+
+  """The day of the month the subscription is billed."""
+  billingDayOfMonth: Int
+
+  """
+  The number of times the billing cycle will be executed. A value of 0 indicates the plan never expires.
+  """
+  numberOfBillingCycles: Int
+
+  """Trial period settings for this plan."""
+  trial: RecurringBillingSubscriptionTrial
+
+  """The collection of add-ons associated with this plan."""
+  addOns: [RecurringBillingSubscriptionPlanAddOn!]
+
+  """The collection of discounts associated with this plan."""
+  discounts: [RecurringBillingSubscriptionPlanDiscount!]
+
+  """The date/time the plan was created."""
+  createdAt: Timestamp!
+
+  """The date/time the plan was last updated."""
+  updatedAt: Timestamp!
+}
+
+"""The global template for a recurring billing subscription plan add-on."""
+type RecurringBillingSubscriptionPlanAddOn implements Node {
+  """The add-on identifier."""
+  id: ID!
+
+  """The legacy add-on identifier."""
+  legacyId: ID!
+
+  """The name of the add-on."""
+  name: String!
+
+  """A description of the add-on."""
+  description: String
+
+  """The add-on amount."""
+  amount: Amount!
+
+  """
+  The number of billing cycles to execute. A value of 0 indicates it never expires.
+  """
+  numberOfBillingCycles: Int
+
+  """The date/time the add-on was created."""
+  createdAt: Timestamp
+
+  """The date/time the add-on was last updated."""
+  updatedAt: Timestamp
+}
+
+"""
+The response object returned when querying recurring billing subscription plan add-ons.
+"""
+type RecurringBillingSubscriptionPlanAddOnsPayload {
+  """A list of recurring billing subscription plan add-ons."""
+  addOns: [RecurringBillingSubscriptionPlanAddOn!]
+}
+
+"""
+The global template for a recurring billing subscription plan discount.
+"""
+type RecurringBillingSubscriptionPlanDiscount implements Node {
+  """The discount identifier."""
+  id: ID!
+
+  """The legacy discount identifier."""
+  legacyId: ID!
+
+  """The name of the discount."""
+  name: String!
+
+  """A description of the discount."""
+  description: String
+
+  """The discount amount."""
+  amount: Amount!
+
+  """
+  The number of billing cycles to execute. A value of 0 indicates it never expires.
+  """
+  numberOfBillingCycles: Int
+
+  """The date/time the discount was created."""
+  createdAt: Timestamp
+
+  """The date/time the discount was last updated."""
+  updatedAt: Timestamp
+}
+
+"""
+The response object returned when querying recurring billing subscription plan discounts.
+"""
+type RecurringBillingSubscriptionPlanDiscountsPayload {
+  """A list of recurring billing subscription plan discounts."""
+  discounts: [RecurringBillingSubscriptionPlanDiscount!]
+}
+
+"""
+The response object returned after a recurring billing subscription plan mutation.
+"""
+type RecurringBillingSubscriptionPlanPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The plan that was created or updated."""
+  plan: RecurringBillingSubscriptionPlan
+}
+
+"""
+The response object returned when querying recurring billing subscription plans.
+"""
+type RecurringBillingSubscriptionPlansPayload {
+  """A list of recurring billing subscription plans."""
+  plans: [RecurringBillingSubscriptionPlan!]
+}
+
+"""Trial period configuration for recurring billing subscription plans."""
+type RecurringBillingSubscriptionTrial {
+  """The duration of the trial period."""
+  duration: Int!
+
+  """The unit for the trial duration."""
+  durationUnit: RecurringBillingSubscriptionTrialDurationUnit!
+}
+
+"""
+Units used to define the duration of a recurring billing subscription trial period.
+"""
+enum RecurringBillingSubscriptionTrialDurationUnit {
+  DAY
+  MONTH
+}
+
+"""
+Input for configuring a trial period on a recurring billing subscription plan.
+"""
+input RecurringBillingSubscriptionTrialInput {
+  """
+  The trial timeframe. A value of 0 starts the subscription immediately without a trial period.
+  """
+  duration: Int!
+
+  """The trial unit of time."""
+  durationUnit: RecurringBillingSubscriptionTrialDurationUnit!
 }
 
 """The type of recurring payment a transaction represents."""
@@ -8834,6 +9199,9 @@ input RefundSearchInput {
   Find refunds by the ID of the store that the transaction was processed in.
   """
   storeId: SearchValueInput
+
+  """Find refunds by the reader ID."""
+  readerId: SearchValueInput
 
   """Find refunds by the shipping address."""
   shippingAddress: SearchAddressInput
@@ -10479,7 +10847,11 @@ input SearchPaymentStatusInput {
   in: [PaymentStatus!]
 }
 
-"""Payment status transition times."""
+"""
+Payment status transition times. Used by payment and refund searches. Includes
+all payment lifecycle timestamps (e.g. authorizationExpiredAt,
+gatewayRejectedAt, processorDeclinedAt) that are not applicable to transaction searches.
+"""
 input SearchPaymentStatusTransitionInput {
   """Find transactions with a given failed at time."""
   failedAt: SearchTimestampInput
@@ -10636,7 +11008,11 @@ input SearchTransactionStatusInput {
   in: [PaymentStatus!]
 }
 
-"""Transaction status transition times."""
+"""
+Transaction status transition times. Used only by transaction searches. A subset
+of `SearchPaymentStatusTransitionInput` with only the four fields supported by
+transaction search.
+"""
 input SearchTransactionStatusTransitionInput {
   """Find transactions with a given failed at time."""
   failedAt: SearchTimestampInput
@@ -10908,6 +11284,44 @@ input SubMerchantDetailsInput {
   address: AddressInput!
 }
 
+"""Top-level input fields for submitting dispute feedback."""
+input SubmitDisputeFeedbackInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The external processor's transaction ID."""
+  externalTransactionId: ID!
+
+  """
+  The riskData ID returned in the evaluateTransactionRisk response for the original transaction.
+  """
+  riskDataId: ID
+
+  """The amount disputed."""
+  amountDisputed: Amount
+
+  """The reason for the dispute."""
+  disputeReason: DisputeReason
+
+  """The current status of the dispute."""
+  disputeStatus: DisputeStatus
+
+  """Timestamp when the dispute was received."""
+  disputeCreatedAt: Timestamp
+}
+
+"""
+Top-level output field from submitting a feedback of an evaluated transaction.
+"""
+type SubmitFeedbackPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+}
+
 """
 Accompanying information for a transaction that is submitted for settlement.
 This status indicates that the transaction is scheduled to be settled.
@@ -10934,6 +11348,28 @@ type SubmittedForSettlementEvent implements PaymentStatusEvent {
   User name of the person who performed an action that triggered the status change of the transaction.
   """
   userName: String
+}
+
+"""Top-level input fields for submitting transaction feedback."""
+input SubmitTransactionFeedbackInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  The riskData ID returned in the evaluateTransactionRisk response for the original transaction.
+  """
+  riskDataId: ID!
+
+  """The external processor's transaction ID."""
+  externalTransactionId: ID!
+
+  """Status details of payment."""
+  externalPaymentResponse: ExternalPaymentResponseInput!
+
+  """Issuer response."""
+  externalProcessorResponse: ExternalProcessorResponseInput
 }
 
 """The type of tax identifier."""
@@ -12274,9 +12710,6 @@ type Transaction implements Node & Payment {
   """Discount amount that was included in the total transaction amount."""
   discountAmount: String
 
-  """Surcharge amount that was included in the total transaction amount."""
-  surchargeAmount: String
-
   """Line items for this transaction."""
   lineItems: [TransactionLineItem!]
 
@@ -12600,14 +13033,6 @@ input TransactionInput {
   *Required for Level 3 processing*.
   """
   discountAmount: String
-
-  """
-  Surcharge amount that was included in the total transaction amount. Does not
-  add to the total amount the payment method will be charged. This value can't be negative.
-  
-  *Required for Visa Rent Discount Program*.
-  """
-  surchargeAmount: String
 
   """
   Line items for this transaction. Up to 249 line items may be specified.
@@ -13165,6 +13590,9 @@ input TransactionSearchInput {
   """
   storeId: SearchValueInput
 
+  """Find transactions by the reader ID."""
+  readerId: SearchValueInput
+
   """Find transactions by the shipping address."""
   shippingAddress: SearchAddressInput
 
@@ -13348,10 +13776,15 @@ enum TransactionTransferType {
   PERSON_TO_PERSON
 
   """
+  Bank initiated, person to person money transfer that is offered by a financial institution for AFT only.
+  """
+  PERSON_TO_PERSON_BANK_INITIATED
+
+  """
   Prepaid card load or top up, adding value to an eligible prepaid card or
   funding a user's prepaid account. This transfer type is used in AFT only.
   """
-  PREPAID_TOPUP
+  PREPAID_TOP_UP
 
   """
   Adding value to a merchant's staged digital wallet. This transfer type is available for both AFT and SDWO (Brazil only).
@@ -13654,6 +14087,15 @@ input UpdateInStoreReaderInput {
   locationId: ID
 }
 
+"""
+Operation type for updating recurring billing subscription modifications (add-ons and discounts).
+"""
+enum UpdateModificationOperation {
+  ADD
+  EDIT
+  REMOVE
+}
+
 """Input fields for updating a PayPal one-time payment."""
 input UpdatePayPalOneTimePaymentInput {
   """
@@ -13707,6 +14149,116 @@ type UpdatePayPalOneTimePaymentPayload {
 
   """The updated payment method containing the new payment method ID."""
   paymentMethod: PaymentMethod
+}
+
+"""
+Input for managing add-ons when updating a recurring billing subscription plan.
+"""
+input UpdateRecurringBillingSubscriptionPlanAddOnInput {
+  """The operation to perform."""
+  action: UpdateModificationOperation!
+
+  """
+  The ID of the add-on. For ADD, this is the template ID. For EDIT and REMOVE, this is the existing add-on ID on the plan.
+  """
+  addOnId: ID!
+
+  """The amount for this add-on."""
+  amount: Amount
+
+  """The name of the add-on."""
+  name: String
+
+  """A description of the add-on."""
+  description: String
+
+  """
+  The number of times the billing cycle will be executed. For ADD, omit to
+  inherit from the template. For EDIT, omit to keep the current value.
+  """
+  numberOfBillingCycles: Int
+}
+
+"""
+Input for managing discounts when updating a recurring billing subscription plan.
+"""
+input UpdateRecurringBillingSubscriptionPlanDiscountInput {
+  """The operation to perform."""
+  action: UpdateModificationOperation!
+
+  """
+  The ID of the discount. For ADD, this is the template ID. For EDIT and REMOVE,
+  this is the existing discount ID on the plan.
+  """
+  discountId: ID!
+
+  """The amount for this discount."""
+  amount: Amount
+
+  """The name of the discount."""
+  name: String
+
+  """A description of the discount."""
+  description: String
+
+  """
+  The number of times the billing cycle will be executed. For ADD, omit to
+  inherit from the template. For EDIT, omit to keep the current value.
+  """
+  numberOfBillingCycles: Int
+}
+
+"""
+Top-level input fields for updating a recurring billing subscription plan.
+"""
+input UpdateRecurringBillingSubscriptionPlanInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The plan's identifier."""
+  id: ID!
+
+  """The name of the plan."""
+  name: String
+
+  """A description of the plan."""
+  description: String
+
+  """The base price and currency for the plan."""
+  monetaryAmount: MonetaryAmountInput
+
+  """The day of the month the subscription is billed."""
+  billingDayOfMonth: Int
+
+  """Specifies the billing interval of the plan."""
+  billingFrequency: Int
+
+  """
+  The number of times the billing cycle will be executed. A value of 0 indicates the plan never expires.
+  """
+  numberOfBillingCycles: Int
+
+  """Trial period configuration for the plan."""
+  trial: RecurringBillingSubscriptionTrialInput
+
+  """
+  The collection of add-on and discount IDs to associate with this plan. These
+  reference existing add-on and discount templates. Ignored if either add-ons or
+  discounts are provided.
+  """
+  modificationIds: [ID!]
+
+  """
+  Operations for managing add-ons on this plan. Takes precedence over modificationIds.
+  """
+  addOns: [UpdateRecurringBillingSubscriptionPlanAddOnInput!]
+
+  """
+  Operations for managing discounts on this plan. Takes precedence over modificationIds.
+  """
+  discounts: [UpdateRecurringBillingSubscriptionPlanDiscountInput!]
 }
 
 """Top-level input fields for a updating a transaction's amount."""
@@ -14460,6 +15012,9 @@ type VenmoAccountDetails {
 
   """The Venmo user ID."""
   venmoUserId: String
+
+  """Funding instrument details for the Venmo account."""
+  fundingInstrumentDetails: VenmoFundingInstrumentDetails
 }
 
 """Output fields for Venmo app switch context information."""
@@ -14519,6 +15074,24 @@ enum VenmoEnvironment {
   SANDBOX
   production
   sandbox
+}
+
+"""Funding instrument details for a Venmo Account."""
+type VenmoFundingInstrumentDetails {
+  """The primary funding instrument type."""
+  primaryFIType: VenmoPrimaryFundingInstrumentType
+
+  """The last 4 digits of the primary funding instrument."""
+  primaryFILast4: String
+
+  """The current balance of the Venmo account."""
+  currentBalance: Amount
+
+  """The secondary (backup) funding instrument type."""
+  secondaryFIType: VenmoSecondaryFundingInstrumentType
+
+  """The last 4 digits of the secondary funding instrument."""
+  secondaryFILast4: String
 }
 
 """The intended checkout flow communicated to the Venmo app."""
@@ -14896,6 +15469,23 @@ input VenmoPaysheetTransactionDetailsInput {
   The list of line items belonging to the pay sheet. Can include up to 249 line items.
   """
   venmoPaysheetLineItems: [VenmoPaysheetLineItemInput!]
+}
+
+""" The primary funding instrument type for Venmo Funding Instrument Details.
+"""
+enum VenmoPrimaryFundingInstrumentType {
+  BALANCE
+  BANK
+  CREDIT
+  DEBIT
+}
+
+""" The secondary (backup) funding instrument type for Venmo Funding Instrument Details.
+"""
+enum VenmoSecondaryFundingInstrumentType {
+  BANK
+  CREDIT
+  DEBIT
 }
 
 """

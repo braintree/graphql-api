@@ -1,3 +1,97 @@
+# 04-20-2026
+* Add new mutations:
+    * `createRecurringBillingSubscriptionPlan`
+    * `submitDisputeFeedback`
+    * `submitTransactionFeedback`
+    * `updateRecurringBillingSubscriptionPlan`
+* Add new queries:
+    * `recurringBillingSubscriptionPlanAddOns`
+    * `recurringBillingSubscriptionPlanDiscounts`
+    * `recurringBillingSubscriptionPlans`
+* Add new types:
+    * `RecurringBillingSubscriptionPlan`
+    * `RecurringBillingSubscriptionPlanAddOn`
+    * `RecurringBillingSubscriptionPlanAddOnsPayload`
+    * `RecurringBillingSubscriptionPlanDiscount`
+    * `RecurringBillingSubscriptionPlanDiscountsPayload`
+    * `RecurringBillingSubscriptionPlanPayload`
+    * `RecurringBillingSubscriptionPlansPayload`
+    * `RecurringBillingSubscriptionTrial`
+    * `SubmitFeedbackPayload`
+    * `VenmoFundingInstrumentDetails`
+* Add new inputs:
+    * `CreateRecurringBillingSubscriptionPlanAddOnInput`
+    * `CreateRecurringBillingSubscriptionPlanDiscountInput`
+    * `CreateRecurringBillingSubscriptionPlanInput`
+    * `ExternalPaymentResponseInput`
+    * `ExternalProcessorResponseInput`
+    * `RecurringBillingSubscriptionTrialInput`
+    * `SubmitDisputeFeedbackInput`
+    * `SubmitTransactionFeedbackInput`
+    * `UpdateRecurringBillingSubscriptionPlanAddOnInput`
+    * `UpdateRecurringBillingSubscriptionPlanDiscountInput`
+    * `UpdateRecurringBillingSubscriptionPlanInput`
+* Add new enums:
+    * `ExternalPaymentStatus`
+    * `RecurringBillingSubscriptionTrialDurationUnit`
+    * `UpdateModificationOperation`
+    * `VenmoPrimaryFundingInstrumentType`
+    * `VenmoSecondaryFundingInstrumentType`
+* Add new enum values:
+    * `AUTHORIZED`, `DECLINED`, `FAILED`, `PENDING`, `REFUNDED`, `REJECTED`, `SETTLED`, `SUCCESS`, `UNKNOWN`, `VOIDED` to `ExternalPaymentStatus`
+    * `RECURRING_BILLING_SUBSCRIPTION_PLAN`, `RECURRING_BILLING_SUBSCRIPTION_PLAN_ADD_ON`, `RECURRING_BILLING_SUBSCRIPTION_PLAN_DISCOUNT` to `LegacyIdType`
+    * `BIZUM`, `KLARNA`, `SKRILL`, `TWINT` to `LocalPaymentMethodType`
+    * `BIZUM_VIA_PAYPAL`, `KLARNA_VIA_PAYPAL`, `SKRILL_VIA_PAYPAL`, `TWINT_VIA_PAYPAL` to `PaymentMethodSnapshotSearchType`
+    * `DAY`, `MONTH` to `RecurringBillingSubscriptionTrialDurationUnit`
+    * `PERSON_TO_PERSON_BANK_INITIATED`, `PREPAID_TOP_UP` to `TransactionTransferType`
+    * `ADD`, `EDIT`, `REMOVE` to `UpdateModificationOperation`
+    * `BALANCE`, `BANK`, `CREDIT`, `DEBIT` to `VenmoPrimaryFundingInstrumentType`
+    * `BANK`, `CREDIT`, `DEBIT` to `VenmoSecondaryFundingInstrumentType`
+* Add new fields:
+    * `action` to `UpdateRecurringBillingSubscriptionPlanAddOnInput`, `UpdateRecurringBillingSubscriptionPlanDiscountInput`
+    * `addOnId` to `CreateRecurringBillingSubscriptionPlanAddOnInput`, `UpdateRecurringBillingSubscriptionPlanAddOnInput`
+    * `addOns` to `CreateRecurringBillingSubscriptionPlanInput`, `RecurringBillingSubscriptionPlan`, `RecurringBillingSubscriptionPlanAddOnsPayload`, `UpdateRecurringBillingSubscriptionPlanInput`
+    * `amount` to `CreateRecurringBillingSubscriptionPlanAddOnInput`, `CreateRecurringBillingSubscriptionPlanDiscountInput`, `RecurringBillingSubscriptionPlanAddOn`, `RecurringBillingSubscriptionPlanDiscount`, `UpdateRecurringBillingSubscriptionPlanAddOnInput`, `UpdateRecurringBillingSubscriptionPlanDiscountInput`
+    * `amountDisputed`, `disputeCreatedAt`, `disputeReason`, `disputeStatus` to `SubmitDisputeFeedbackInput`
+    * `avsResponseCode`, `cvvResponseCode` to `ExternalProcessorResponseInput`
+    * `billingDayOfMonth` to `CreateRecurringBillingSubscriptionPlanInput`, `RecurringBillingSubscriptionPlan`, `UpdateRecurringBillingSubscriptionPlanInput`
+    * `billingFrequency` to `CreateRecurringBillingSubscriptionPlanInput`, `RecurringBillingSubscriptionPlan`, `UpdateRecurringBillingSubscriptionPlanInput`
+    * `clientMutationId` to `CreateRecurringBillingSubscriptionPlanInput`, `RecurringBillingSubscriptionPlanPayload`, `SubmitDisputeFeedbackInput`, `SubmitFeedbackPayload`, `SubmitTransactionFeedbackInput`, `UpdateRecurringBillingSubscriptionPlanInput`
+    * `countryName` to `Merchant`
+    * `createdAt` to `RecurringBillingSubscriptionPlan`, `RecurringBillingSubscriptionPlanAddOn`, `RecurringBillingSubscriptionPlanDiscount`
+    * `currentBalance`, `primaryFILast4`, `primaryFIType`, `secondaryFILast4`, `secondaryFIType` to `VenmoFundingInstrumentDetails`
+    * `description` to `CreateRecurringBillingSubscriptionPlanAddOnInput`, `CreateRecurringBillingSubscriptionPlanDiscountInput`, `CreateRecurringBillingSubscriptionPlanInput`, `RecurringBillingSubscriptionPlan`, `RecurringBillingSubscriptionPlanAddOn`, `RecurringBillingSubscriptionPlanDiscount`, `UpdateRecurringBillingSubscriptionPlanAddOnInput`, `UpdateRecurringBillingSubscriptionPlanDiscountInput`, `UpdateRecurringBillingSubscriptionPlanInput`
+    * `discountId` to `CreateRecurringBillingSubscriptionPlanDiscountInput`, `UpdateRecurringBillingSubscriptionPlanDiscountInput`
+    * `discounts` to `CreateRecurringBillingSubscriptionPlanInput`, `RecurringBillingSubscriptionPlan`, `RecurringBillingSubscriptionPlanDiscountsPayload`, `UpdateRecurringBillingSubscriptionPlanInput`
+    * `duration` to `RecurringBillingSubscriptionTrial`, `RecurringBillingSubscriptionTrialInput`
+    * `durationUnit` to `RecurringBillingSubscriptionTrial`, `RecurringBillingSubscriptionTrialInput`
+    * `externalPaymentResponse`, `externalProcessorResponse` to `SubmitTransactionFeedbackInput`
+    * `externalTransactionId` to `SubmitDisputeFeedbackInput`, `SubmitTransactionFeedbackInput`
+    * `fundingInstrumentDetails` to `VenmoAccountDetails`
+    * `id` to `RecurringBillingSubscriptionPlan`, `RecurringBillingSubscriptionPlanAddOn`, `RecurringBillingSubscriptionPlanDiscount`, `UpdateRecurringBillingSubscriptionPlanInput`
+    * `legacyId` to `RecurringBillingSubscriptionPlan`, `RecurringBillingSubscriptionPlanAddOn`, `RecurringBillingSubscriptionPlanDiscount`
+    * `modificationIds` to `CreateRecurringBillingSubscriptionPlanInput`, `UpdateRecurringBillingSubscriptionPlanInput`
+    * `monetaryAmount` to `CreateRecurringBillingSubscriptionPlanInput`, `UpdateRecurringBillingSubscriptionPlanInput`
+    * `name` to `CreateRecurringBillingSubscriptionPlanAddOnInput`, `CreateRecurringBillingSubscriptionPlanDiscountInput`, `CreateRecurringBillingSubscriptionPlanInput`, `RecurringBillingSubscriptionPlan`, `RecurringBillingSubscriptionPlanAddOn`, `RecurringBillingSubscriptionPlanDiscount`, `UpdateRecurringBillingSubscriptionPlanAddOnInput`, `UpdateRecurringBillingSubscriptionPlanDiscountInput`, `UpdateRecurringBillingSubscriptionPlanInput`
+    * `numberOfBillingCycles` to `CreateRecurringBillingSubscriptionPlanAddOnInput`, `CreateRecurringBillingSubscriptionPlanDiscountInput`, `CreateRecurringBillingSubscriptionPlanInput`, `RecurringBillingSubscriptionPlan`, `RecurringBillingSubscriptionPlanAddOn`, `RecurringBillingSubscriptionPlanDiscount`, `UpdateRecurringBillingSubscriptionPlanAddOnInput`, `UpdateRecurringBillingSubscriptionPlanDiscountInput`, `UpdateRecurringBillingSubscriptionPlanInput`
+    * `plan` to `RecurringBillingSubscriptionPlanPayload`
+    * `plans` to `RecurringBillingSubscriptionPlansPayload`
+    * `price` to `RecurringBillingSubscriptionPlan`
+    * `readerId` to `CardPresentOriginDetails`, `EmvCardOriginDetails`, `InStoreReaderOriginDetails`, `PaymentSearchInput`, `RefundSearchInput`, `TransactionSearchInput`
+    * `reason`, `status` to `ExternalPaymentResponseInput`
+    * `riskDataId` to `SubmitDisputeFeedbackInput`, `SubmitTransactionFeedbackInput`
+    * `storeId` to `CardPresentOriginDetails`, `EmvCardOriginDetails`, `InStoreReaderOriginDetails`
+    * `trial` to `CreateRecurringBillingSubscriptionPlanInput`, `RecurringBillingSubscriptionPlan`, `UpdateRecurringBillingSubscriptionPlanInput`
+    * `updatedAt` to `RecurringBillingSubscriptionPlan`, `RecurringBillingSubscriptionPlanAddOn`, `RecurringBillingSubscriptionPlanDiscount`
+* Add interface implementations:
+    * `RecurringBillingSubscriptionPlan` now implements `Node`
+    * `RecurringBillingSubscriptionPlanAddOn` now implements `Node`
+    * `RecurringBillingSubscriptionPlanDiscount` now implements `Node`
+* Remove:
+    * `PREPAID_TOPUP` from `TransactionTransferType` enum
+    * `surchargeAmount` field from `Transaction`
+    * `surchargeAmount` field from `TransactionInput`
+
 # 02-17-2026
 * Add new types:
     * `UsBankAccountTransactionDetails`
