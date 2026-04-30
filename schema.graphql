@@ -1566,6 +1566,11 @@ input ClientTokenInput {
   Flag that prevents the same payment method from being stored multiple times for the same customer.
   """
   failOnDuplicatePaymentMethodForCustomer: Boolean
+
+  """
+  The ID of the preferred payment method to be shown in the View/Edit Funding Instrument flow.
+  """
+  paymentMethodId: ID
 }
 
 """Top-level input field for confirming micro-transfer values."""
@@ -1649,6 +1654,34 @@ type CreateApplePayWebSessionPayload {
 
   """The Apple Pay session identifier."""
   merchantSessionIdentifier: String
+}
+
+"""
+Input fields for creating a Billing Agreement JWT for the View/Edit Funding Instrument workflow.
+"""
+input CreateBillingAgreementJwtInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """
+  The Payment Method JWT from the client token, used to identify the vaulted billing agreement.
+  """
+  paymentMethodJwt: String!
+}
+
+"""
+The payload containing a newly created Billing Agreement JWT for the View/Edit Funding Instrument workflow.
+"""
+type CreateBillingAgreementJwtPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The signed Billing Agreement JWT containing the billing agreement ID."""
+  jwt: String!
 }
 
 """Top-level input field for generating a client token."""
@@ -4269,6 +4302,12 @@ type IDealConfiguration {
   assetsUrl: String
 }
 
+"""Input for the idsFromLegacyIds query."""
+input IdsFromLegacyIdsInput {
+  """The list of legacy ID and type pairs to resolve. Min: 1 Max: 50."""
+  ids: [LegacyIdElementsInput!]!
+}
+
 """Input fields for industry data additional charges."""
 input IndustryAdditionalChargeInput {
   """The kind of charge."""
@@ -5343,6 +5382,15 @@ pattern: `^[a-z]{2}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}))?$`
 """
 scalar Language
 
+"""A legacy ID paired with its type, used for batch ID lookup."""
+input LegacyIdElementsInput {
+  """The legacy ID."""
+  legacyId: ID!
+
+  """The type of the legacy ID."""
+  type: LegacyIdType!
+}
+
 """
 The type of object the legacy ID represents when converting it to a global ID.
 """
@@ -6369,6 +6417,11 @@ type Mutation {
 
   """Unregisters a domain from Apple Pay."""
   unregisterApplePayDomain(input: UnregisterApplePayDomainInput!): UnregisterApplePayDomainPayload
+
+  """
+  Exchanges a Payment Method JWT for a Billing Agreement JWT for the View/Edit Funding Instrument workflow.
+  """
+  createBillingAgreementJwt(input: CreateBillingAgreementJwtInput!): CreateBillingAgreementJwtPayload
 
   """
   Update a PayPal one-time payment with revised amount, line items, and shipping details.
@@ -8646,7 +8699,15 @@ type Query {
   Get a GraphQL ID from a legacy ID that was returned from an SDK or a legacyId
   field. Does not verify existence except for payment methods.
   """
-  idFromLegacyId(legacyId: ID!, type: LegacyIdType!): ID!
+  idFromLegacyId(legacyId: ID!, type: LegacyIdType!): ID! @deprecated(reason: "Use idsFromLegacyIds instead.")
+
+  """
+  Get GraphQL IDs from a list of legacy IDs and their types. Does not verify
+  existence except for payment methods; if a payment method cannot be resolved,
+  `null` is returned at that position in the list. Already-global IDs are
+  returned as-is. Min: 1 Max: 50 IDs.
+  """
+  idsFromLegacyIds(input: IdsFromLegacyIdsInput!): [ID]!
 
   """
   A collection of the available reports. Each field on the `Report` type is a
@@ -15012,9 +15073,6 @@ type VenmoAccountDetails {
 
   """The Venmo user ID."""
   venmoUserId: String
-
-  """Funding instrument details for the Venmo account."""
-  fundingInstrumentDetails: VenmoFundingInstrumentDetails
 }
 
 """Output fields for Venmo app switch context information."""
@@ -15074,24 +15132,6 @@ enum VenmoEnvironment {
   SANDBOX
   production
   sandbox
-}
-
-"""Funding instrument details for a Venmo Account."""
-type VenmoFundingInstrumentDetails {
-  """The primary funding instrument type."""
-  primaryFIType: VenmoPrimaryFundingInstrumentType
-
-  """The last 4 digits of the primary funding instrument."""
-  primaryFILast4: String
-
-  """The current balance of the Venmo account."""
-  currentBalance: Amount
-
-  """The secondary (backup) funding instrument type."""
-  secondaryFIType: VenmoSecondaryFundingInstrumentType
-
-  """The last 4 digits of the secondary funding instrument."""
-  secondaryFILast4: String
 }
 
 """The intended checkout flow communicated to the Venmo app."""
@@ -15469,23 +15509,6 @@ input VenmoPaysheetTransactionDetailsInput {
   The list of line items belonging to the pay sheet. Can include up to 249 line items.
   """
   venmoPaysheetLineItems: [VenmoPaysheetLineItemInput!]
-}
-
-""" The primary funding instrument type for Venmo Funding Instrument Details.
-"""
-enum VenmoPrimaryFundingInstrumentType {
-  BALANCE
-  BANK
-  CREDIT
-  DEBIT
-}
-
-""" The secondary (backup) funding instrument type for Venmo Funding Instrument Details.
-"""
-enum VenmoSecondaryFundingInstrumentType {
-  BANK
-  CREDIT
-  DEBIT
 }
 
 """

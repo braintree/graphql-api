@@ -1,3 +1,29 @@
+# 04-30-2026
+* Add new mutations:
+    * `createBillingAgreementJwt`
+* Add new queries:
+    * `idsFromLegacyIds`
+* Add new types:
+    * `CreateBillingAgreementJwtPayload`
+* Add new inputs:
+    * `CreateBillingAgreementJwtInput`
+    * `IdsFromLegacyIdsInput`
+    * `LegacyIdElementsInput`
+* Add new fields:
+    * `clientMutationId` to `CreateBillingAgreementJwtInput`, `CreateBillingAgreementJwtPayload`
+    * `ids` to `IdsFromLegacyIdsInput`
+    * `jwt` to `CreateBillingAgreementJwtPayload`
+    * `legacyId`, `type` to `LegacyIdElementsInput`
+    * `paymentMethodId` to `ClientTokenInput`
+    * `paymentMethodJwt` to `CreateBillingAgreementJwtInput`
+* Deprecate:
+    * `idFromLegacyId` on `Query`
+* Remove:
+    * `fundingInstrumentDetails` field from `VenmoAccountDetails`
+    * `VenmoFundingInstrumentDetails` type
+    * `VenmoPrimaryFundingInstrumentType` type
+    * `VenmoSecondaryFundingInstrumentType` type
+
 # 04-20-2026
 * Add new mutations:
     * `createRecurringBillingSubscriptionPlan`
