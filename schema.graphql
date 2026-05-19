@@ -901,6 +901,17 @@ enum BusinessType {
   TAX_EXEMPT @deprecated(reason: "No longer applicable, use NONPROFIT instead.")
 }
 
+"""Top-level input fields for canceling a subscription."""
+input CancelRecurringBillingSubscriptionInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The ID of the subscription to cancel."""
+  subscriptionId: ID!
+}
+
 """Top-level input fields for capturing an authorized transaction."""
 input CaptureTransactionInput {
   """
@@ -2099,6 +2110,60 @@ type CreatePayPalOneTimePaymentPayload {
 
   """Indicates app switch eligibility."""
   launchPayPalApp: Boolean
+}
+
+"""Top-level input fields for creating a subscription."""
+input CreateRecurringBillingSubscriptionInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """Required. The plan identifier."""
+  planId: ID!
+
+  """
+  The payment method to use for this subscription. Accepts single-use or vaulted payment methods.
+  """
+  paymentMethodId: ID!
+
+  """
+  The merchant account ID used to create the subscription's transactions.
+  Currency is determined by merchant account ID and must match the plan's currency.
+  """
+  merchantAccountId: ID
+
+  """The descriptor for bank statements."""
+  descriptor: RecurringBillingSubscriptionDescriptorInput
+
+  """
+  The base price for the subscription. Must be a positive value (e.g., 10 or
+  10.00). Overrides the plan's price regardless of billing frequency. Currency
+  is determined by the merchant account.
+  """
+  price: Amount
+
+  """
+  The number of times the billing cycle will be executed. Set to 0 to indicate
+  the subscription never expires (bills indefinitely). Valid range: 0-999.
+  """
+  numberOfBillingCycles: Int
+
+  """
+  Controls when the subscription starts billing. Only one option may be
+  provided. If omitted, the plan's default settings are used.
+  """
+  options: RecurringBillingSubscriptionOptionsInput
+
+  """
+  The description displayed to customers in PayPal email receipts. 127 character maximum.
+  """
+  payPalDescription: String
+
+  """
+  How to apply add-on and discount modifications. If omitted, the plan's add-ons and discounts are inherited.
+  """
+  modifications: RecurringBillingSubscriptionModificationInput
 }
 
 """
@@ -5400,6 +5465,7 @@ enum LegacyIdType {
   MERCHANT_ACCOUNT_APPLICATION
   PAYMENT_CONTEXT
   PAYMENT_METHOD
+  RECURRING_BILLING_SUBSCRIPTION
   RECURRING_BILLING_SUBSCRIPTION_PLAN
   RECURRING_BILLING_SUBSCRIPTION_PLAN_ADD_ON
   RECURRING_BILLING_SUBSCRIPTION_PLAN_DISCOUNT
@@ -6448,6 +6514,17 @@ type Mutation {
   Updates an existing recurring billing subscription plan's metadata or default billing settings.
   """
   updateRecurringBillingSubscriptionPlan(input: UpdateRecurringBillingSubscriptionPlanInput!): RecurringBillingSubscriptionPlanPayload
+
+  """Creates a new recurring billing subscription."""
+  createRecurringBillingSubscription(input: CreateRecurringBillingSubscriptionInput!): RecurringBillingSubscriptionPayload
+
+  """Updates an existing recurring billing subscription."""
+  updateRecurringBillingSubscription(input: UpdateRecurringBillingSubscriptionInput!): RecurringBillingSubscriptionPayload
+
+  """
+  Cancels a recurring billing subscription. Returns the subscription with Canceled status.
+  """
+  cancelRecurringBillingSubscription(input: CancelRecurringBillingSubscriptionInput!): RecurringBillingSubscriptionPayload
 }
 
 """The name of the party."""
@@ -7621,10 +7698,14 @@ input PayPalAppSwitchNativeAppInput {
   osVersion: String
 
   """
-  The universal merchant app URL used to redirect the buyer back to merchant's
-  native app, either a Universal Link on iOS or an App Link on Android.
+  The universal URL of the merchant's native app to which PayPal redirects the buyer after the buyer approves the payment.
   """
-  appUrl: URL
+  returnAppUrl: URL
+
+  """
+  The universal URL of the merchant's native app to which PayPal redirects the buyer after the buyer cancels the payment.
+  """
+  cancelAppUrl: URL
 }
 
 """OS type of the buyer's device."""
@@ -8750,6 +8831,264 @@ enum ReaderStatus {
 }
 
 """
+Represents a user's subscription record, containing billing status, pricing
+details, and lifecycle timing within a specific merchant account.
+"""
+type RecurringBillingSubscription implements Node {
+  """The unique identifier for this subscription."""
+  id: ID!
+
+  """The legacy subscription identifier."""
+  legacyId: ID!
+
+  """
+  The description of the transaction displayed to customers in PayPal email receipts.
+  """
+  payPalDescription: String
+
+  """The current lifecycle state of the subscription."""
+  status: RecurringBillingSubscriptionStatus!
+
+  """The base price and currency for this subscription."""
+  price: Amount!
+
+  """The amount of outstanding charges associated with a subscription."""
+  balance: Amount!
+
+  """
+  The day of the month when the subscription will be charged on every billing
+  cycle. Valid values are 1-28 or 31 (31 represents the last day of the month).
+  """
+  billingDayOfMonth: Int!
+
+  """
+  The subscription's current billing cycle. It is incremented each time the subscription passes the billingPeriodEndDate.
+  """
+  currentBillingCycle: Int!
+
+  """
+  The number of billing cycles to execute. A value of 0 indicates it never expires.
+  """
+  numberOfBillingCycles: Int
+
+  """
+  The number of consecutive failed charge attempts by the recurring billing
+  engine. Increments with each failed attempt and resets to 0 after a successful charge.
+  """
+  failureCount: Int!
+
+  """The number of days that the subscription is past due."""
+  daysPastDue: Int
+
+  """Timeline information including billing dates and payment status."""
+  timeline: RecurringBillingSubscriptionTimeline!
+
+  """
+  The total subscription amount for the next billing period. This amount
+  includes add-ons and discounts but does not include the current balance.
+  """
+  nextBillingPeriodAmount: Amount
+
+  """
+  Trial period settings for this subscription. Empty indicates there is no trial.
+  """
+  trial: RecurringBillingSubscriptionTrial
+
+  """
+  The descriptive value on bank statements. This value may comprise static or
+  dynamic information, and is passed on a per-transaction basis.
+  """
+  descriptor: RecurringBillingSubscriptionDescriptor
+
+  """The plan identifier."""
+  planId: ID!
+
+  """
+  The payment method to use for this subscription. Accepts single-use or vaulted payment methods.
+  """
+  paymentMethodId: ID!
+
+  """The merchant account ID used for the subscription."""
+  merchantAccountId: ID
+
+  """The collection of add-ons associated with this subscription."""
+  addOns: [RecurringBillingSubscriptionAddOn!]
+
+  """The collection of discounts associated with this subscription."""
+  discounts: [RecurringBillingSubscriptionDiscount!]
+
+  """
+  IDs of transactions associated with the subscription, sorted by creation date
+  with the most recent first. When returned in a subscription webhook, this
+  array contains only the 20 most recent transaction IDs; otherwise, it contains
+  all transaction IDs associated with the subscription.
+  """
+  transactionIds: [ID!]
+
+  """Array of up to 50 subscription history events."""
+  statusHistory: [RecurringBillingSubscriptionStatusEvent!]
+}
+
+"""
+Represents a specific instance of an add-on attached to a subscription.
+"""
+type RecurringBillingSubscriptionAddOn {
+  """The cost associated with this add-on for this specific subscription."""
+  amount: Amount!
+
+  """The number of units of this add-on applied to the subscription."""
+  quantity: Int!
+
+  """The number of billing cycles that have already passed for this add-on."""
+  currentBillingCycle: Int!
+
+  """
+  The number of billing cycles to execute. A value of 0 indicates it never expires.
+  """
+  numberOfBillingCycles: Int
+
+  """The ID of the plan add-on template this instance was created from."""
+  addOnId: ID!
+}
+
+"""Input fields for an add-on on a subscription."""
+input RecurringBillingSubscriptionAddOnInput {
+  """Required. The add-on template ID."""
+  addOnId: ID!
+
+  """The quantity of this add-on. Defaults to 1."""
+  quantity: Int
+
+  """The amount for this add-on."""
+  amount: Amount
+
+  """
+  The number of times the billing cycle will be executed. Set to 0 to indicate
+  the add-on never expires (bills indefinitely). Valid range: 0-999.
+  """
+  numberOfBillingCycles: Int
+}
+
+"""
+The dynamic information that appears on a customer's bank or credit card statement for a specific subscription.
+"""
+type RecurringBillingSubscriptionDescriptor {
+  """The company name displayed on the statement (e.g., 'Spotify*Premium')."""
+  companyName: String
+
+  """
+  The customer service phone number displayed on customer bank statements.
+  """
+  phoneNumber: String
+
+  """
+  The customer service URL or support website displayed on the statement.
+  """
+  url: URL
+}
+
+"""
+Input fields for dynamic descriptors that define what appears on a customer's
+credit card statement for subscriptions. Not all accounts have this enabled by
+default. If you receive error 92203, please contact support to enable dynamic descriptors.
+"""
+input RecurringBillingSubscriptionDescriptorInput {
+  """
+  The company name displayed on customer bank statements. Max 22 characters. The
+  clearer the name, the lower the risk of chargebacks.
+  """
+  companyName: String
+
+  """Contact phone number displayed on customer bank statements."""
+  phoneNumber: String
+
+  """Customer service URL."""
+  url: URL
+}
+
+"""
+Represents a specific instance of a discount attached to a subscription.
+"""
+type RecurringBillingSubscriptionDiscount {
+  """The discount amount for this specific subscription."""
+  amount: Amount!
+
+  """The number of units of this discount applied to the subscription."""
+  quantity: Int!
+
+  """
+  The number of billing cycles that have already passed for this discount.
+  """
+  currentBillingCycle: Int!
+
+  """
+  The number of billing cycles to execute. A value of 0 indicates it never expires.
+  """
+  numberOfBillingCycles: Int
+
+  """The ID of the plan discount template this instance was created from."""
+  discountId: ID!
+}
+
+"""Input fields for a discount on a subscription."""
+input RecurringBillingSubscriptionDiscountInput {
+  """Required. The discount template ID."""
+  discountId: ID!
+
+  """The quantity of this discount. Defaults to 1."""
+  quantity: Int
+
+  """The amount for this discount."""
+  amount: Amount
+
+  """
+  The number of times the billing cycle will be executed. Set to 0 to indicate
+  the discount never expires (bills indefinitely). Valid range: 0-999.
+  """
+  numberOfBillingCycles: Int
+}
+
+"""
+Specifies how modifications should be applied to the subscription. Exactly one field must be provided.
+"""
+input RecurringBillingSubscriptionModificationInput {
+  """
+  Retain existing plan add-ons and discounts, applying only the specified changes.
+  """
+  retainExisting: RecurringBillingSubscriptionRetainExistingModificationsInput
+
+  """Replace all plan add-ons and discounts with the provided list."""
+  replaceExisting: RecurringBillingSubscriptionReplaceExistingModificationsInput
+}
+
+"""Input fields for specifying when the subscription starts billing."""
+input RecurringBillingSubscriptionOptionsInput {
+  """
+  When true, starts the subscription immediately, overriding the plan's default
+  start date settings. When false, the plan's default settings apply unless
+  startDate is also provided. Cannot be true when startDate is also provided.
+  """
+  startImmediately: Boolean
+
+  """
+  The specific date configuration for when the subscription starts billing.
+  Exactly one field must be provided. Cannot be combined with startImmediately: true.
+  """
+  startDate: RecurringBillingSubscriptionStartDateInput
+}
+
+"""The response object returned after a subscription-related mutation."""
+type RecurringBillingSubscriptionPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The subscription that was created, updated, or modified."""
+  subscription: RecurringBillingSubscription
+}
+
+"""
 A recurring billing subscription plan template that subscriptions can be based upon.
 """
 type RecurringBillingSubscriptionPlan implements Node {
@@ -8890,6 +9229,159 @@ The response object returned when querying recurring billing subscription plans.
 type RecurringBillingSubscriptionPlansPayload {
   """A list of recurring billing subscription plans."""
   plans: [RecurringBillingSubscriptionPlan!]
+}
+
+"""Replace all plan add-ons and discounts with the provided list."""
+input RecurringBillingSubscriptionReplaceExistingModificationsInput {
+  """The add-ons to set on this subscription."""
+  addOns: [RecurringBillingSubscriptionAddOnInput!]
+
+  """The discounts to set on this subscription."""
+  discounts: [RecurringBillingSubscriptionDiscountInput!]
+}
+
+"""Operations for add-ons when retaining existing modifications."""
+input RecurringBillingSubscriptionRetainExistingAddOnsInput {
+  """Add-ons to add (by template ID)."""
+  add: [RecurringBillingSubscriptionAddOnInput!]
+
+  """Add-ons to edit (by template ID; server resolves to instance)."""
+  edit: [RecurringBillingSubscriptionAddOnInput!]
+
+  """IDs of add-on instances to remove."""
+  remove: [ID!]
+}
+
+"""Operations for discounts when retaining existing modifications."""
+input RecurringBillingSubscriptionRetainExistingDiscountsInput {
+  """Discounts to add (by template ID)."""
+  add: [RecurringBillingSubscriptionDiscountInput!]
+
+  """Discounts to edit (by template ID; server resolves to instance)."""
+  edit: [RecurringBillingSubscriptionDiscountInput!]
+
+  """IDs of discount instances to remove."""
+  remove: [ID!]
+}
+
+"""Retain existing add-ons and discounts, applying incremental changes."""
+input RecurringBillingSubscriptionRetainExistingModificationsInput {
+  """Operations for managing add-ons."""
+  addOns: RecurringBillingSubscriptionRetainExistingAddOnsInput
+
+  """Operations for managing discounts."""
+  discounts: RecurringBillingSubscriptionRetainExistingDiscountsInput
+}
+
+"""Where the subscription event was created."""
+enum RecurringBillingSubscriptionSource {
+  API
+  CONTROL_PANEL
+  RECURRING
+}
+
+"""
+Input fields for specifying the billing start date for a subscription. Exactly one field must be provided.
+"""
+input RecurringBillingSubscriptionStartDateInput {
+  """
+  The date the subscription starts billing. Must be a future date. Dates are interpreted as UTC.
+  """
+  firstBillingDate: Date
+
+  """
+  The day of the month the subscription will be charged on every billing cycle.
+  Must be 1-28 or 31. A value of 31 charges on the last day of the month. For
+  dates 29 or 30, use 31 (last day of month) to avoid validation errors.
+  """
+  billingDayOfMonth: Int
+
+  """
+  Trial period configuration. Overrides the plan's default trial settings.
+  """
+  trial: RecurringBillingSubscriptionTrialInput
+}
+
+"""The current lifecycle state of a subscription."""
+enum RecurringBillingSubscriptionStatus {
+  ACTIVE
+  CANCELED
+  EXPIRED
+  PAST_DUE
+  PENDING
+}
+
+"""Represents a status change event in a subscription's lifecycle."""
+type RecurringBillingSubscriptionStatusEvent {
+  """The subscription status."""
+  status: RecurringBillingSubscriptionStatus!
+
+  """The balance of the subscription."""
+  balance: Amount!
+
+  """The price of the subscription."""
+  price: Amount!
+
+  """The source that triggered the subscription status change."""
+  subscriptionSource: RecurringBillingSubscriptionSource
+
+  """The date and time when the status change occurred."""
+  timestamp: Timestamp!
+
+  """
+  The plan ID associated with the subscription at the time of the status change.
+  """
+  planId: ID!
+
+  """The currency code at the time of the status change."""
+  currencyIsoCode: CurrencyCodeAlpha!
+}
+
+"""
+Timeline information for a subscription, including billing dates and payment status.
+"""
+type RecurringBillingSubscriptionTimeline {
+  """
+  The date when the subscription first started billing. For pending
+  subscriptions with a future start date, this will be a future date.
+  """
+  firstBillingDate: Date!
+
+  """
+  The date when the system will attempt to bill the subscription again. For
+  pending subscriptions that have not yet started, this equals firstBillingDate.
+  This date adjusts automatically with each billing attempt. For past due
+  subscriptions with automatic retry enabled, this date will advance based on
+  your configured retry settings.
+  """
+  nextBillingDate: Date!
+
+  """
+  The start date for the current billing period, regardless of subscription
+  status. Automatic retries on past due subscriptions do not change the start
+  and end dates of the current billing period.
+  """
+  billingPeriodStartDate: Date
+
+  """
+  The end date for the current billing period, regardless of subscription
+  status. Automatic retries on past due subscriptions do not change the start
+  and end dates of the current billing period.
+  """
+  billingPeriodEndDate: Date
+
+  """
+  The date through which the subscription has been paid. It is the
+  billingPeriodEndDate at the time of the last successful transaction. If the
+  subscription is pending (has a future start date), this field is null.
+  """
+  paidThroughDate: Date
+
+  """The date and time when the subscription was created."""
+  createdAt: Timestamp
+
+  """The date and time when the subscription was last updated."""
+  updatedAt: Timestamp
 }
 
 """Trial period configuration for recurring billing subscription plans."""
@@ -14210,6 +14702,82 @@ type UpdatePayPalOneTimePaymentPayload {
 
   """The updated payment method containing the new payment method ID."""
   paymentMethod: PaymentMethod
+}
+
+"""Top-level input fields for updating a subscription."""
+input UpdateRecurringBillingSubscriptionInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The ID of the subscription to update."""
+  subscriptionId: ID!
+
+  """
+  Updating a plan only changes the association; the price is not automatically
+  changed. You can only update to a plan with the same billing cycle. You can't
+  edit the plan on a Past Due, Expired, or Canceled subscription.
+  """
+  planId: ID
+
+  """
+  The merchant account ID used to create the subscription's transactions.
+  Currency is also determined by merchant account ID and it must match the
+  Plan's currency.
+  """
+  merchantAccountId: ID
+
+  """
+  The new base price for the subscription. Must be a positive decimal value
+  (e.g., 10 or 10.00). Overrides the previous price. Cannot be changed if the
+  subscription is Past Due, Expired, or Canceled. Currency is determined by the
+  merchant account.
+  """
+  price: Amount
+
+  """
+  The number of times the billing cycle will be executed. Set to 0 to indicate
+  the subscription never expires (bills indefinitely). Valid range: 0-999.
+  """
+  numberOfBillingCycles: Int
+
+  """
+  The payment method identifier to use for this subscription. Accepts single-use
+  or multi-use payment methods. A single-use payment method will be vaulted automatically.
+  """
+  paymentMethodId: ID
+
+  """
+  The description displayed to customers in PayPal email receipts. 127 character maximum.
+  """
+  payPalDescription: String
+
+  """How to apply add-on and discount modifications."""
+  modifications: RecurringBillingSubscriptionModificationInput
+
+  """Optional execution flags for subscription updates."""
+  overrides: UpdateRecurringBillingSubscriptionOptionsInput
+
+  """Update the bank statement descriptor fields."""
+  descriptor: RecurringBillingSubscriptionDescriptorInput
+}
+
+"""Input fields for subscription update options."""
+input UpdateRecurringBillingSubscriptionOptionsInput {
+  """
+  A flag that specifies whether the change in subscription price should be prorated.
+  If omitted, defaults to the merchant account's prorate upgrades/downgrades setting.
+  """
+  prorateCharges: Boolean
+
+  """
+  By default, if the transaction for the prorated amount fails, the subscription is reverted.
+  If you would like to continue with the update to the subscription and add the
+  prorated amount to the balance even though the transaction failed, you should
+  set this field to false.
+  """
+  revertSubscriptionOnProrationFailure: Boolean
 }
 
 """

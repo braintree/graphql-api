@@ -1,3 +1,82 @@
+# 05-19-2026
+* Add new mutations:
+    * `cancelRecurringBillingSubscription`
+    * `createRecurringBillingSubscription`
+    * `updateRecurringBillingSubscription`
+* Add new types:
+    * `RecurringBillingSubscription`
+    * `RecurringBillingSubscriptionAddOn`
+    * `RecurringBillingSubscriptionDescriptor`
+    * `RecurringBillingSubscriptionDiscount`
+    * `RecurringBillingSubscriptionPayload`
+    * `RecurringBillingSubscriptionStatusEvent`
+    * `RecurringBillingSubscriptionTimeline`
+* Add new inputs:
+    * `CancelRecurringBillingSubscriptionInput`
+    * `CreateRecurringBillingSubscriptionInput`
+    * `RecurringBillingSubscriptionAddOnInput`
+    * `RecurringBillingSubscriptionDescriptorInput`
+    * `RecurringBillingSubscriptionDiscountInput`
+    * `RecurringBillingSubscriptionModificationInput`
+    * `RecurringBillingSubscriptionOptionsInput`
+    * `RecurringBillingSubscriptionReplaceExistingModificationsInput`
+    * `RecurringBillingSubscriptionRetainExistingAddOnsInput`
+    * `RecurringBillingSubscriptionRetainExistingDiscountsInput`
+    * `RecurringBillingSubscriptionRetainExistingModificationsInput`
+    * `RecurringBillingSubscriptionStartDateInput`
+    * `UpdateRecurringBillingSubscriptionInput`
+    * `UpdateRecurringBillingSubscriptionOptionsInput`
+* Add new enums:
+    * `RecurringBillingSubscriptionSource`
+    * `RecurringBillingSubscriptionStatus`
+* Add new enum values:
+    * `RECURRING_BILLING_SUBSCRIPTION` to `LegacyIdType`
+    * `API`, `CONTROL_PANEL`, `RECURRING` to `RecurringBillingSubscriptionSource`
+    * `ACTIVE`, `CANCELED`, `EXPIRED`, `PAST_DUE`, `PENDING` to `RecurringBillingSubscriptionStatus`
+* Add new fields:
+    * `add` to `RecurringBillingSubscriptionRetainExistingAddOnsInput`, `RecurringBillingSubscriptionRetainExistingDiscountsInput`
+    * `addOnId` to `RecurringBillingSubscriptionAddOn`, `RecurringBillingSubscriptionAddOnInput`
+    * `addOns` to `RecurringBillingSubscription`, `RecurringBillingSubscriptionReplaceExistingModificationsInput`, `RecurringBillingSubscriptionRetainExistingModificationsInput`
+    * `amount` to `RecurringBillingSubscriptionAddOn`, `RecurringBillingSubscriptionAddOnInput`, `RecurringBillingSubscriptionDiscount`, `RecurringBillingSubscriptionDiscountInput`
+    * `balance` to `RecurringBillingSubscription`, `RecurringBillingSubscriptionStatusEvent`
+    * `billingDayOfMonth` to `RecurringBillingSubscription`, `RecurringBillingSubscriptionStartDateInput`
+    * `billingPeriodEndDate`, `billingPeriodStartDate`, `createdAt`, `nextBillingDate`, `paidThroughDate`, `updatedAt` to `RecurringBillingSubscriptionTimeline`
+    * `cancelAppUrl`, `returnAppUrl` to `PayPalAppSwitchNativeAppInput`
+    * `clientMutationId` to `CancelRecurringBillingSubscriptionInput`, `CreateRecurringBillingSubscriptionInput`, `RecurringBillingSubscriptionPayload`, `UpdateRecurringBillingSubscriptionInput`
+    * `companyName` to `RecurringBillingSubscriptionDescriptor`, `RecurringBillingSubscriptionDescriptorInput`
+    * `currencyIsoCode`, `subscriptionSource`, `timestamp` to `RecurringBillingSubscriptionStatusEvent`
+    * `currentBillingCycle` to `RecurringBillingSubscription`, `RecurringBillingSubscriptionAddOn`, `RecurringBillingSubscriptionDiscount`
+    * `daysPastDue`, `failureCount`, `id`, `legacyId`, `nextBillingPeriodAmount`, `statusHistory`, `timeline`, `transactionIds` to `RecurringBillingSubscription`
+    * `descriptor` to `CreateRecurringBillingSubscriptionInput`, `RecurringBillingSubscription`, `UpdateRecurringBillingSubscriptionInput`
+    * `discountId` to `RecurringBillingSubscriptionDiscount`, `RecurringBillingSubscriptionDiscountInput`
+    * `discounts` to `RecurringBillingSubscription`, `RecurringBillingSubscriptionReplaceExistingModificationsInput`, `RecurringBillingSubscriptionRetainExistingModificationsInput`
+    * `edit` to `RecurringBillingSubscriptionRetainExistingAddOnsInput`, `RecurringBillingSubscriptionRetainExistingDiscountsInput`
+    * `firstBillingDate` to `RecurringBillingSubscriptionStartDateInput`, `RecurringBillingSubscriptionTimeline`
+    * `merchantAccountId` to `CreateRecurringBillingSubscriptionInput`, `RecurringBillingSubscription`, `UpdateRecurringBillingSubscriptionInput`
+    * `modifications` to `CreateRecurringBillingSubscriptionInput`, `UpdateRecurringBillingSubscriptionInput`
+    * `numberOfBillingCycles` to `CreateRecurringBillingSubscriptionInput`, `RecurringBillingSubscription`, `RecurringBillingSubscriptionAddOn`, `RecurringBillingSubscriptionAddOnInput`, `RecurringBillingSubscriptionDiscount`, `RecurringBillingSubscriptionDiscountInput`, `UpdateRecurringBillingSubscriptionInput`
+    * `options` to `CreateRecurringBillingSubscriptionInput`
+    * `overrides` to `UpdateRecurringBillingSubscriptionInput`
+    * `paymentMethodId` to `CreateRecurringBillingSubscriptionInput`, `RecurringBillingSubscription`, `UpdateRecurringBillingSubscriptionInput`
+    * `payPalDescription` to `CreateRecurringBillingSubscriptionInput`, `RecurringBillingSubscription`, `UpdateRecurringBillingSubscriptionInput`
+    * `phoneNumber` to `RecurringBillingSubscriptionDescriptor`, `RecurringBillingSubscriptionDescriptorInput`
+    * `planId` to `CreateRecurringBillingSubscriptionInput`, `RecurringBillingSubscription`, `RecurringBillingSubscriptionStatusEvent`, `UpdateRecurringBillingSubscriptionInput`
+    * `price` to `CreateRecurringBillingSubscriptionInput`, `RecurringBillingSubscription`, `RecurringBillingSubscriptionStatusEvent`, `UpdateRecurringBillingSubscriptionInput`
+    * `prorateCharges`, `revertSubscriptionOnProrationFailure` to `UpdateRecurringBillingSubscriptionOptionsInput`
+    * `quantity` to `RecurringBillingSubscriptionAddOn`, `RecurringBillingSubscriptionAddOnInput`, `RecurringBillingSubscriptionDiscount`, `RecurringBillingSubscriptionDiscountInput`
+    * `remove` to `RecurringBillingSubscriptionRetainExistingAddOnsInput`, `RecurringBillingSubscriptionRetainExistingDiscountsInput`
+    * `replaceExisting`, `retainExisting` to `RecurringBillingSubscriptionModificationInput`
+    * `startDate`, `startImmediately` to `RecurringBillingSubscriptionOptionsInput`
+    * `status` to `RecurringBillingSubscription`, `RecurringBillingSubscriptionStatusEvent`
+    * `subscription` to `RecurringBillingSubscriptionPayload`
+    * `subscriptionId` to `CancelRecurringBillingSubscriptionInput`, `UpdateRecurringBillingSubscriptionInput`
+    * `trial` to `RecurringBillingSubscription`, `RecurringBillingSubscriptionStartDateInput`
+    * `url` to `RecurringBillingSubscriptionDescriptor`, `RecurringBillingSubscriptionDescriptorInput`
+* Add interface implementations:
+    * `RecurringBillingSubscription` now implements `Node`
+* Remove:
+    * `appUrl` field from `PayPalAppSwitchNativeAppInput`
+
 # 04-30-2026
 * Add new mutations:
     * `createBillingAgreementJwt`
