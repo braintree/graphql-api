@@ -1293,6 +1293,30 @@ input ChargePayPalAccountOptionsInput {
   description: String
 }
 
+"""Input fields for charging a past due subscription."""
+input ChargeRecurringBillingSubscriptionInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The ID of the subscription to retry charging."""
+  subscriptionId: ID!
+
+  """
+  The amount to charge the customer if different from the current balance on the subscription.
+  This value must be greater than 0, and must match the appropriate currency format.
+  If omitted, the current balance on the subscription will be charged.
+  """
+  amount: Amount
+
+  """
+  If set to true, the transaction will automatically be submitted for settlement if the retry request is successful.
+  If false or omitted, the transaction must be manually submitted for settlement.
+  """
+  submitForSettlement: Boolean
+}
+
 """
 Top-level input fields for creating a transaction by charging a US bank account.
 """
@@ -3979,16 +4003,10 @@ input ExternalPaymentResponseInput {
 
 """The type of payment status returned by external processors."""
 enum ExternalPaymentStatus {
-  AUTHORIZED
-  DECLINED
-  FAILED
-  PENDING
-  REFUNDED
+  DECLINE
+  ERROR
   REJECTED
-  SETTLED
   SUCCESS
-  UNKNOWN
-  VOIDED
 }
 
 """The name of the payment service provider processing the transaction."""
@@ -4107,6 +4125,18 @@ type FinalizeDisputePayload {
 
   """Information about the dispute that was finalized."""
   dispute: Dispute
+}
+
+"""
+Fraud Protection custom field name/value pairs. Used to pass arbitrary data to
+Fraud Protection for rule evaluation. No field definition is required up-front.
+"""
+input FraudProtectionCustomFieldInput {
+  """Name for the custom field. Maximum 255 characters."""
+  name: CustomFieldName!
+
+  """Value for the custom field. Maximum 255 characters."""
+  value: String!
 }
 
 """Configuration for fraud protection provider."""
@@ -6525,6 +6555,13 @@ type Mutation {
   Cancels a recurring billing subscription. Returns the subscription with Canceled status.
   """
   cancelRecurringBillingSubscription(input: CancelRecurringBillingSubscriptionInput!): RecurringBillingSubscriptionPayload
+
+  """
+  Manually retry charging a past due subscription. Creates a new transaction for
+  the subscription's current balance or a specified amount.
+  See [managing subscriptions](https://developer.paypal.com/braintree/docs/guides/recurring-billing/manage) for details.
+  """
+  chargeRecurringBillingSubscription(input: ChargeRecurringBillingSubscriptionInput!): TransactionPayload
 }
 
 """The name of the party."""
@@ -7325,6 +7362,11 @@ input PaymentReaderMetadataInput {
   storeId: ID
 
   """
+  The logical name of the payment reader that processed this transaction.
+  """
+  readerName: String
+
+  """
   A flag used to indicate that the payment method was approved offline due to
   connectivity issues on the payment reader. Defaults to `false` when the
   payment method was approved online.
@@ -7612,7 +7654,7 @@ type PayPalAccountDetails {
   """
   Payer's selected financing option at the time of creating a transaction.
   """
-  selectedFinancingOption: SelectedPayPalFinancingOptionDetails @deprecated(reason: "This field is no longer supported.")
+  selectedFinancingOption: SelectedPayPalFinancingOptionDetails
 
   """Customer's Funding Instrument information."""
   fundingSourceDescription: String
@@ -7706,6 +7748,12 @@ input PayPalAppSwitchNativeAppInput {
   The universal URL of the merchant's native app to which PayPal redirects the buyer after the buyer cancels the payment.
   """
   cancelAppUrl: URL
+
+  """
+  A fallback URL scheme used to deep-link back to the merchant app when the
+  universal/app link cannot be opened. The scheme must be allowlisted by Braintree.
+  """
+  fallbackUrlScheme: String
 }
 
 """OS type of the buyer's device."""
@@ -8969,6 +9017,31 @@ input RecurringBillingSubscriptionAddOnInput {
   numberOfBillingCycles: Int
 }
 
+"""A paginated list of recurring billing subscriptions."""
+type RecurringBillingSubscriptionConnection {
+  """A list of recurring billing subscriptions."""
+  edges: [RecurringBillingSubscriptionConnectionEdge]
+
+  """
+  Information about the page of recurring billing subscriptions contained in `edges`.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+A recurring billing subscription within a RecurringBillingSubscriptionConnection.
+"""
+type RecurringBillingSubscriptionConnectionEdge {
+  """
+  This recurring billing subscription's location within the
+  RecurringBillingSubscriptionConnection. Used for requesting additional pages.
+  """
+  cursor: String
+
+  """The recurring billing subscription."""
+  node: RecurringBillingSubscription
+}
+
 """
 The dynamic information that appears on a customer's bank or credit card statement for a specific subscription.
 """
@@ -9271,6 +9344,42 @@ input RecurringBillingSubscriptionRetainExistingModificationsInput {
 
   """Operations for managing discounts."""
   discounts: RecurringBillingSubscriptionRetainExistingDiscountsInput
+}
+
+"""Input fields for searching for recurring billing subscriptions."""
+input RecurringBillingSubscriptionSearchInput {
+  """Find subscriptions with a given ID or IDs."""
+  id: SearchValueInput
+
+  """Find subscriptions with a given plan ID or IDs."""
+  planId: SearchTextValueInput
+
+  """Find subscriptions with a given status."""
+  status: [RecurringBillingSubscriptionStatus!]
+
+  """Find subscriptions with a given merchant account ID."""
+  merchantAccountId: SearchValueInput
+
+  """Find subscriptions currently in a trial period."""
+  inTrialPeriod: Boolean
+
+  """Find subscriptions with a given transaction ID."""
+  transactionId: SearchTextInput
+
+  """Find subscriptions created at a given time."""
+  createdAt: SearchTimestampInput
+
+  """Find subscriptions with a given price."""
+  price: SearchRangeInput
+
+  """Find subscriptions with a given number of days past due."""
+  daysPastDue: SearchRangeInput
+
+  """Find subscriptions with a given number of billing cycles remaining."""
+  billingCyclesRemaining: SearchRangeInput
+
+  """Find subscriptions with a given next billing date."""
+  nextBillingDate: SearchDateInput
 }
 
 """Where the subscription event was created."""
@@ -11054,6 +11163,11 @@ type Search {
   A paginated list of roles that match any of the conditions in RoleSearchInput.
   """
   roles(input: RoleSearchInput!, first: Int, after: String): RoleSearchConnection
+
+  """
+  A paginated list of recurring billing subscriptions that match the RecurringBillingSubscriptionSearchInput.
+  """
+  recurringBillingSubscriptions(input: RecurringBillingSubscriptionSearchInput!, first: Int, after: String): RecurringBillingSubscriptionConnection
 }
 
 """Input fields for searching by address."""
@@ -11598,10 +11712,7 @@ input SearchVerificationStatusInput {
   in: [VerificationStatus!]
 }
 
-"""
-Deprecated: SelectedPayPalFinancingOptionDetails are no longer supported.
-Details about a selected financing option by a PayPal buyer.
-"""
+"""Details about a selected financing option by a PayPal buyer."""
 type SelectedPayPalFinancingOptionDetails {
   """Total number of payments over which to finance the transaction."""
   term: Int
@@ -11847,19 +11958,14 @@ input SubmitDisputeFeedbackInput {
   """The external processor's transaction ID."""
   externalTransactionId: ID!
 
-  """
-  The riskData ID returned in the evaluateTransactionRisk response for the original transaction.
-  """
-  riskDataId: ID
-
   """The amount disputed."""
   amountDisputed: Amount
 
   """The reason for the dispute."""
-  disputeReason: DisputeReason
+  disputeReason: DisputeReason!
 
   """The current status of the dispute."""
-  disputeStatus: DisputeStatus
+  disputeStatus: DisputeStatus!
 
   """Timestamp when the dispute was received."""
   disputeCreatedAt: Timestamp
@@ -12836,7 +12942,9 @@ input TokenizeCreditCardInput {
 """Credit card tokenization options."""
 input TokenizeCreditCardOptionsInput {
   """
-  Whether to run validations on credit card fields. Validations are not run by default.
+  Whether to run validations on credit card fields. Validations default to true
+  when supported by the authentication method; otherwise they default to false
+  and cannot be enabled.
   """
   validate: Boolean
 }
@@ -13263,6 +13371,9 @@ type Transaction implements Node & Payment {
   """Discount amount that was included in the total transaction amount."""
   discountAmount: String
 
+  """Surcharge amount that was included in the total transaction amount."""
+  surchargeAmount: String
+
   """Line items for this transaction."""
   lineItems: [TransactionLineItem!]
 
@@ -13397,6 +13508,13 @@ type TransactionAuthorizationProcessorResponse {
   Response EMV data provided by the processor if this was an EMV transaction.
   """
   emvData: String
+
+  """
+  The Mastercard transaction link identifier is used for linking related
+  subsequent transactions. This field is applicable only to transactions
+  processed through Mastercard.
+  """
+  mastercardTransactionLinkId: String
 }
 
 """A paginated list of transactions."""
@@ -13586,6 +13704,14 @@ input TransactionInput {
   *Required for Level 3 processing*.
   """
   discountAmount: String
+
+  """
+  Surcharge amount that was included in the total transaction amount. Does not
+  add to the total amount the payment method will be charged. This value can't be negative.
+  
+  *Required for Visa Rent Discount Program*.
+  """
+  surchargeAmount: String
 
   """
   Line items for this transaction. Up to 249 line items may be specified.
@@ -14022,10 +14148,10 @@ input TransactionRiskEvaluateInput {
   riskData: RiskDataInput
 
   """
-  Collection of custom field/value pairs. You must [set up each custom field in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#creating-a-custom-field)
-  prior to passing it with a request.
+  Collection of Fraud Protection custom field/value pairs passed through for
+  Fraud Protection rule evaluation. No field definition is required up-front.
   """
-  customFields: [CustomFieldInput!]
+  fraudProtectionCustomFields: [FraudProtectionCustomFieldInput!]
 
   """
   The initiator of the payment. Payment can either be merchant-initiated or
@@ -14290,59 +14416,6 @@ input TransactionTaxInput {
   *Required for Level 2 processing*.
   """
   taxExempt: Boolean
-}
-
-"""Indicates the transfer type for AFT and SDWO transactions."""
-enum TransactionTransferType {
-  """
-  Moving funds between a user's accounts at the same or a different financial
-  institution. This transfer type is available for both AFT and SDWO (Brazil only).
-  """
-  ACCOUNT_TO_ACCOUNT
-
-  """
-  Paying a bill (identified/unidentified). This transfer type is used for SDWO (Brazil only).
-  """
-  BOLETO_TICKET
-
-  """
-  Payout where a third party uses an Account Funding Transaction(AFT) to fund
-  the disbursement of an Original Credit Transaction(OCT). This transfer type is
-  used in AFT only.
-  """
-  FUND_DISBURSEMENT
-
-  """
-  Adding funds to or cashing out of a stored value digital wallet. This transfer type is used in AFT only.
-  """
-  FUND_TRANSFER
-
-  """
-  Payroll disbursement on behalf of a merchant, when done by a payroll provider. This transfer type is used in AFT only.
-  """
-  PAYROLL_DISBURSEMENT
-
-  """
-  Moving funds to another individual's non-merchant account.  This transfer type
-  is available for both AFT and SDWO (Brazil only).
-  """
-  PERSON_TO_PERSON
-
-  """
-  Bank initiated, person to person money transfer that is offered by a financial institution for AFT only.
-  """
-  PERSON_TO_PERSON_BANK_INITIATED
-
-  """
-  Prepaid card load or top up, adding value to an eligible prepaid card or
-  funding a user's prepaid account. This transfer type is used in AFT only.
-  """
-  PREPAID_TOP_UP
-
-  """
-  Adding value to a merchant's staged digital wallet. This transfer type is available for both AFT and SDWO (Brazil only).
-  """
-  WALLET_TRANSFER
 }
 
 """Configuration for UnionPay cards."""
@@ -16188,9 +16261,16 @@ type VerificationProcessorResponse {
   avsStreetAddressResponse: AvsCvvResponseCode
 
   """
-  If present, any additional information recieved from the processor. May provide further insight into the `legacyCode`.
+  If present, any additional information received from the processor. May provide further insight into the `legacyCode`.
   """
   additionalInformation: String
+
+  """
+  The Mastercard transaction link identifier is used for linking related
+  subsequent transactions. This field is applicable only to transactions
+  processed through Mastercard.
+  """
+  mastercardTransactionLinkId: String
 }
 
 """Input fields for searching for verifications."""

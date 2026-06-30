@@ -1,3 +1,45 @@
+# 06-30-2026
+* Add new mutations:
+    * `chargeRecurringBillingSubscription`
+* Add new types:
+    * `RecurringBillingSubscriptionConnection`
+    * `RecurringBillingSubscriptionConnectionEdge`
+* Add new inputs:
+    * `ChargeRecurringBillingSubscriptionInput`
+    * `FraudProtectionCustomFieldInput`
+    * `RecurringBillingSubscriptionSearchInput`
+* Add new enum values:
+    * `DECLINE`, `ERROR` to `ExternalPaymentStatus`
+* Add new fields:
+    * `amount`, `clientMutationId`, `submitForSettlement`, `subscriptionId` to `ChargeRecurringBillingSubscriptionInput`
+    * `billingCyclesRemaining`, `createdAt`, `daysPastDue`, `id`, `inTrialPeriod`, `merchantAccountId`, `nextBillingDate`, `planId`, `price`, `status`, `transactionId` to `RecurringBillingSubscriptionSearchInput`
+    * `cursor`, `node` to `RecurringBillingSubscriptionConnectionEdge`
+    * `edges`, `pageInfo` to `RecurringBillingSubscriptionConnection`
+    * `fallbackUrlScheme` to `PayPalAppSwitchNativeAppInput`
+    * `fraudProtectionCustomFields` to `TransactionRiskEvaluateInput`
+    * `mastercardTransactionLinkId` to `TransactionAuthorizationProcessorResponse`, `VerificationProcessorResponse`
+    * `name`, `value` to `FraudProtectionCustomFieldInput`
+    * `readerName` to `PaymentReaderMetadataInput`
+    * `recurringBillingSubscriptions` to `Search`
+    * `surchargeAmount` to `Transaction`, `TransactionInput`
+* Update types:
+    * Make `disputeReason` required on `SubmitDisputeFeedbackInput`
+    * Make `disputeStatus` required on `SubmitDisputeFeedbackInput`
+* Remove deprecation:
+    * `selectedFinancingOption` on `PayPalAccountDetails`
+* Remove:
+    * `AUTHORIZED` from `ExternalPaymentStatus` enum
+    * `customFields` field from `TransactionRiskEvaluateInput`
+    * `DECLINED` from `ExternalPaymentStatus` enum
+    * `FAILED` from `ExternalPaymentStatus` enum
+    * `PENDING` from `ExternalPaymentStatus` enum
+    * `REFUNDED` from `ExternalPaymentStatus` enum
+    * `riskDataId` field from `SubmitDisputeFeedbackInput`
+    * `SETTLED` from `ExternalPaymentStatus` enum
+    * `TransactionTransferType` type
+    * `UNKNOWN` from `ExternalPaymentStatus` enum
+    * `VOIDED` from `ExternalPaymentStatus` enum
+
 # 05-19-2026
 * Add new mutations:
     * `cancelRecurringBillingSubscription`
