@@ -1,3 +1,50 @@
+# 07-07-2026
+* Add new mutations:
+    * `createRecurringBillingSubscriptionPlanAddOnTemplate`
+    * `createRecurringBillingSubscriptionPlanDiscountTemplate`
+    * `deleteRecurringBillingSubscriptionPlan`
+    * `updateRecurringBillingSubscriptionPlanAddOnTemplate`
+    * `updateRecurringBillingSubscriptionPlanDiscountTemplate`
+* Add new queries:
+    * `businessAccountCreationRequests`
+    * `customers`
+    * `disputes`
+    * `inStoreReaders`
+    * `payments`
+    * `recurringBillingSubscriptions`
+    * `refunds`
+    * `roles`
+    * `searchInStoreLocations`
+    * `transactions`
+    * `verifications`
+* Add new types:
+    * `DeleteRecurringBillingSubscriptionPlanPayload`
+    * `RecurringBillingSubscriptionPlanAddOnPayload`
+    * `RecurringBillingSubscriptionPlanDiscountPayload`
+* Add new inputs:
+    * `CreateRecurringBillingSubscriptionPlanAddOnTemplateInput`
+    * `CreateRecurringBillingSubscriptionPlanDiscountTemplateInput`
+    * `DeleteRecurringBillingSubscriptionPlanInput`
+    * `UpdateRecurringBillingSubscriptionPlanAddOnTemplateInput`
+    * `UpdateRecurringBillingSubscriptionPlanDiscountTemplateInput`
+* Add new enums:
+    * `ThreeDSecurePassThroughNetwork`
+* Add new enum values:
+    * `EFTPOS`, `MASTERCARD`, `VISA` to `ThreeDSecurePassThroughNetwork`
+* Add new fields:
+    * `addOn` to `RecurringBillingSubscriptionPlanAddOnPayload`
+    * `amount` to `CreateRecurringBillingSubscriptionPlanAddOnTemplateInput`, `CreateRecurringBillingSubscriptionPlanDiscountTemplateInput`, `UpdateRecurringBillingSubscriptionPlanAddOnTemplateInput`, `UpdateRecurringBillingSubscriptionPlanDiscountTemplateInput`
+    * `clientMutationId` to `CreateRecurringBillingSubscriptionPlanAddOnTemplateInput`, `CreateRecurringBillingSubscriptionPlanDiscountTemplateInput`, `DeleteRecurringBillingSubscriptionPlanInput`, `DeleteRecurringBillingSubscriptionPlanPayload`, `RecurringBillingSubscriptionPlanAddOnPayload`, `RecurringBillingSubscriptionPlanDiscountPayload`, `UpdateRecurringBillingSubscriptionPlanAddOnTemplateInput`, `UpdateRecurringBillingSubscriptionPlanDiscountTemplateInput`
+    * `description` to `CreateRecurringBillingSubscriptionPlanAddOnTemplateInput`, `CreateRecurringBillingSubscriptionPlanDiscountTemplateInput`, `UpdateRecurringBillingSubscriptionPlanAddOnTemplateInput`, `UpdateRecurringBillingSubscriptionPlanDiscountTemplateInput`
+    * `discount` to `RecurringBillingSubscriptionPlanDiscountPayload`
+    * `id` to `DeleteRecurringBillingSubscriptionPlanInput`, `UpdateRecurringBillingSubscriptionPlanAddOnTemplateInput`, `UpdateRecurringBillingSubscriptionPlanDiscountTemplateInput`
+    * `name` to `CreateRecurringBillingSubscriptionPlanAddOnTemplateInput`, `CreateRecurringBillingSubscriptionPlanDiscountTemplateInput`, `UpdateRecurringBillingSubscriptionPlanAddOnTemplateInput`, `UpdateRecurringBillingSubscriptionPlanDiscountTemplateInput`
+    * `network` to `ThreeDSecurePassThroughInput`
+    * `numberOfBillingCycles` to `CreateRecurringBillingSubscriptionPlanAddOnTemplateInput`, `CreateRecurringBillingSubscriptionPlanDiscountTemplateInput`, `UpdateRecurringBillingSubscriptionPlanAddOnTemplateInput`, `UpdateRecurringBillingSubscriptionPlanDiscountTemplateInput`
+* Deprecate:
+    * `search` on `Query`
+    * `businessAccountCreationRequests`, `customers`, `disputes`, `inStoreLocations`, `inStoreReaders`, `payments`, `recurringBillingSubscriptions`, `refunds`, `roles`, `transactions`, `verifications` on `Search`
+
 # 06-30-2026
 * Add new mutations:
     * `chargeRecurringBillingSubscription`

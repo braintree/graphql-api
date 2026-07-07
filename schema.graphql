@@ -2213,6 +2213,30 @@ input CreateRecurringBillingSubscriptionPlanAddOnInput {
 }
 
 """
+Top-level input fields for creating a recurring billing subscription plan add-on template.
+"""
+input CreateRecurringBillingSubscriptionPlanAddOnTemplateInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The name of the add-on."""
+  name: String!
+
+  """A description of the add-on."""
+  description: String
+
+  """The add-on amount."""
+  amount: Amount!
+
+  """
+  The number of times the billing cycle will be executed. Use 0 to indicate the add-on never expires.
+  """
+  numberOfBillingCycles: Int
+}
+
+"""
 Input for adding a discount when creating a recurring billing subscription plan.
 """
 input CreateRecurringBillingSubscriptionPlanDiscountInput {
@@ -2230,6 +2254,30 @@ input CreateRecurringBillingSubscriptionPlanDiscountInput {
 
   """
   The number of times the billing cycle will be executed. Omit to inherit from the discount template.
+  """
+  numberOfBillingCycles: Int
+}
+
+"""
+Top-level input fields for creating a recurring billing subscription plan discount template.
+"""
+input CreateRecurringBillingSubscriptionPlanDiscountTemplateInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The name of the discount."""
+  name: String!
+
+  """A description of the discount."""
+  description: String
+
+  """The discount amount."""
+  amount: Amount!
+
+  """
+  The number of times the billing cycle will be executed. Use 0 to indicate the discount never expires.
   """
   numberOfBillingCycles: Int
 }
@@ -3204,6 +3252,29 @@ input DeletePaymentMethodFromVaultInput {
 
 """Top-level output field from deleting a multi-use payment method."""
 type DeletePaymentMethodFromVaultPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+}
+
+"""
+Top-level input fields for deleting a recurring billing subscription plan.
+"""
+input DeleteRecurringBillingSubscriptionPlanInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The plan's identifier. Accepts both global and legacy plan IDs."""
+  id: ID!
+}
+
+"""
+The response object returned after deleting a recurring billing subscription plan.
+"""
+type DeleteRecurringBillingSubscriptionPlanPayload {
   """
   An identifier used to reconcile requests and responses. 255 characters maximum.
   """
@@ -6545,6 +6616,16 @@ type Mutation {
   """
   updateRecurringBillingSubscriptionPlan(input: UpdateRecurringBillingSubscriptionPlanInput!): RecurringBillingSubscriptionPlanPayload
 
+  """
+  Deletes a recurring billing subscription plan permanently. After deletion,
+  querying the plan by Node ID will return a NOT_FOUND error.
+  
+  Note: This mutation is different from canceling a subscription:
+  - DELETE plan: Removes the plan definition entirely (requires no active, past due, or pending subscriptions)
+  - CANCEL subscription: Sets individual subscription to CANCELED status (can be reactivated).
+  """
+  deleteRecurringBillingSubscriptionPlan(input: DeleteRecurringBillingSubscriptionPlanInput!): DeleteRecurringBillingSubscriptionPlanPayload
+
   """Creates a new recurring billing subscription."""
   createRecurringBillingSubscription(input: CreateRecurringBillingSubscriptionInput!): RecurringBillingSubscriptionPayload
 
@@ -6562,6 +6643,22 @@ type Mutation {
   See [managing subscriptions](https://developer.paypal.com/braintree/docs/guides/recurring-billing/manage) for details.
   """
   chargeRecurringBillingSubscription(input: ChargeRecurringBillingSubscriptionInput!): TransactionPayload
+
+  """Creates a new recurring billing subscription plan add-on template."""
+  createRecurringBillingSubscriptionPlanAddOnTemplate(input: CreateRecurringBillingSubscriptionPlanAddOnTemplateInput!): RecurringBillingSubscriptionPlanAddOnPayload
+
+  """
+  Updates an existing recurring billing subscription plan add-on template.
+  """
+  updateRecurringBillingSubscriptionPlanAddOnTemplate(input: UpdateRecurringBillingSubscriptionPlanAddOnTemplateInput!): RecurringBillingSubscriptionPlanAddOnPayload
+
+  """Creates a new recurring billing subscription plan discount template."""
+  createRecurringBillingSubscriptionPlanDiscountTemplate(input: CreateRecurringBillingSubscriptionPlanDiscountTemplateInput!): RecurringBillingSubscriptionPlanDiscountPayload
+
+  """
+  Updates an existing recurring billing subscription plan discount template.
+  """
+  updateRecurringBillingSubscriptionPlanDiscountTemplate(input: UpdateRecurringBillingSubscriptionPlanDiscountTemplateInput!): RecurringBillingSubscriptionPlanDiscountPayload
 }
 
 """The name of the party."""
@@ -8848,7 +8945,54 @@ type Query {
   A collection of the available searches. Each field on the `Search` type is a
   different search that can be queried with its own input parameters.
   """
-  search: Search
+  search: Search @deprecated(reason: "Use the individual top-level search queries (e.g. `transactions`, `refunds`, `verifications`) instead.")
+
+  """
+  A paginated list of verifications that match the VerificationSearchInput.
+  """
+  verifications(input: VerificationSearchInput!, first: Int, after: String): VerificationConnection
+
+  """A paginated list of customers that match the CustomerSearchInput."""
+  customers(input: CustomerSearchInput!, first: Int, after: String): CustomerConnection
+
+  """
+  A paginated list of business account creation requests that match the BusinessAccountCreationRequestSearchInput.
+  """
+  businessAccountCreationRequests(input: BusinessAccountCreationRequestSearchInput!, first: Int, after: String): BusinessAccountCreationRequestConnection
+
+  """A paginated list of roles that match the RoleSearchInput."""
+  roles(input: RoleSearchInput!, first: Int, after: String): RoleSearchConnection
+
+  """
+  A paginated list of recurring billing subscriptions that match the RecurringBillingSubscriptionSearchInput.
+  """
+  recurringBillingSubscriptions(input: RecurringBillingSubscriptionSearchInput!, first: Int, after: String): RecurringBillingSubscriptionConnection
+
+  """
+  A paginated list of in-store readers that match the InStoreReaderSearchInput.
+  """
+  inStoreReaders(input: InStoreReaderSearchInput!, first: Int, after: String): InStoreReaderConnection
+
+  """A paginated list of refunds that match the RefundSearchInput."""
+  refunds(input: RefundSearchInput!, first: Int, after: String): RefundConnection
+
+  """
+  A paginated list of all types of Payment that match the PaymentSearchInput.
+  """
+  payments(input: PaymentSearchInput!, first: Int, after: String): PaymentConnection
+
+  """
+  A paginated list of transactions that match the TransactionSearchInput.
+  """
+  transactions(input: TransactionSearchInput!, first: Int, after: String): TransactionConnection
+
+  """A paginated list of disputes that match the DisputeSearchInput."""
+  disputes(input: DisputeSearchInput!, first: Int, after: String): DisputeConnection
+
+  """
+  A paginated list of in-store locations that match the InStoreLocationSearchInput.
+  """
+  searchInStoreLocations(input: InStoreLocationSearchInput!, first: Int, after: String): InStoreLocationSearchConnection
 
   """Retrieve a paginated list of all in-store locations."""
   inStoreLocations(first: Int, after: String): InStoreLocationConnection
@@ -9237,6 +9381,19 @@ type RecurringBillingSubscriptionPlanAddOn implements Node {
 }
 
 """
+The response object returned after a recurring billing subscription plan add-on template mutation.
+"""
+type RecurringBillingSubscriptionPlanAddOnPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The add-on that was created or updated."""
+  addOn: RecurringBillingSubscriptionPlanAddOn
+}
+
+"""
 The response object returned when querying recurring billing subscription plan add-ons.
 """
 type RecurringBillingSubscriptionPlanAddOnsPayload {
@@ -9273,6 +9430,19 @@ type RecurringBillingSubscriptionPlanDiscount implements Node {
 
   """The date/time the discount was last updated."""
   updatedAt: Timestamp
+}
+
+"""
+The response object returned after a recurring billing subscription plan discount template mutation.
+"""
+type RecurringBillingSubscriptionPlanDiscountPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The discount that was created or updated."""
+  discount: RecurringBillingSubscriptionPlanDiscount
 }
 
 """
@@ -11123,51 +11293,51 @@ type Search {
   """
   A paginated list of transactions that match the TransactionSearchInput.
   """
-  transactions(input: TransactionSearchInput!, first: Int, after: String): TransactionConnection
+  transactions(input: TransactionSearchInput!, first: Int, after: String): TransactionConnection @deprecated(reason: "Use the top-level `transactions` query instead.")
 
   """A paginated list of refunds that match the RefundSearchInput."""
-  refunds(input: RefundSearchInput!, first: Int, after: String): RefundConnection
+  refunds(input: RefundSearchInput!, first: Int, after: String): RefundConnection @deprecated(reason: "Use the top-level `refunds` query instead.")
 
   """
   A paginated list of all types of Payment that match the PaymentSearchInput.
   """
-  payments(input: PaymentSearchInput!, first: Int, after: String): PaymentConnection
+  payments(input: PaymentSearchInput!, first: Int, after: String): PaymentConnection @deprecated(reason: "Use the top-level `payments` query instead.")
 
   """A paginated list of disputes that match the DisputeSearchInput."""
-  disputes(input: DisputeSearchInput!, first: Int, after: String): DisputeConnection
+  disputes(input: DisputeSearchInput!, first: Int, after: String): DisputeConnection @deprecated(reason: "Use the top-level `disputes` query instead.")
 
   """
   A paginated list of verifications that match the VerificationSearchInput.
   """
-  verifications(input: VerificationSearchInput!, first: Int, after: String): VerificationConnection
+  verifications(input: VerificationSearchInput!, first: Int, after: String): VerificationConnection @deprecated(reason: "Use the top-level `verifications` query instead.")
 
   """A paginated list of customers that match the CustomerSearchInput."""
-  customers(input: CustomerSearchInput!, first: Int, after: String): CustomerConnection
+  customers(input: CustomerSearchInput!, first: Int, after: String): CustomerConnection @deprecated(reason: "Use the top-level `customers` query instead.")
 
   """
   A paginated list of business account creation requests that match the BusinessAccountCreationRequestSearchInput.
   """
-  businessAccountCreationRequests(input: BusinessAccountCreationRequestSearchInput!, first: Int, after: String): BusinessAccountCreationRequestConnection
+  businessAccountCreationRequests(input: BusinessAccountCreationRequestSearchInput!, first: Int, after: String): BusinessAccountCreationRequestConnection @deprecated(reason: "Use the top-level `businessAccountCreationRequests` query instead.")
 
   """
   A paginated list of in-store readers that match the InStoreReaderSearchInput.
   """
-  inStoreReaders(input: InStoreReaderSearchInput!, first: Int, after: String): InStoreReaderConnection
+  inStoreReaders(input: InStoreReaderSearchInput!, first: Int, after: String): InStoreReaderConnection @deprecated(reason: "Use the top-level `inStoreReaders` query instead.")
 
   """
   A paginated list of in-store locations that match any of the conditions in InStoreLocationSearchInput.
   """
-  inStoreLocations(input: InStoreLocationSearchInput!, first: Int, after: String): InStoreLocationSearchConnection
+  inStoreLocations(input: InStoreLocationSearchInput!, first: Int, after: String): InStoreLocationSearchConnection @deprecated(reason: "Use the top-level `searchInStoreLocations` query instead.")
 
   """
   A paginated list of roles that match any of the conditions in RoleSearchInput.
   """
-  roles(input: RoleSearchInput!, first: Int, after: String): RoleSearchConnection
+  roles(input: RoleSearchInput!, first: Int, after: String): RoleSearchConnection @deprecated(reason: "Use the top-level `roles` query instead.")
 
   """
   A paginated list of recurring billing subscriptions that match the RecurringBillingSubscriptionSearchInput.
   """
-  recurringBillingSubscriptions(input: RecurringBillingSubscriptionSearchInput!, first: Int, after: String): RecurringBillingSubscriptionConnection
+  recurringBillingSubscriptions(input: RecurringBillingSubscriptionSearchInput!, first: Int, after: String): RecurringBillingSubscriptionConnection @deprecated(reason: "Use the top-level `recurringBillingSubscriptions` query instead.")
 }
 
 """Input fields for searching by address."""
@@ -12837,6 +13007,22 @@ input ThreeDSecurePassThroughInput {
   directory server. This field must be supplied for Mastercard Identity Check.
   """
   directoryServerTransactionId: String
+
+  """
+  Specifies which network was used during 3D Secure authentication, so
+  processing occurs on the same network. This is primarily for dual-network
+  cards (e.g., eftpos cards). If not supplied, Braintree selects the network
+  automatically, which, for dual-network cards, may not match the network used
+  during 3D Secure authentication.
+  """
+  network: ThreeDSecurePassThroughNetwork
+}
+
+"""The payment network used during 3D Secure authentication."""
+enum ThreeDSecurePassThroughNetwork {
+  EFTPOS
+  MASTERCARD
+  VISA
 }
 
 """
@@ -14882,6 +15068,33 @@ input UpdateRecurringBillingSubscriptionPlanAddOnInput {
 }
 
 """
+Top-level input fields for updating a recurring billing subscription plan add-on template.
+"""
+input UpdateRecurringBillingSubscriptionPlanAddOnTemplateInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The add-on's identifier."""
+  id: ID!
+
+  """The name of the add-on."""
+  name: String
+
+  """A description of the add-on."""
+  description: String
+
+  """The add-on amount."""
+  amount: Amount
+
+  """
+  The number of times the billing cycle will be executed. Use 0 to indicate the add-on never expires.
+  """
+  numberOfBillingCycles: Int
+}
+
+"""
 Input for managing discounts when updating a recurring billing subscription plan.
 """
 input UpdateRecurringBillingSubscriptionPlanDiscountInput {
@@ -14906,6 +15119,33 @@ input UpdateRecurringBillingSubscriptionPlanDiscountInput {
   """
   The number of times the billing cycle will be executed. For ADD, omit to
   inherit from the template. For EDIT, omit to keep the current value.
+  """
+  numberOfBillingCycles: Int
+}
+
+"""
+Top-level input fields for updating a recurring billing subscription plan discount template.
+"""
+input UpdateRecurringBillingSubscriptionPlanDiscountTemplateInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The discount's identifier."""
+  id: ID!
+
+  """The name of the discount."""
+  name: String
+
+  """A description of the discount."""
+  description: String
+
+  """The discount amount."""
+  amount: Amount
+
+  """
+  The number of times the billing cycle will be executed. Use 0 to indicate the discount never expires.
   """
   numberOfBillingCycles: Int
 }
