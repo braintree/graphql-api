@@ -2207,7 +2207,8 @@ input CreateRecurringBillingSubscriptionPlanAddOnInput {
   description: String
 
   """
-  The number of times the billing cycle will be executed. Omit to inherit from the add-on template.
+  The number of times the billing cycle will be executed. Omit to inherit from
+  the add-on template. Pass 0 to set as never expires.
   """
   numberOfBillingCycles: Int
 }
@@ -2253,7 +2254,8 @@ input CreateRecurringBillingSubscriptionPlanDiscountInput {
   description: String
 
   """
-  The number of times the billing cycle will be executed. Omit to inherit from the discount template.
+  The number of times the billing cycle will be executed. Omit to inherit from
+  the discount template. Pass 0 to set as never expires.
   """
   numberOfBillingCycles: Int
 }
@@ -3256,6 +3258,52 @@ type DeletePaymentMethodFromVaultPayload {
   An identifier used to reconcile requests and responses. 255 characters maximum.
   """
   clientMutationId: String
+}
+
+"""
+The response object returned after deleting a recurring billing subscription plan add-on template.
+"""
+type DeleteRecurringBillingSubscriptionPlanAddOnPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+}
+
+"""
+Top-level input fields for deleting a recurring billing subscription plan add-on template.
+"""
+input DeleteRecurringBillingSubscriptionPlanAddOnTemplateInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The add-on's identifier."""
+  id: ID!
+}
+
+"""
+The response object returned after deleting a recurring billing subscription plan discount template.
+"""
+type DeleteRecurringBillingSubscriptionPlanDiscountPayload {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+}
+
+"""
+Top-level input fields for deleting a recurring billing subscription plan discount template.
+"""
+input DeleteRecurringBillingSubscriptionPlanDiscountTemplateInput {
+  """
+  An identifier used to reconcile requests and responses. 255 characters maximum.
+  """
+  clientMutationId: String
+
+  """The discount's identifier."""
+  id: ID!
 }
 
 """
@@ -6659,6 +6707,16 @@ type Mutation {
   Updates an existing recurring billing subscription plan discount template.
   """
   updateRecurringBillingSubscriptionPlanDiscountTemplate(input: UpdateRecurringBillingSubscriptionPlanDiscountTemplateInput!): RecurringBillingSubscriptionPlanDiscountPayload
+
+  """
+  Deletes an existing recurring billing subscription plan add-on template.
+  """
+  deleteRecurringBillingSubscriptionPlanAddOnTemplate(input: DeleteRecurringBillingSubscriptionPlanAddOnTemplateInput!): DeleteRecurringBillingSubscriptionPlanAddOnPayload
+
+  """
+  Deletes an existing recurring billing subscription plan discount template.
+  """
+  deleteRecurringBillingSubscriptionPlanDiscountTemplate(input: DeleteRecurringBillingSubscriptionPlanDiscountTemplateInput!): DeleteRecurringBillingSubscriptionPlanDiscountPayload
 }
 
 """The name of the party."""
@@ -11340,6 +11398,15 @@ type Search {
   recurringBillingSubscriptions(input: RecurringBillingSubscriptionSearchInput!, first: Int, after: String): RecurringBillingSubscriptionConnection @deprecated(reason: "Use the top-level `recurringBillingSubscriptions` query instead.")
 }
 
+"""Input fields for searching for a transaction with a given ACH type."""
+input SearchACHTypeInput {
+  """The ACH type used is exactly this value."""
+  is: ACHType
+
+  """The ACH type used is one of these values."""
+  in: [ACHType!]
+}
+
 """Input fields for searching by address."""
 input SearchAddressInput {
   """Company name."""
@@ -14475,6 +14542,9 @@ input TransactionSearchInput {
 
   """Find transactions by the processing mode."""
   processingMode: SearchProcessingModeInput
+
+  """Find transactions by the ACH type used."""
+  achType: SearchACHTypeInput
 }
 
 """
@@ -15062,7 +15132,8 @@ input UpdateRecurringBillingSubscriptionPlanAddOnInput {
 
   """
   The number of times the billing cycle will be executed. For ADD, omit to
-  inherit from the template. For EDIT, omit to keep the current value.
+  inherit from the template. For EDIT, omit to keep the current value. Pass 0 to
+  set as never expires.
   """
   numberOfBillingCycles: Int
 }
@@ -15118,7 +15189,8 @@ input UpdateRecurringBillingSubscriptionPlanDiscountInput {
 
   """
   The number of times the billing cycle will be executed. For ADD, omit to
-  inherit from the template. For EDIT, omit to keep the current value.
+  inherit from the template. For EDIT, omit to keep the current value. Pass 0 to
+  set as never expires.
   """
   numberOfBillingCycles: Int
 }

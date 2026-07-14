@@ -1,3 +1,20 @@
+# 07-14-2026
+* Add new mutations:
+    * `deleteRecurringBillingSubscriptionPlanAddOnTemplate`
+    * `deleteRecurringBillingSubscriptionPlanDiscountTemplate`
+* Add new types:
+    * `DeleteRecurringBillingSubscriptionPlanAddOnPayload`
+    * `DeleteRecurringBillingSubscriptionPlanDiscountPayload`
+* Add new inputs:
+    * `DeleteRecurringBillingSubscriptionPlanAddOnTemplateInput`
+    * `DeleteRecurringBillingSubscriptionPlanDiscountTemplateInput`
+    * `SearchACHTypeInput`
+* Add new fields:
+    * `achType` to `TransactionSearchInput`
+    * `clientMutationId` to `DeleteRecurringBillingSubscriptionPlanAddOnPayload`, `DeleteRecurringBillingSubscriptionPlanAddOnTemplateInput`, `DeleteRecurringBillingSubscriptionPlanDiscountPayload`, `DeleteRecurringBillingSubscriptionPlanDiscountTemplateInput`
+    * `id` to `DeleteRecurringBillingSubscriptionPlanAddOnTemplateInput`, `DeleteRecurringBillingSubscriptionPlanDiscountTemplateInput`
+    * `in`, `is` to `SearchACHTypeInput`
+
 # 07-07-2026
 * Add new mutations:
     * `createRecurringBillingSubscriptionPlanAddOnTemplate`
