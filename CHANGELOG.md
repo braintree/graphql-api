@@ -1,3 +1,17 @@
+# 08-04-2026
+* Add new types:
+    * `MerchantAccountCapabilities`
+* Add new enums:
+    * `MerchantAccountType`
+* Add new directives:
+    * `deprecatedSince`
+* Add new enum values:
+    * `NARANJA`, `TROY`, `VERVE`, `naranja`, `troy`, `verve` to `CreditCardBrandCode`
+    * `MASTER`, `STANDARD`, `SUB_MERCHANT` to `MerchantAccountType`
+* Add new fields:
+    * `accountType`, `capabilities` to `MerchantAccount`
+    * `supportsPublicDescriptors` to `MerchantAccountCapabilities`
+
 # 07-14-2026
 * Add new mutations:
     * `deleteRecurringBillingSubscriptionPlanAddOnTemplate`

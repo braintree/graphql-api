@@ -1,3 +1,11 @@
+"""
+Records the date (in YYYY-MM-DD format) that a schema element was deprecated.
+Must accompany the standard @deprecated directive. This is a public directive:
+its definition is exposed through schema introspection, and passthrough schema
+exports preserve its usages for downstream deprecation tracking and tooling.
+"""
+directive @deprecatedSince(date: Date!) on FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM_VALUE | INPUT_FIELD_DEFINITION
+
 """Exposes a URL that specifies the behaviour of this scalar."""
 directive @specifiedBy(
   """The URL that specifies the behaviour of this scalar."""
@@ -2496,11 +2504,14 @@ enum CreditCardBrandCode {
   INTERNATIONAL_MAESTRO
   JCB
   MASTERCARD
+  NARANJA
   SOLO
   SWITCH
+  TROY
   UK_MAESTRO
   UNION_PAY
   UNKNOWN
+  VERVE
   VISA
   american_express
   citi
@@ -2512,11 +2523,14 @@ enum CreditCardBrandCode {
   international_maestro
   jcb
   mastercard
+  naranja
   solo
   switch
+  troy
   uk_maestro
   union_pay
   unknown
+  verve
   visa
 }
 
@@ -5979,6 +5993,22 @@ type MerchantAccount {
 
   """The 3D Secure configuration for the merchant account."""
   threeDSecure: MerchantAccountThreeDSecureConfiguration
+
+  """
+  Capabilities that are enabled, supported, or active for this merchant account.
+  """
+  capabilities: MerchantAccountCapabilities
+
+  """Merchant account type."""
+  accountType: MerchantAccountType
+}
+
+"""
+Capabilities that are enabled, supported, or active for this merchant account.
+"""
+type MerchantAccountCapabilities {
+  """Whether public descriptors are supported."""
+  supportsPublicDescriptors: Boolean
 }
 
 """A paginated list of merchant accounts."""
@@ -6045,6 +6075,13 @@ Details about the configuration of a version of 3D Secure for the merchant accou
 type MerchantAccountThreeDSecureVersionConfiguration {
   """Card types enabled for this 3D Secure version."""
   supportedCardBrands: [CreditCardBrandCode!]
+}
+
+"""The type of merchant account."""
+enum MerchantAccountType {
+  MASTER
+  STANDARD
+  SUB_MERCHANT
 }
 
 """
@@ -16186,8 +16223,8 @@ type VenmoPaymentContext implements Node & PaymentContext {
   clientSDKMetadata: ClientSDKMetadata
 
   """
-  Deprecated: This field is included for supporting legacy clients. Please use `payerInfo.userName` instead.
-  
+    Deprecated: This field is included for supporting legacy clients. Please use `payerInfo.userName` instead.
+    
   The username associated with the payment.
   """
   userName: String
