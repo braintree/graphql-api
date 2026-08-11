@@ -217,17 +217,17 @@ input AddressInput {
   adminArea1: String
 
   """
-  Postal code in any country's format, otherwise known as CAP, CEP, Eircode,
+    Postal code in any country's format, otherwise known as CAP, CEP, Eircode,
   NPA, PIN, PLZ, or ZIP code. Nine alphanumeric characters maximum, may also
   contain spaces and hyphens.
-  
+    
   *Required in the shipping address for Level 3 processing*.
   """
   postalCode: String
 
   """
-  Country code for the address.
-  
+    Country code for the address.
+    
   *Required in the shipping address for Level 3 processing*.
   """
   countryCode: CountryCode
@@ -460,15 +460,15 @@ input AuthorizeCreditCardInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -477,7 +477,7 @@ input AuthorizeCreditCardInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -551,15 +551,15 @@ input AuthorizeInStoreCreditCardInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -568,7 +568,7 @@ input AuthorizeInStoreCreditCardInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -599,15 +599,15 @@ input AuthorizePaymentMethodInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -616,7 +616,7 @@ input AuthorizePaymentMethodInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -644,15 +644,15 @@ input AuthorizePayPalAccountInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -661,7 +661,7 @@ input AuthorizePayPalAccountInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -705,15 +705,15 @@ input AuthorizeVenmoAccountInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -722,7 +722,7 @@ input AuthorizeVenmoAccountInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -928,15 +928,15 @@ input CaptureTransactionInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -945,7 +945,7 @@ input CaptureTransactionInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -985,17 +985,17 @@ input CaptureTransactionOptionsInput {
   descriptor: TransactionDescriptorInput
 
   """
-  Discount amount that was included in the total transaction amount. Does not
+    Discount amount that was included in the total transaction amount. Does not
   add to the total amount the payment method will be charged. This value can't
   be negative. Please note that this field is not used on PayPal transactions.
-  
+    
   *Required for Level 3 processing*.
   """
   discountAmount: String
 
   """
-  Line items for this transaction. Up to 249 line items may be specified.
-  
+    Line items for this transaction. Up to 249 line items may be specified.
+    
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
@@ -1009,22 +1009,22 @@ input CaptureTransactionOptionsInput {
   orderId: String
 
   """
-  A purchase order identification value you associate with this transaction.
-  
+    A purchase order identification value you associate with this transaction.
+    
   *Required for Level 2 processing*.
   """
   purchaseOrderNumber: String
 
   """
-  Shipping information.
-  
+    Shipping information.
+    
   *Required for Level 3 processing*.
   """
   shipping: TransactionShippingInput
 
   """
-  Tax information about the transaction.
-  
+    Tax information about the transaction.
+    
   *Required for Level 2 processing*.
   """
   tax: TransactionTaxInput
@@ -1109,15 +1109,15 @@ input ChargeCreditCardInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -1126,7 +1126,7 @@ input ChargeCreditCardInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -1157,15 +1157,15 @@ input ChargeInStoreCreditCardInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -1174,7 +1174,7 @@ input ChargeInStoreCreditCardInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -1205,15 +1205,15 @@ input ChargePaymentMethodInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -1222,7 +1222,7 @@ input ChargePaymentMethodInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -1250,15 +1250,15 @@ input ChargePayPalAccountInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -1267,7 +1267,7 @@ input ChargePayPalAccountInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -1335,15 +1335,15 @@ input ChargeUsBankAccountInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -1352,7 +1352,7 @@ input ChargeUsBankAccountInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -1403,15 +1403,15 @@ input ChargeVenmoAccountInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -1420,7 +1420,7 @@ input ChargeVenmoAccountInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -3061,12 +3061,12 @@ input CustomerInput {
   website: URL
 
   """
-  A set of country code ID pairs, analogous to Social Security numbers in the United States.
-  
+    A set of country code ID pairs, analogous to Social Security numbers in the United States.
+    
   A customer may have multiple tax identifiers, but only one per tax
   jurisdiction. The values provided for an update will be stored and previous
   entries will be updated.
-  
+    
   **Note:** You will only need to use these fields for processing in certain countries.
   """
   taxIdentifiers: [CustomerTaxIdentifierInput!]
@@ -5540,38 +5540,38 @@ input InStoreTransactionInput {
   channel: String
 
   """
-  A purchase order identification value you associate with this transaction.
-  
+    A purchase order identification value you associate with this transaction.
+    
   *Required for Level 2 processing*.
   """
   purchaseOrderNumber: String
 
   """
-  Tax information about the transaction.
-  
+    Tax information about the transaction.
+    
   *Required for Level 2 processing*.
   """
   tax: TransactionTaxInput
 
   """
-  Shipping information.
-  
+    Shipping information.
+    
   *Required for Level 3 processing*.
   """
   shipping: TransactionShippingInput
 
   """
-  Discount amount that was included in the total transaction amount. Does not
+    Discount amount that was included in the total transaction amount. Does not
   add to the total amount the payment method will be charged. This value can't
   be negative. Please note that this field is not used on PayPal transactions.
-  
+    
   *Required for Level 3 processing*.
   """
   discountAmount: String
 
   """
-  Line items for this transaction. Up to 249 line items may be specified.
-  
+    Line items for this transaction. Up to 249 line items may be specified.
+    
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
@@ -5840,6 +5840,7 @@ enum LocalPaymentMethodType {
   BANCONTACT
   BIZUM
   BLIK
+  BLIK_PAY_LATER
   BOLETOBANCARIO @deprecated(reason: "Boleto Bancário is no longer supported.")
   CRYPTO
   EPS
@@ -5851,9 +5852,11 @@ enum LocalPaymentMethodType {
   MULTIBANCO
   MYBANK
   OXXO
+  OXXO_PAY
   P24
   PAYU
   PAY_UPON_INVOICE
+  PIX_INTERNATIONAL
   SATISPAY
   SEPA
   SKRILL
@@ -6294,9 +6297,9 @@ type Mutation {
   reverseRefund(input: ReverseRefundInput!): RefundTransactionPayload
 
   """
-  Create a detached refund (unassociated with any previous Braintree payment) to
-  a credit card and return a payload that includes details of the refund.
-  
+    Create a detached refund (unassociated with any previous Braintree payment)
+  to a credit card and return a payload that includes details of the refund.
+    
   We have previously referred to this as issuing a "detached credit," and it is
   disallowed by default. See the [documentation](https://articles.braintreepayments.com/control-panel/transactions/refunds-voids-credits#detached-credits)
   for more information regarding eligibility and configuration.
@@ -6310,9 +6313,9 @@ type Mutation {
   refundInStoreCreditCard(input: RefundInStoreCreditCardInput!): RefundCreditCardPayload
 
   """
-  Create a detached refund (unassociated with any previous Braintree payment) to
-  a  US Bank Account and return a payload that includes details of the refund.
-  
+    Create a detached refund (unassociated with any previous Braintree payment)
+  to a  US Bank Account and return a payload that includes details of the refund.
+    
   We have previously referred to this as issuing a "detached credit," and it is
   disallowed by default. See the [documentation](https://articles.braintreepayments.com/control-panel/transactions/refunds-voids-credits#detached-credits)
   for more information regarding eligibility and configuration.
@@ -6702,12 +6705,12 @@ type Mutation {
   updateRecurringBillingSubscriptionPlan(input: UpdateRecurringBillingSubscriptionPlanInput!): RecurringBillingSubscriptionPlanPayload
 
   """
-  Deletes a recurring billing subscription plan permanently. After deletion,
+    Deletes a recurring billing subscription plan permanently. After deletion,
   querying the plan by Node ID will return a NOT_FOUND error.
-  
+    
   Note: This mutation is different from canceling a subscription:
-  - DELETE plan: Removes the plan definition entirely (requires no active, past due, or pending subscriptions)
-  - CANCEL subscription: Sets individual subscription to CANCELED status (can be reactivated).
+    - DELETE plan: Removes the plan definition entirely (requires no active, past due, or pending subscriptions)
+    - CANCEL subscription: Sets individual subscription to CANCELED status (can be reactivated).
   """
   deleteRecurringBillingSubscriptionPlan(input: DeleteRecurringBillingSubscriptionPlanInput!): DeleteRecurringBillingSubscriptionPlanPayload
 
@@ -6919,6 +6922,7 @@ enum NonInstantLocalPaymentMethodType {
   BOLETOBANCARIO
   MULTIBANCO
   OXXO
+  OXXO_PAY
   TRUSTLY
 }
 
@@ -7042,15 +7046,15 @@ input PartialCaptureTransactionInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -7059,7 +7063,7 @@ input PartialCaptureTransactionInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -7093,10 +7097,10 @@ input PartialCaptureTransactionOptionsInput {
   amount: Amount!
 
   """
-  Discount amount that was included in the total transaction amount. Does not
+    Discount amount that was included in the total transaction amount. Does not
   add to the total amount the payment method will be charged. This value can't
   be negative. Please note that this field is not on PayPal transactions.
-  
+    
   *Required for Level 3 processing*.
   """
   discountAmount: String
@@ -7107,8 +7111,8 @@ input PartialCaptureTransactionOptionsInput {
   finalCapture: Boolean
 
   """
-  Line items for this transaction. Up to 249 line items may be specified.
-  
+    Line items for this transaction. Up to 249 line items may be specified.
+    
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
@@ -7122,22 +7126,22 @@ input PartialCaptureTransactionOptionsInput {
   orderId: String
 
   """
-  A purchase order identification value you associate with this transaction.
-  
+    A purchase order identification value you associate with this transaction.
+    
   *Required for Level 2 processing*.
   """
   purchaseOrderNumber: String
 
   """
-  Shipping information.
-  
+    Shipping information.
+    
   *Required for Level 3 processing*.
   """
   shipping: TransactionShippingInput
 
   """
-  Tax information about the transaction.
-  
+    Tax information about the transaction.
+    
   *Required for Level 2 processing*.
   """
   tax: TransactionTaxInput
@@ -7441,6 +7445,7 @@ enum PaymentMethodSnapshotSearchType {
   BANCOMATPAY_VIA_PAYPAL
   BANCONTACT_VIA_PAYPAL
   BIZUM_VIA_PAYPAL
+  BLIK_PAY_LATER_VIA_PAYPAL
   BLIK_VIA_PAYPAL
 
   """Deprecated: Boleto Bancário is no longer supported."""
@@ -7467,11 +7472,13 @@ enum PaymentMethodSnapshotSearchType {
   MBWAY_VIA_PAYPAL
   MULTIBANCO_VIA_PAYPAL
   MYBANK_VIA_PAYPAL
+  OXXO_PAY_VIA_PAYPAL
   OXXO_VIA_PAYPAL
   P24_VIA_PAYPAL
   PAYPAL
   PAYU_VIA_PAYPAL
   PAY_UPON_INVOICE_VIA_PAYPAL
+  PIX_INTERNATIONAL_VIA_PAYPAL
   SATISPAY_VIA_PAYPAL
   SEPA_DIRECT_DEBIT
   SEPA_VIA_PAYPAL
@@ -9934,15 +9941,15 @@ input RefundCreditCardInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a refund being created (in any status), then the
   same refund in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -9951,7 +9958,7 @@ input RefundCreditCardInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
@@ -10007,8 +10014,8 @@ input RefundInput {
   description: String
 
   """
-  Line items for this refund. Up to 249 line items may be specified.
-  
+    Line items for this refund. Up to 249 line items may be specified.
+    
   Only allowed for Custom Actions transactions.
   """
   lineItems: [TransactionLineItemInput!]
@@ -10024,15 +10031,15 @@ input RefundInStoreCreditCardInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a refund being created (in any status), then the
   same refund in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -10041,7 +10048,7 @@ input RefundInStoreCreditCardInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
@@ -10154,15 +10161,15 @@ input RefundTransactionInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a refund being created (in any status), then the
   same refund in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -10171,7 +10178,7 @@ input RefundTransactionInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
@@ -10208,15 +10215,15 @@ input RefundUsBankAccountInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a refund being created (in any status), then the
   same refund in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -10225,7 +10232,7 @@ input RefundUsBankAccountInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
@@ -11008,15 +11015,15 @@ input ReverseEmvTransactionInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -11025,7 +11032,7 @@ input ReverseEmvTransactionInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -11051,15 +11058,15 @@ input ReverseRefundInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a refund being created (in any status), then the
   same refund in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -11068,7 +11075,7 @@ input ReverseRefundInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
@@ -11089,15 +11096,15 @@ input ReverseTransactionInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction or refund being created (in any
   status), then the same transaction or refund in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -11106,7 +11113,7 @@ input ReverseTransactionInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction or refund is created, then no
@@ -12647,7 +12654,8 @@ enum ThreeDSecureDeviceChannel {
   THREE_R_I
 }
 
-""" The billing address of the cardholder sent with 3D Secure Lookup requests.
+"""
+The billing address of the cardholder sent with 3D Secure Lookup requests.
 """
 input ThreeDSecureLookupBillingAddressInput {
   """
@@ -12791,7 +12799,8 @@ type ThreeDSecureLookupData {
   transactionId: String
 }
 
-""" The shipping address of the transaction to be sent with 3D Secure Lookup requests.
+"""
+The shipping address of the transaction to be sent with 3D Secure Lookup requests.
 """
 input ThreeDSecureLookupShippingAddressInput {
   """
@@ -13929,8 +13938,8 @@ input TransactionInput {
   exchangeRateQuoteId: ID
 
   """
-  A purchase order identification value you associate with this transaction.
-  
+    A purchase order identification value you associate with this transaction.
+    
   *Required for Level 2 processing*.
   """
   purchaseOrderNumber: String
@@ -13973,39 +13982,39 @@ input TransactionInput {
   customerId: ID
 
   """
-  Shipping information.
-  
+    Shipping information.
+    
   *Required for Level 3 processing*.
   """
   shipping: TransactionShippingInput
 
   """
-  Tax information about the transaction.
-  
+    Tax information about the transaction.
+    
   *Required for Level 2 processing*.
   """
   tax: TransactionTaxInput
 
   """
-  Discount amount that was included in the total transaction amount. Does not
+    Discount amount that was included in the total transaction amount. Does not
   add to the total amount the payment method will be charged. This value can't
   be negative. Please note that this field is not used on PayPal transactions.
-  
+    
   *Required for Level 3 processing*.
   """
   discountAmount: String
 
   """
-  Surcharge amount that was included in the total transaction amount. Does not
+    Surcharge amount that was included in the total transaction amount. Does not
   add to the total amount the payment method will be charged. This value can't be negative.
-  
+    
   *Required for Visa Rent Discount Program*.
   """
   surchargeAmount: String
 
   """
-  Line items for this transaction. Up to 249 line items may be specified.
-  
+    Line items for this transaction. Up to 249 line items may be specified.
+    
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
@@ -14018,14 +14027,14 @@ input TransactionInput {
   vaultPaymentMethodAfterTransacting: VaultPaymentMethodAfterTransactingInput
 
   """
-  Customer information to be stored on the transaction and used for fraud
+    Customer information to be stored on the transaction and used for fraud
   protection. Use this if you wish to pass customer information on a transaction
   without creating an independent stored customer record in the vault.
-  
+    
   This parameter can only be used if you do not pass `customerId`, and if you
   are not using a vaulted/multi-use payment method. In other words, this field
   is only valid when the transaction will not be associated with an existing customer.
-  
+    
   If `vaultPaymentMethodAfterTransacting` is also passed, these values will be
   used when creating a new customer for the newly-vaulted payment method.
   """
@@ -14193,98 +14202,99 @@ type TransactionLineItem {
 """Data for individual line items on a transaction."""
 input TransactionLineItemInput {
   """
-  Item name. Maximum 35 characters, or 127 characters for PayPal transactions.
-  
+    Item name. Maximum 35 characters, or 127 characters for PayPal transactions.
+    
   *Required for Level 3 processing*.
   """
   name: String!
 
   """
-  Indicates whether the line item is a sale or refund.
-  
+    Indicates whether the line item is a sale or refund.
+    
   *Required for Level 3 processing*.
   """
   kind: TransactionLineItemType!
 
   """
-  Number of units of the item purchased. Can include up to 4 decimal places. This value can't be negative or zero.
-  
+    Number of units of the item purchased. Can include up to 4 decimal places. This value can't be negative or zero.
+    
   *Required for Level 3 processing*.
   """
   quantity: String!
 
   """
-  Per-unit price of the item. Maximum 4 decimal places, or 2 decimal places for
+    Per-unit price of the item. Maximum 4 decimal places, or 2 decimal places for
   PayPal transactions. This value can't be negative or zero.
-  
+    
   *Required for Level 3 processing*.
   """
   unitAmount: String!
 
   """
-  Total price amount for the line item: quantity multiplied by unitAmount. Can include up to 2 decimal places.
-  
+    Total price amount for the line item: quantity multiplied by unitAmount. Can include up to 2 decimal places.
+    
   *Required for Level 3 processing*.
   """
   totalAmount: String!
 
   """
-  Per-unit tax price of the item. Can include up to 2 decimal places. This value can't be negative or zero.
-  
+    Per-unit tax price of the item. Can include up to 2 decimal places. This value can't be negative or zero.
+    
   *Required for Level 3 processing*.
   """
   unitTaxAmount: String
 
   """
-  Tax amount for the line item. Can include up to 2 decimal places. This value can't be negative.
-  
+    Tax amount for the line item. Can include up to 2 decimal places. This value can't be negative.
+    
   *Required for Level 3 processing*.
   """
   taxAmount: String
 
   """
-  Amount of discount for the line item. Can include up to 2 decimal places. This
-  value can't be negative. Please note that this field is not used on PayPal transactions.
-  
+    Amount of discount for the line item. Can include up to 2 decimal places.
+  This value can't be negative. Please note that this field is not used on
+  PayPal transactions.
+    
   *Required for Level 3 processing*.
   """
   discountAmount: String
 
   """
-  The unit of measure or the unit of measure code. Maximum 12 characters.
-  
+    The unit of measure or the unit of measure code. Maximum 12 characters.
+    
   *Required for Level 3 processing*.
   """
   unitOfMeasure: String
 
   """
-  Product or UPC code for the item. Maximum 12 characters, or 127 characters for PayPal transactions.
-  
+    Product or UPC code for the item. Maximum 12 characters, or 127 characters for PayPal transactions.
+    
   *Required for Level 3 processing*.
   """
   productCode: String
 
   """
-  Code used to classify items purchased and track the total amount spent across
+    Code used to classify items purchased and track the total amount spent across
   various categories of products and services. Different corporate purchasing
   organizations may use different standards, but the [United Nations Standard
   Products and Services Code (UNSPSC)](https://www.unspsc.org/) is frequently
   used. Maximum 12 characters.
-  
+    
   *Required for Level 3 processing*.
   """
   commodityCode: String
 
   """
-  Item description. Maximum 127 characters.
-  
+    Item description. Maximum 127 characters.
+    
   *Required for Level 3 processing*.
   """
   description: String
 
   """
-  A URL to information about the product.
-  
+    A URL to information about the product.
+    
   *Required for Level 3 processing*.
   """
   url: String
@@ -14458,10 +14468,10 @@ input TransactionRiskEvaluateInput {
   customerId: ID
 
   """
-  Customer information to be stored on the transaction and used for fraud
+    Customer information to be stored on the transaction and used for fraud
   protection. Use this if you wish to pass customer information on a transaction
   without creating an independent stored customer record in the vault.
-  
+    
   This parameter can only be used if you do not pass `customerId`, and if you
   are not using a vaulted/multi-use payment method. In other words, this field
   is only valid when the transaction will not be associated with an existing customer.
@@ -14475,8 +14485,8 @@ input TransactionRiskEvaluateInput {
   billingAddress: AddressInput
 
   """
-  Line items for this transaction. Up to 249 line items may be specified.
-  
+    Line items for this transaction. Up to 249 line items may be specified.
+    
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
@@ -14640,22 +14650,22 @@ type TransactionShipping {
 """Information related to shipping a physical product."""
 input TransactionShippingInput {
   """
-  Shipping destination address information.
-  
+    Shipping destination address information.
+    
   *Required for Level 3 processing*.
   """
   shippingAddress: AddressInput
 
   """
-  Shipping cost on the entire transaction.
-  
+    Shipping cost on the entire transaction.
+    
   *Required for Level 3 processing*.
   """
   shippingAmount: String
 
   """
-  The postal code of the source shipping location, in any country's format.
-  
+    The postal code of the source shipping location, in any country's format.
+    
   *Required for Level 3 processing*.
   """
   shipsFromPostalCode: String
@@ -14664,8 +14674,8 @@ input TransactionShippingInput {
   shippingMethod: TransactionShippingMethod
 
   """
-  Shipping tax amount on the entire transaction.
-  
+    Shipping tax amount on the entire transaction.
+    
   *Required for Level 3 processing*.
   """
   shippingTaxAmount: String
@@ -14696,16 +14706,16 @@ type TransactionTaxInformation {
 """Information related to taxes on the transaction."""
 input TransactionTaxInput {
   """
-  Amount of tax that was included in the total transaction amount. Does not add
+    Amount of tax that was included in the total transaction amount. Does not add
   to the total amount the payment method will be charged.
-  
+    
   *Required for Level 2 processing* unless `taxExempt` is `true`.
   """
   taxAmount: Amount
 
   """
-  Whether the transaction should be considered eligible for tax exemption.
-  
+    Whether the transaction should be considered eligible for tax exemption.
+    
   *Required for Level 2 processing*.
   """
   taxExempt: Boolean
@@ -15826,7 +15836,8 @@ input VaultCreditCardVerificationOptionsInput {
   fraudTools: CreditCardFraudToolsOptionsInput
 }
 
-""" Specifies behavior for vaulting a single-use payment method for an in-store transaction.
+"""
+Specifies behavior for vaulting a single-use payment method for an in-store transaction.
 """
 input VaultInStorePaymentMethodAfterTransactingInput {
   """Specifies the criteria which must be met to vault this payment method."""
@@ -15871,7 +15882,8 @@ input VaultLimitedUsePayPalAccountOptionsInput {
   makeDefault: Boolean
 }
 
-""" Specifies behavior for vaulting a single-use payment method after transacting with it.
+"""
+Specifies behavior for vaulting a single-use payment method after transacting with it.
 """
 input VaultPaymentMethodAfterTransactingInput {
   """Specifies the criteria which must be met to vault this payment method."""
@@ -16833,15 +16845,15 @@ input VoidTransactionInput {
   clientMutationId: String
 
   """
-  An identifier to detect duplicate operations and prevent double-processing.
+    An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-  
+    
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being voided (in any status), then the
   same transaction in its current status will be returned.
-  
+    
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -16850,7 +16862,7 @@ input VoidTransactionInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-  
+    
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is voided, then no duplication

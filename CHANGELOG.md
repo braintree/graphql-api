@@ -1,3 +1,9 @@
+# 08-11-2026
+* Add new enum values:
+    * `BLIK_PAY_LATER`, `OXXO_PAY`, `PIX_INTERNATIONAL` to `LocalPaymentMethodType`
+    * `OXXO_PAY` to `NonInstantLocalPaymentMethodType`
+    * `BLIK_PAY_LATER_VIA_PAYPAL`, `OXXO_PAY_VIA_PAYPAL`, `PIX_INTERNATIONAL_VIA_PAYPAL` to `PaymentMethodSnapshotSearchType`
+
 # 08-04-2026
 * Add new types:
     * `MerchantAccountCapabilities`
