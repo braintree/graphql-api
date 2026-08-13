@@ -1,3 +1,9 @@
+# 08-13-2026
+* Add new fields:
+    * `merchantAccountId` to `MerchantAccountSearchInput`
+* Remove:
+    * `id` field from `MerchantAccountSearchInput`
+
 # 08-11-2026
 * Add new enum values:
     * `BLIK_PAY_LATER`, `OXXO_PAY`, `PIX_INTERNATIONAL` to `LocalPaymentMethodType`

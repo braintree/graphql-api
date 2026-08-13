@@ -6036,11 +6036,11 @@ type MerchantAccountConnectionEdge {
 
 """Input fields for searching for merchant accounts."""
 input MerchantAccountSearchInput {
-  """Find merchant accounts with an id or ids."""
-  id: SearchValueInput
-
   """Find merchant accounts associated with a given PayPal account ID."""
   paypalAccountId: SearchValueInput
+
+  """Find merchant accounts by their merchant account ID (token)."""
+  merchantAccountId: SearchTextValueInput
 }
 
 """
@@ -6252,6 +6252,8 @@ type Mutation {
   Vault payment information from a single-use payment method and return a
   payload that includes a new multi-use payment method. When vaulting a credit
   card, by default, this mutation will also verify that card before vaulting.
+  When using an OAuth Access Token to call this mutation, it must include the
+  CUSTOMER_CREATE and MULTI_USE_PAYMENT_METHOD_CREATE scopes.
   """
   vaultPaymentMethod(input: VaultPaymentMethodInput!): VaultPaymentMethodPayload
 
@@ -6285,6 +6287,8 @@ type Mutation {
 
   """
   Reverse a transaction and return a payload that includes either the voided transaction or a refund.
+  When using an OAuth Access Token to call this mutation, it must include the
+  TRANSACTION_REFUND and TRANSACTION_VOID scopes.
   """
   reverseTransaction(input: ReverseTransactionInput!): ReverseTransactionPayload
 
