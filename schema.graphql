@@ -9078,6 +9078,10 @@ type Query {
   existence except for payment methods; if a payment method cannot be resolved,
   `null` is returned at that position in the list. Already-global IDs are
   returned as-is. Min: 1 Max: 50 IDs.
+  When calling this query with an OAuth access token, include a find scope (an
+  `OAuthScope` ending in `_FIND`). Converting `PAYMENT_METHOD` IDs requires
+  `MULTI_USE_PAYMENT_METHOD_FIND`; use this scope if your integration supports
+  every `LegacyIdType`.
   """
   idsFromLegacyIds(input: IdsFromLegacyIdsInput!): [ID]!
 
