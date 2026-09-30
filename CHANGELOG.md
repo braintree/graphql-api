@@ -1,3 +1,18 @@
+# 09-30-2026
+* Add new enums:
+    * `PayPalShippingPreference`
+* Add new enum values:
+    * `BUYER_SELECTS_ADDRESS`, `MERCHANT_PROVIDED_ADDRESS_LOCKED`, `NO_SHIPPING_ADDRESS` to `PayPalShippingPreference`
+* Add new fields:
+    * `firstName`, `lastName` to `TransactionCustomerDetailsInput`
+    * `shippingPreference` to `PayPalBillingAgreementExperienceProfileInput`, `PayPalExperienceProfileInput`
+    * `surchargeAmount` to `CreditCardDetachedRefundOptionsInput`, `Refund`, `RefundInput`
+* Remove:
+    * `collectShippingAddress` field from `PayPalBillingAgreementExperienceProfileInput`
+    * `collectShippingAddress` field from `PayPalExperienceProfileInput`
+    * `shippingAddressEditable` field from `PayPalBillingAgreementExperienceProfileInput`
+    * `shippingAddressEditable` field from `PayPalExperienceProfileInput`
+
 # 09-15-2026
 * Add new enum values:
     * `ACI_WORLDWIDE`, `AIB_MERCHANT_SERVICES`, `AUTOPAY`, `BAMBORA`, `BANK_OF_AMERICA_MERCHANT_SERVICES`, `BARCLAYCARD_PAYMENTS`, `BUCKAROO`, `CHECKOUT_COM`, `CM_COM`, `COMPUTOP`, `ECOMMPAY`, `ELAVON`, `EMERCHANTPAY`, `FIS`, `GETNET`, `GLOBAL_PAYMENTS`, `GOCARDLESS`, `HEARTLAND_PAYMENT_SYSTEMS`, `HELCIM`, `MOLLIE`, `MONERIS`, `MULTISAFEPAY`, `NEXI_GROUP`, `OPAYO`, `PAYONE`, `PAYSAFE`, `PAYU`, `PPRO`, `PRIORITY_TECHNOLOGY`, `PRZELEWY24`, `RAPYD`, `REDSYS`, `SHIFT4_PAYMENTS`, `TRUSTLY`, `TRUST_PAYMENTS`, `TSYS`, `UNZER`, `VERIFONE_2CHECKOUT`, `WELLS_FARGO_MERCHANT_SERVICES`, `WORLDLINE` to `ExternalProcessor`

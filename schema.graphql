@@ -2570,6 +2570,14 @@ input CreditCardDetachedRefundOptionsInput {
   explicitly overridden during transaction creation.
   """
   merchantCategoryCode: MerchantCategoryCode
+
+  """
+  The portion of the total refund amount attributable to the surcharge. This
+  amount is already included in the total refund amount and must not be added
+  separately. Value must be non-negative. Applicable to e-commerce credit card
+  transactions only. [US region].
+  """
+  surchargeAmount: String
 }
 
 """Details about a credit card."""
@@ -4204,7 +4212,7 @@ input ExternalProcessorResponseInput {
   cvvResponseCode: AvsCvvResponseCode
 }
 
-"""A credit card's assocation with an external vault."""
+"""A credit card's association with an external vault."""
 enum ExternalVaultStatus {
   """
   The payment method for this transaction has been vaulted in an external vault.
@@ -8091,11 +8099,6 @@ input PayPalBillingAgreementExperienceProfileInput {
   brandName: String
 
   """
-  Indicates whether a shipping address will be collected from the customer during the agreement approval flow.
-  """
-  collectShippingAddress: Boolean
-
-  """
   Specifies the PayPal page to display when a user lands on the PayPal site to complete the payment.
   """
   landingPageType: PayPalLandingPageType
@@ -8104,15 +8107,12 @@ input PayPalBillingAgreementExperienceProfileInput {
   locale: Language
 
   """
-  Indicates whether to enable user editing of the shipping address. Only applies
-  when shipping address is provided by merchant.
-  """
-  shippingAddressEditable: Boolean
-
-  """
   Presents the customer with either the Continue or Setup Now flow. Default is Continue flow if the field is not provided.
   """
   userAction: PayPalBillingAgreementUserAction
+
+  """Controls how the buyer's shipping address is handled during checkout."""
+  shippingPreference: PayPalShippingPreference
 }
 
 """
@@ -8244,23 +8244,12 @@ input PayPalExperienceProfileInput {
   brandName: String
 
   """
-  Indicates whether a shipping address will be collected from the customer during the agreement approval flow.
-  """
-  collectShippingAddress: Boolean
-
-  """
   Specifies the PayPal page to display when a user lands on the PayPal site to complete the payment.
   """
   landingPageType: PayPalLandingPageType
 
   """Locale of the PayPal payment approval experience."""
   locale: Language
-
-  """
-  Indicates whether to enable user editing of the shipping address. Only applies
-  when shipping address is provided by merchant.
-  """
-  shippingAddressEditable: Boolean
 
   """
   Presents the customer with either the Continue or Pay Now (COMMIT) checkout
@@ -8270,6 +8259,9 @@ input PayPalExperienceProfileInput {
 
   """Indicates the contact information preferred by the customers."""
   contactPreference: PayPalUserContactPreference
+
+  """Controls how the buyer's shipping address is handled during checkout."""
+  shippingPreference: PayPalShippingPreference
 }
 
 """The intent for PayPal payments."""
@@ -8692,6 +8684,24 @@ input PayPalShippingOptionInput {
 enum PayPalShippingOptionType {
   PICKUP
   SHIPPING
+}
+
+"""
+Controls how the buyer's shipping address is handled during PayPal checkout.
+"""
+enum PayPalShippingPreference {
+  """
+  The buyer selects a shipping address from their PayPal account (or provides a new one).
+  """
+  BUYER_SELECTS_ADDRESS
+
+  """
+  The merchant-provided shipping address is used and cannot be changed by the buyer.
+  """
+  MERCHANT_PROVIDED_ADDRESS_LOCKED
+
+  """No shipping address is collected or displayed."""
+  NO_SHIPPING_ADDRESS
 }
 
 """PayPal-specific details on a transaction."""
@@ -9929,6 +9939,14 @@ type Refund implements Node & Payment {
   """
   customer: Customer
 
+  """
+  The portion of the total refund amount attributable to the surcharge. This
+  amount is already included in the total refund amount and must not be added
+  separately. Value must be non-negative. Applicable to e-commerce credit card
+  transactions only. [US region].
+  """
+  surchargeAmount: String
+
   """Line items for this refund."""
   lineItems: [TransactionLineItem!]
 
@@ -10060,6 +10078,14 @@ input RefundInput {
   Description of the refund that is displayed to customers in PayPal email receipts.
   """
   description: String
+
+  """
+  The portion of the total refund amount attributable to the surcharge. This
+  amount is already included in the total refund amount and must not be added
+  separately. Value must be non-negative. Applicable to e-commerce credit card
+  transactions only. [US region].
+  """
+  surchargeAmount: String
 
   """
     Line items for this refund. Up to 249 line items may be specified.
@@ -13894,6 +13920,12 @@ input TransactionCustomerDetailsInput {
 
   """Phone number for the customer."""
   phoneNumber: String
+
+  """First name of the customer. 255 character maximum."""
+  firstName: String
+
+  """Last name of the customer. 255 character maximum."""
+  lastName: String
 }
 
 """
@@ -13931,7 +13963,7 @@ multi-use payment methods, or from single-use payment methods which will not be
 stored in an external vault.
 """
 input TransactionExternalVaultOptionsInput {
-  """The credit card's assocation with an external vault."""
+  """The credit card's association with an external vault."""
   status: ExternalVaultStatus!
 
   """
