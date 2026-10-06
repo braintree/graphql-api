@@ -1,3 +1,14 @@
+# 10-06-2026
+* Add new fields:
+    * `deviceId` to `PerformThreeDSecureLookupInput`
+* Update types:
+    * Make `paymentMethodId` nullable on `RecurringBillingSubscription`
+* Deprecate:
+    * `BOLETOBANCARIO` on `NonInstantLocalPaymentMethodType`
+    * `SAMSUNG_PAY` on `PaymentMethodOriginType`
+    * `BOLETOBANCARIO_VIA_PAYPAL`, `CREDIT_CARD_VIA_SAMSUNG_PAY` on `PaymentMethodSnapshotSearchType`
+    * `userName` on `VenmoPaymentContext`
+
 # 09-30-2026
 * Add new enums:
     * `PayPalShippingPreference`

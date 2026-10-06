@@ -119,7 +119,11 @@ type Address {
   """Company name."""
   company: String
 
-  """The street address."""
+  """
+  The street address.
+  
+  Deprecated (since 2020-11-18): Use `addressLine1` instead.
+  """
   streetAddress: String @deprecated(reason: "Use `addressLine1` instead.")
 
   """
@@ -127,7 +131,11 @@ type Address {
   """
   addressLine1: String
 
-  """Extended address information, such as an apartment or suite number."""
+  """
+  Extended address information, such as an apartment or suite number.
+  
+  Deprecated (since 2020-11-18): Use `addressLine2` instead.
+  """
   extendedAddress: String @deprecated(reason: "Use `addressLine2` instead.")
 
   """
@@ -135,22 +143,38 @@ type Address {
   """
   addressLine2: String
 
-  """First name."""
+  """
+  First name.
+  
+  Deprecated (since 2020-02-26): Use `fullName` instead.
+  """
   firstName: String @deprecated(reason: "Use `fullName` instead.")
 
-  """Last name."""
+  """
+  Last name.
+  
+  Deprecated (since 2020-02-26): Use `fullName` instead.
+  """
   lastName: String @deprecated(reason: "Use `fullName` instead.")
 
   """Full name."""
   fullName: String
 
-  """Locality/city."""
+  """
+  Locality/city.
+  
+  Deprecated (since 2020-11-18): Use `adminArea2` instead.
+  """
   locality: String @deprecated(reason: "Use `adminArea2` instead.")
 
   """A city, town, or village."""
   adminArea2: String
 
-  """State or province."""
+  """
+  State or province.
+  
+  Deprecated (since 2020-11-18): Use `adminArea1` instead.
+  """
   region: String @deprecated(reason: "Use `adminArea1` instead.")
 
   """
@@ -166,7 +190,11 @@ type Address {
   """Country code for the address."""
   countryCode: CountryCode
 
-  """Phone number."""
+  """
+  Phone number.
+  
+  Deprecated (since 2024-12-17): Use `phone` instead
+  """
   phoneNumber: String @deprecated(reason: "Use `phone` instead")
 
   """Phone number."""
@@ -217,17 +245,17 @@ input AddressInput {
   adminArea1: String
 
   """
-    Postal code in any country's format, otherwise known as CAP, CEP, Eircode,
+  Postal code in any country's format, otherwise known as CAP, CEP, Eircode,
   NPA, PIN, PLZ, or ZIP code. Nine alphanumeric characters maximum, may also
   contain spaces and hyphens.
-    
+  
   *Required in the shipping address for Level 3 processing*.
   """
   postalCode: String
 
   """
-    Country code for the address.
-    
+  Country code for the address.
+  
   *Required in the shipping address for Level 3 processing*.
   """
   countryCode: CountryCode
@@ -460,15 +488,15 @@ input AuthorizeCreditCardInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -477,7 +505,7 @@ input AuthorizeCreditCardInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -551,15 +579,15 @@ input AuthorizeInStoreCreditCardInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -568,7 +596,7 @@ input AuthorizeInStoreCreditCardInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -599,15 +627,15 @@ input AuthorizePaymentMethodInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -616,7 +644,7 @@ input AuthorizePaymentMethodInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -644,15 +672,15 @@ input AuthorizePayPalAccountInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -661,7 +689,7 @@ input AuthorizePayPalAccountInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -705,15 +733,15 @@ input AuthorizeVenmoAccountInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -722,7 +750,7 @@ input AuthorizeVenmoAccountInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -902,10 +930,18 @@ enum BusinessType {
   LIMITED_LIABILITY_CORPORATION
   NONPROFIT
   PARTNERSHIP
+
+  """
+  Deprecated (since 2020-11-23): No longer applicable, use PARTNERSHIP instead.
+  """
   PARTNERSHIP_LLP @deprecated(reason: "No longer applicable, use PARTNERSHIP instead.")
   PRIVATE_CORPORATION
   PUBLIC_CORPORATION
   SOLE_PROPRIETORSHIP
+
+  """
+  Deprecated (since 2020-11-23): No longer applicable, use NONPROFIT instead.
+  """
   TAX_EXEMPT @deprecated(reason: "No longer applicable, use NONPROFIT instead.")
 }
 
@@ -928,15 +964,15 @@ input CaptureTransactionInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -945,7 +981,7 @@ input CaptureTransactionInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -985,17 +1021,17 @@ input CaptureTransactionOptionsInput {
   descriptor: TransactionDescriptorInput
 
   """
-    Discount amount that was included in the total transaction amount. Does not
+  Discount amount that was included in the total transaction amount. Does not
   add to the total amount the payment method will be charged. This value can't
   be negative. Please note that this field is not used on PayPal transactions.
-    
+  
   *Required for Level 3 processing*.
   """
   discountAmount: String
 
   """
-    Line items for this transaction. Up to 249 line items may be specified.
-    
+  Line items for this transaction. Up to 249 line items may be specified.
+  
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
@@ -1009,22 +1045,22 @@ input CaptureTransactionOptionsInput {
   orderId: String
 
   """
-    A purchase order identification value you associate with this transaction.
-    
+  A purchase order identification value you associate with this transaction.
+  
   *Required for Level 2 processing*.
   """
   purchaseOrderNumber: String
 
   """
-    Shipping information.
-    
+  Shipping information.
+  
   *Required for Level 3 processing*.
   """
   shipping: TransactionShippingInput
 
   """
-    Tax information about the transaction.
-    
+  Tax information about the transaction.
+  
   *Required for Level 2 processing*.
   """
   tax: TransactionTaxInput
@@ -1109,15 +1145,15 @@ input ChargeCreditCardInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -1126,7 +1162,7 @@ input ChargeCreditCardInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -1157,15 +1193,15 @@ input ChargeInStoreCreditCardInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -1174,7 +1210,7 @@ input ChargeInStoreCreditCardInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -1205,15 +1241,15 @@ input ChargePaymentMethodInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -1222,7 +1258,7 @@ input ChargePaymentMethodInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -1250,15 +1286,15 @@ input ChargePayPalAccountInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -1267,7 +1303,7 @@ input ChargePayPalAccountInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -1335,15 +1371,15 @@ input ChargeUsBankAccountInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -1352,7 +1388,7 @@ input ChargeUsBankAccountInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -1403,15 +1439,15 @@ input ChargeVenmoAccountInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -1420,7 +1456,7 @@ input ChargeVenmoAccountInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -1457,7 +1493,11 @@ type ChildCapture {
 
 """Top-level fields returned from the client configuration query."""
 type ClientConfiguration {
-  """URL to send analytics."""
+  """
+  URL to send analytics.
+  
+  Deprecated (since 2018-02-12): This field is included for supporting SDKs that send analytics.
+  """
   analyticsUrl: String @deprecated(reason: "This field is included for supporting SDKs that send analytics.")
 
   """Configuration for Apple Pay on iOS."""
@@ -1471,13 +1511,25 @@ type ClientConfiguration {
   """
   assetsUrl: String
 
-  """A URL pointing to the base path of Braintree's client API."""
+  """
+  A URL pointing to the base path of Braintree's client API.
+  
+  Deprecated (since 2018-02-12): This field is included for supporting legacy clients.
+  """
   clientApiUrl: String @deprecated(reason: "This field is included for supporting legacy clients.")
 
-  """A list of client features the merchant supports."""
+  """
+  A list of client features the merchant supports.
+  
+  Deprecated (since 2018-02-26): This field is included for supporting legacy clients.
+  """
   supportedFeatures: [ClientFeature!] @deprecated(reason: "This field is included for supporting legacy clients.")
 
-  """Configuration for payment methods in legacy clients."""
+  """
+  Configuration for payment methods in legacy clients.
+  
+  Deprecated (since 2018-07-12): This field is included for supporting legacy clients.
+  """
   braintreeApi: BraintreeApiConfiguration @deprecated(reason: "This field is included for supporting legacy clients.")
 
   """Configuration for credit card tokenization."""
@@ -1495,11 +1547,17 @@ type ClientConfiguration {
   """Configuration for Google Pay on Android and the web."""
   googlePay: GooglePayConfiguration
 
-  """Deprecated, this field will always be null."""
+  """
+  This field will always be null.
+  
+  Deprecated (since 2019-04-16): This field is included for supporting legacy clients.
+  """
   ideal: IDealConfiguration @deprecated(reason: "This field is included for supporting legacy clients.")
 
   """
-  Deprecated, formerly configuration for Kount fraud tools, now this configuration lives under fraudProvider.
+  Formerly configuration for Kount fraud tools; this configuration now lives under `fraudProvider`.
+  
+  Deprecated (since 2020-04-03): This field is included for supporting legacy clients.
   """
   kount: KountConfiguration @deprecated(reason: "This field is included for supporting legacy clients.")
 
@@ -1513,7 +1571,9 @@ type ClientConfiguration {
   paypal: PayPalConfiguration
 
   """
-  Deprecated: Samsung pay is no longer supported. Configuration for Samsung Pay.
+  Configuration for Samsung Pay.
+  
+  Deprecated (since 2024-10-21): Samsung pay is no longer supported.
   """
   samsungPay: SamsungPayConfiguration @deprecated(reason: "Samsung pay is no longer supported.")
 
@@ -1527,7 +1587,9 @@ type ClientConfiguration {
   venmo: VenmoConfiguration
 
   """
-  Deprecated: Visa Checkout is no longer supported. Configuration for Visa Checkout.
+  Configuration for Visa Checkout.
+  
+  Deprecated (since 2026-02-03): Visa Checkout is no longer supported.
   """
   visaCheckout: VisaCheckoutConfiguration @deprecated(reason: "Visa Checkout is no longer supported.")
 
@@ -2546,7 +2608,11 @@ type CreditCardConfiguration {
   """
   challenges: [Challenge!]
 
-  """Whether or not the merchant supports 3D Secure."""
+  """
+  Whether or not the merchant supports 3D Secure.
+  
+  Deprecated (since 2019-01-30): Use `threeDSecure` instead.
+  """
   threeDSecureEnabled: Boolean @deprecated(reason: "Use `threeDSecure` instead.")
 
   """Configuration for 3D Secure."""
@@ -2627,10 +2693,18 @@ type CreditCardDetails {
   """3D Secure information for the payment method."""
   threeDSecure: ThreeDSecureDetails
 
-  """A URL to an image logo representing the card brand."""
+  """
+  A URL to an image logo representing the card brand.
+  
+  Deprecated (since 2018-10-24): This field is included for supporting legacy clients.
+  """
   imageUrl: String @deprecated(reason: "This field is included for supporting legacy clients.")
 
-  """The display name of the card brand, e.g. "Visa" or "American Express"."""
+  """
+  The display name of the card brand, e.g. "Visa" or "American Express".
+  
+  Deprecated (since 2018-09-18): Use `brandCode` instead.
+  """
   brand: String @deprecated(reason: "Use `brandCode` instead.")
 
   """Indicates whether the card on file is network tokenized."""
@@ -3069,12 +3143,12 @@ input CustomerInput {
   website: URL
 
   """
-    A set of country code ID pairs, analogous to Social Security numbers in the United States.
-    
+  A set of country code ID pairs, analogous to Social Security numbers in the United States.
+  
   A customer may have multiple tax identifiers, but only one per tax
   jurisdiction. The values provided for an update will be stored and previous
   entries will be updated.
-    
+  
   **Note:** You will only need to use these fields for processing in certain countries.
   """
   taxIdentifiers: [CustomerTaxIdentifierInput!]
@@ -3519,7 +3593,11 @@ type Dispute implements Node {
   """
   transaction: Transaction
 
-  """The chargeback protection status of the dispute."""
+  """
+  The chargeback protection status of the dispute.
+  
+  Deprecated (since 2022-09-19): Use `protectionLevel` instead.
+  """
   chargebackProtectionLevel: ChargebackProtectionLevel @deprecated(reason: "Use `protectionLevel` instead.")
 
   """The protection level of the dispute."""
@@ -3527,6 +3605,10 @@ type Dispute implements Node {
 
   """
   Indicates whether or not the merchant can upload evidence for this dispute based on its current status.
+  
+  Deprecated (since 2023-10-11): This field is redundant to `OPEN` status which
+  represents disputes with allowed evidence submission. For all other statuses
+  it is not possible to submit evidence.
   """
   evidenceSubmittable: Boolean @deprecated(reason: "This field is redundant to `OPEN` status which represents disputes with allowed evidence submission. For all other statuses it is not possible to submit evidence.")
 
@@ -3579,6 +3661,10 @@ interface DisputeEvidence {
 
 """The evidence category that specifies which requirement it satisfies."""
 enum DisputeEvidenceCategory {
+  """
+  Deprecated (since 2023-06-21): AVS_RESPONSE from the original transaction is
+  provided on your behalf when submitting a dispute.
+  """
   AVS_RESPONSE @deprecated(reason: "AVS_RESPONSE from the original transaction is provided on your behalf when submitting a dispute.")
   CARRIER_NAME
   CARRIER_NAME_OTHER
@@ -3809,7 +3895,11 @@ type DisputeTextEvidence implements DisputeEvidence {
   """Date and time at which the evidence was sent to the processor."""
   sentToProcessorAt: Timestamp
 
-  """The body for text evidence."""
+  """
+  The body for text evidence.
+  
+  Deprecated (since 2021-02-03): Use `content` for name instead.
+  """
   comment: String @deprecated(reason: "Use `content` for name instead.")
 
   """The body for text evidence."""
@@ -3823,6 +3913,10 @@ type DisputeTextEvidence implements DisputeEvidence {
 For text evidence: the evidence category that specifies which requirement it satisfies.
 """
 enum DisputeTextEvidenceCategory {
+  """
+  Deprecated (since 2023-06-21): AVS_RESPONSE from the original transaction is
+  provided on your behalf when submitting a dispute.
+  """
   AVS_RESPONSE @deprecated(reason: "AVS_RESPONSE from the original transaction is provided on your behalf when submitting a dispute.")
   CARRIER_NAME
   CREDIT_ISSUED_AMOUNT
@@ -4517,7 +4611,11 @@ type GooglePayConfiguration {
   """The environment being used for Google Pay."""
   environment: GooglePayEnvironment
 
-  """Authorization to use when tokenizing a Google Pay payment method."""
+  """
+  Authorization to use when tokenizing a Google Pay payment method.
+  
+  Deprecated (since 2018-02-26): This field is included for supporting legacy clients.
+  """
   googleAuthorization: String @deprecated(reason: "This field is included for supporting legacy clients.")
 
   """
@@ -4895,19 +4993,39 @@ input InStoreChoiceInput {
 
 """Reference object for an in-store request."""
 type InStoreContext implements Node & InStoreContextResult {
-  """A unique ID for this in-store request."""
+  """
+  A unique ID for this in-store request.
+  
+  Deprecated (since 2021-04-14): Use the id field from the InStoreContextPayload
+  """
   id: ID! @deprecated(reason: "Use the id field from the InStoreContextPayload")
 
-  """The transaction representing the charge on the payment method."""
+  """
+  The transaction representing the charge on the payment method.
+  
+  Deprecated (since 2021-04-14): Use a Node query for a RequestTransactionInStoreContext
+  """
   transaction: Transaction @deprecated(reason: "Use a Node query for a RequestTransactionInStoreContext")
 
-  """The refund representing the refund on the payment method."""
+  """
+  The refund representing the refund on the payment method.
+  
+  Deprecated (since 2021-04-14): Use a Node query for a RequestRefundInStoreContext
+  """
   refund: Refund @deprecated(reason: "Use a Node query for a RequestRefundInStoreContext")
 
-  """The reader associated with the in-store request."""
+  """
+  The reader associated with the in-store request.
+  
+  Deprecated (since 2021-04-14): Use the reader field from the InStoreContextPayload
+  """
   reader: InStoreReader @deprecated(reason: "Use the reader field from the InStoreContextPayload")
 
-  """The status of the context created."""
+  """
+  The status of the context created.
+  
+  Deprecated (since 2021-04-14): Use the status field from the InStoreContextPayload
+  """
   status: InStoreContextStatus! @deprecated(reason: "Use the status field from the InStoreContextPayload")
 }
 
@@ -4931,7 +5049,11 @@ type InStoreContextPayload {
   """
   clientMutationId: String
 
-  """The in-store context created when an in-store flow is initiated."""
+  """
+  The in-store context created when an in-store flow is initiated.
+  
+  Deprecated (since 2021-04-14): Use top-level fields
+  """
   inStoreContext: InStoreContext @deprecated(reason: "Use top-level fields")
 
   """A unique ID for this in-store context request."""
@@ -5588,38 +5710,38 @@ input InStoreTransactionInput {
   channel: String
 
   """
-    A purchase order identification value you associate with this transaction.
-    
+  A purchase order identification value you associate with this transaction.
+  
   *Required for Level 2 processing*.
   """
   purchaseOrderNumber: String
 
   """
-    Tax information about the transaction.
-    
+  Tax information about the transaction.
+  
   *Required for Level 2 processing*.
   """
   tax: TransactionTaxInput
 
   """
-    Shipping information.
-    
+  Shipping information.
+  
   *Required for Level 3 processing*.
   """
   shipping: TransactionShippingInput
 
   """
-    Discount amount that was included in the total transaction amount. Does not
+  Discount amount that was included in the total transaction amount. Does not
   add to the total amount the payment method will be charged. This value can't
   be negative. Please note that this field is not used on PayPal transactions.
-    
+  
   *Required for Level 3 processing*.
   """
   discountAmount: String
 
   """
-    Line items for this transaction. Up to 249 line items may be specified.
-    
+  Line items for this transaction. Up to 249 line items may be specified.
+  
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
@@ -5889,6 +6011,8 @@ enum LocalPaymentMethodType {
   BIZUM
   BLIK
   BLIK_PAY_LATER
+
+  """Deprecated (since 2024-12-12): Boleto Bancário is no longer supported."""
   BOLETOBANCARIO @deprecated(reason: "Boleto Bancário is no longer supported.")
   CRYPTO
   EPS
@@ -6009,7 +6133,11 @@ type MerchantAccount {
   """
   id: ID!
 
-  """The disbursement bank account linked with the merchant account."""
+  """
+  The disbursement bank account linked with the merchant account.
+  
+  Deprecated (since 2024-01-22): This field is no longer supported and will always be null.
+  """
   bankAccount: DisbursementBankAccount @deprecated(reason: "This field is no longer supported and will always be null.")
 
   """The ISO code for the currency the merchant account uses."""
@@ -6193,7 +6321,11 @@ type MonetaryAmount {
   """
   value: Amount
 
-  """The ISO code for the money's currency."""
+  """
+  The ISO code for the money's currency.
+  
+  Deprecated (since 2020-11-05): Use `currencyCode` instead.
+  """
   currencyIsoCode: CurrencyCodeAlpha @deprecated(reason: "Use `currencyCode` instead.")
 
   """The currency code for the monetary amount."""
@@ -6349,9 +6481,9 @@ type Mutation {
   reverseRefund(input: ReverseRefundInput!): RefundTransactionPayload
 
   """
-    Create a detached refund (unassociated with any previous Braintree payment)
-  to a credit card and return a payload that includes details of the refund.
-    
+  Create a detached refund (unassociated with any previous Braintree payment) to
+  a credit card and return a payload that includes details of the refund.
+  
   We have previously referred to this as issuing a "detached credit," and it is
   disallowed by default. See the [documentation](https://articles.braintreepayments.com/control-panel/transactions/refunds-voids-credits#detached-credits)
   for more information regarding eligibility and configuration.
@@ -6365,9 +6497,9 @@ type Mutation {
   refundInStoreCreditCard(input: RefundInStoreCreditCardInput!): RefundCreditCardPayload
 
   """
-    Create a detached refund (unassociated with any previous Braintree payment)
-  to a  US Bank Account and return a payload that includes details of the refund.
-    
+  Create a detached refund (unassociated with any previous Braintree payment) to
+  a  US Bank Account and return a payload that includes details of the refund.
+  
   We have previously referred to this as issuing a "detached credit," and it is
   disallowed by default. See the [documentation](https://articles.braintreepayments.com/control-panel/transactions/refunds-voids-credits#detached-credits)
   for more information regarding eligibility and configuration.
@@ -6376,6 +6508,8 @@ type Mutation {
 
   """
   Update custom fields on a transaction. Custom fields are [defined in the Control Panel](https://articles.braintreepayments.com/control-panel/custom-fields#store-and-pass-back-fields).
+  
+  Deprecated (since 2023-10-09): Use `updateCustomFields` instead.
   """
   updateTransactionCustomFields(input: UpdateTransactionCustomFieldsInput!): UpdateTransactionCustomFieldsPayload @deprecated(reason: "Use `updateCustomFields` instead.")
 
@@ -6452,6 +6586,8 @@ type Mutation {
 
   """
   Tokenize Samsung Pay card fields and return a payload that includes a single-use payment method.
+  
+  Deprecated (since 2024-10-21): Samsung pay is no longer supported.
   """
   tokenizeSamsungPayCard(input: TokenizeSamsungPayCardInput!): TokenizeSamsungPayCardPayload @deprecated(reason: "Samsung pay is no longer supported.")
 
@@ -6462,6 +6598,8 @@ type Mutation {
 
   """
   Tokenize US bank login fields and return a payload that includes a single-use payment method.
+  
+  Deprecated (since 2024-02-02): US bank logins are no longer supported.
   """
   tokenizeUsBankLogin(input: TokenizeUsBankLoginInput!): TokenizeUsBankAccountPayload @deprecated(reason: "US bank logins are no longer supported.")
 
@@ -6498,7 +6636,11 @@ type Mutation {
   """
   deleteCustomer(input: DeleteCustomerInput!): DeleteCustomerPayload
 
-  """Delete a payment method referenced by a single-use token."""
+  """
+  Delete a payment method referenced by a single-use token.
+  
+  Deprecated (since 2019-01-22): Use `deletePaymentMethodFromVault` instead.
+  """
   deletePaymentMethodFromSingleUseToken(input: DeletePaymentMethodFromSingleUseTokenInput!): DeletePaymentMethodFromSingleUseTokenPayload @deprecated(reason: "Use `deletePaymentMethodFromVault` instead.")
 
   """
@@ -6757,12 +6899,12 @@ type Mutation {
   updateRecurringBillingSubscriptionPlan(input: UpdateRecurringBillingSubscriptionPlanInput!): RecurringBillingSubscriptionPlanPayload
 
   """
-    Deletes a recurring billing subscription plan permanently. After deletion,
+  Deletes a recurring billing subscription plan permanently. After deletion,
   querying the plan by Node ID will return a NOT_FOUND error.
-    
+  
   Note: This mutation is different from canceling a subscription:
-    - DELETE plan: Removes the plan definition entirely (requires no active, past due, or pending subscriptions)
-    - CANCEL subscription: Sets individual subscription to CANCELED status (can be reactivated).
+  - DELETE plan: Removes the plan definition entirely (requires no active, past due, or pending subscriptions)
+  - CANCEL subscription: Sets individual subscription to CANCELED status (can be reactivated).
   """
   deleteRecurringBillingSubscriptionPlan(input: DeleteRecurringBillingSubscriptionPlanInput!): DeleteRecurringBillingSubscriptionPlanPayload
 
@@ -6970,8 +7112,8 @@ input NonInstantLocalPaymentContextInput {
 
 """A value identifying the type of non-instant regional payment method."""
 enum NonInstantLocalPaymentMethodType {
-  """Deprecated: Boleto Bancário is no longer supported."""
-  BOLETOBANCARIO
+  """Deprecated (since 2024-12-12): Boleto Bancário is no longer supported."""
+  BOLETOBANCARIO @deprecated(reason: "Boleto Bancário is no longer supported.")
   MULTIBANCO
   OXXO
   OXXO_PAY
@@ -7098,15 +7240,15 @@ input PartialCaptureTransactionInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -7115,7 +7257,7 @@ input PartialCaptureTransactionInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -7149,10 +7291,10 @@ input PartialCaptureTransactionOptionsInput {
   amount: Amount!
 
   """
-    Discount amount that was included in the total transaction amount. Does not
+  Discount amount that was included in the total transaction amount. Does not
   add to the total amount the payment method will be charged. This value can't
   be negative. Please note that this field is not on PayPal transactions.
-    
+  
   *Required for Level 3 processing*.
   """
   discountAmount: String
@@ -7163,8 +7305,8 @@ input PartialCaptureTransactionOptionsInput {
   finalCapture: Boolean
 
   """
-    Line items for this transaction. Up to 249 line items may be specified.
-    
+  Line items for this transaction. Up to 249 line items may be specified.
+  
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
@@ -7178,22 +7320,22 @@ input PartialCaptureTransactionOptionsInput {
   orderId: String
 
   """
-    A purchase order identification value you associate with this transaction.
-    
+  A purchase order identification value you associate with this transaction.
+  
   *Required for Level 2 processing*.
   """
   purchaseOrderNumber: String
 
   """
-    Shipping information.
-    
+  Shipping information.
+  
   *Required for Level 3 processing*.
   """
   shipping: TransactionShippingInput
 
   """
-    Tax information about the transaction.
-    
+  Tax information about the transaction.
+  
   *Required for Level 2 processing*.
   """
   tax: TransactionTaxInput
@@ -7473,10 +7615,10 @@ enum PaymentMethodOriginType {
   NETWORK_TOKEN
   PAYPAL
 
-  """Deprecated: Samsung is no longer supported."""
-  SAMSUNG_PAY
+  """Deprecated (since 2024-10-30): Samsung is no longer supported."""
+  SAMSUNG_PAY @deprecated(reason: "Samsung is no longer supported.")
 
-  """Deprecated: Visa Checkout is no longer supported."""
+  """Deprecated (since 2026-02-03): Visa Checkout is no longer supported."""
   VISA_CHECKOUT @deprecated(reason: "Visa Checkout is no longer supported.")
 }
 
@@ -7500,8 +7642,8 @@ enum PaymentMethodSnapshotSearchType {
   BLIK_PAY_LATER_VIA_PAYPAL
   BLIK_VIA_PAYPAL
 
-  """Deprecated: Boleto Bancário is no longer supported."""
-  BOLETOBANCARIO_VIA_PAYPAL
+  """Deprecated (since 2024-12-12): Boleto Bancário is no longer supported."""
+  BOLETOBANCARIO_VIA_PAYPAL @deprecated(reason: "Boleto Bancário is no longer supported.")
   CREDIT_CARD
   CREDIT_CARD_VIA_APPLE_PAY
   CREDIT_CARD_VIA_GOOGLE_PAY
@@ -7509,10 +7651,10 @@ enum PaymentMethodSnapshotSearchType {
   CREDIT_CARD_VIA_META_CHECKOUT
   CREDIT_CARD_VIA_NETWORK_TOKEN
 
-  """Deprecated: Samsung is no longer supported."""
-  CREDIT_CARD_VIA_SAMSUNG_PAY
+  """Deprecated (since 2024-10-30): Samsung is no longer supported."""
+  CREDIT_CARD_VIA_SAMSUNG_PAY @deprecated(reason: "Samsung is no longer supported.")
 
-  """Deprecated: Visa Checkout is no longer supported."""
+  """Deprecated (since 2026-02-03): Visa Checkout is no longer supported."""
   CREDIT_CARD_VIA_VISA_CHECKOUT @deprecated(reason: "Visa Checkout is no longer supported.")
   CRYPTO_VIA_PAYPAL
   EPS_VIA_PAYPAL
@@ -8174,10 +8316,18 @@ type PayPalConfiguration {
   """The merchant's PayPal client ID."""
   clientId: String
 
-  """The merchant's privacy policy URL."""
+  """
+  The merchant's privacy policy URL.
+  
+  Deprecated (since 2023-08-09): This field is deprecated and will no longer be returned
+  """
   privacyUrl: String @deprecated(reason: "This field is deprecated and will no longer be returned")
 
-  """The merchant's user agreement URL."""
+  """
+  The merchant's user agreement URL.
+  
+  Deprecated (since 2023-08-09): This field is deprecated and will no longer be returned
+  """
   userAgreementUrl: String @deprecated(reason: "This field is deprecated and will no longer be returned")
 
   """
@@ -8188,7 +8338,11 @@ type PayPalConfiguration {
   """The PayPal environment."""
   environment: PayPalEnvironment
 
-  """For internal use only."""
+  """
+  For internal use only.
+  
+  Deprecated (since 2018-07-12): This field is only included for internal testing purposes.
+  """
   environmentNoNetwork: Boolean @deprecated(reason: "This field is only included for internal testing purposes.")
 
   """Whether or not the merchant has been vetted."""
@@ -8215,7 +8369,11 @@ type PayPalConfiguration {
   """
   payeeEmail: String
 
-  """For internal use only."""
+  """
+  For internal use only.
+  
+  Deprecated (since 2018-02-12): This field is only included for internal testing purposes.
+  """
   directBaseUrl: String @deprecated(reason: "This field is only included for internal testing purposes.")
 }
 
@@ -8731,7 +8889,12 @@ type PayPalTransactionDetails {
   """The identification value of the payment within PayPal's API."""
   paymentId: String
 
-  """If the transaction is a refund, the PayPal refund ID."""
+  """
+  If the transaction is a refund, the PayPal refund ID.
+  
+  Deprecated (since 2019-12-16): This field will never be populated as it only
+  appears on refunds. Use `details.paypalId` on a refund instead.
+  """
   refundId: String @deprecated(reason: "This field will never be populated as it only appears on refunds. Use `details.paypalId` on a refund instead.")
 
   """Whether or not the transaction qualifies for PayPal Seller Protection."""
@@ -8748,10 +8911,18 @@ type PayPalTransactionDetails {
   """The fee charged by PayPal for the transaction."""
   transactionFee: MonetaryAmount
 
-  """The fee charged by PayPal for the transaction."""
+  """
+  The fee charged by PayPal for the transaction.
+  
+  Deprecated (since 2019-10-18): Use `transactionFee.value` instead.
+  """
   transactionFeeAmount: String @deprecated(reason: "Use `transactionFee.value` instead.")
 
-  """The currency code for the currency of the PayPal transaction fee."""
+  """
+  The currency code for the currency of the PayPal transaction fee.
+  
+  Deprecated (since 2019-10-18): Use `transactionFee.currencyCode` instead.
+  """
   transactionFeeCurrencyIsoCode: String @deprecated(reason: "Use `transactionFee.currencyCode` instead.")
 
   """
@@ -8764,7 +8935,11 @@ type PayPalTransactionDetails {
   """
   origin: PaymentMethodOrigin
 
-  """Buyer selected financing option at the time of creating a transaction."""
+  """
+  Buyer selected financing option at the time of creating a transaction.
+  
+  Deprecated (since 2025-11-04): This field is no longer supported.
+  """
   selectedFinancingOption: SelectedPayPalFinancingOptionDetails @deprecated(reason: "This field is no longer supported.")
 
   """The application used by the payer to scan the QR code."""
@@ -8861,6 +9036,13 @@ input PerformThreeDSecureLookupInput {
   request to the device data that was previously collected.
   """
   dfReferenceId: String
+
+  """
+  Unique and unchanging identifier linked to a specific user device that is
+  consistent across 3DS transactions for that device. Device ID can be used for
+  DCAP eligibility.
+  """
+  deviceId: String
 
   """ID of a payment method to perform the lookup on."""
   paymentMethodId: ID!
@@ -9080,6 +9262,8 @@ type Query {
   """
   Get a GraphQL ID from a legacy ID that was returned from an SDK or a legacyId
   field. Does not verify existence except for payment methods.
+  
+  Deprecated (since 2026-04-09): Use idsFromLegacyIds instead.
   """
   idFromLegacyId(legacyId: ID!, type: LegacyIdType!): ID! @deprecated(reason: "Use idsFromLegacyIds instead.")
 
@@ -9104,6 +9288,9 @@ type Query {
   """
   A collection of the available searches. Each field on the `Search` type is a
   different search that can be queried with its own input parameters.
+  
+  Deprecated (since 2026-07-01): Use the individual top-level search queries
+  (e.g. `transactions`, `refunds`, `verifications`) instead.
   """
   search: Search @deprecated(reason: "Use the individual top-level search queries (e.g. `transactions`, `refunds`, `verifications`) instead.")
 
@@ -9258,7 +9445,7 @@ type RecurringBillingSubscription implements Node {
   """
   The payment method to use for this subscription. Accepts single-use or vaulted payment methods.
   """
-  paymentMethodId: ID!
+  paymentMethodId: ID
 
   """The merchant account ID used for the subscription."""
   merchantAccountId: ID
@@ -9887,7 +10074,11 @@ type Refund implements Node & Payment {
   """The current status of this refund."""
   status: PaymentStatus
 
-  """Fields describing the payment processor response."""
+  """
+  Fields describing the payment processor response.
+  
+  Deprecated (since 2025-10-30): Use relevant events in `statusHistory` or `processorAuthorizationResponse` instead.
+  """
   processorResponse: TransactionAuthorizationProcessorResponse @deprecated(reason: "Use relevant events in `statusHistory` or `processorAuthorizationResponse` instead.")
 
   """Fields describing the payment authorization processor response."""
@@ -10007,15 +10198,15 @@ input RefundCreditCardInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a refund being created (in any status), then the
   same refund in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -10024,7 +10215,7 @@ input RefundCreditCardInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
@@ -10088,8 +10279,8 @@ input RefundInput {
   surchargeAmount: String
 
   """
-    Line items for this refund. Up to 249 line items may be specified.
-    
+  Line items for this refund. Up to 249 line items may be specified.
+  
   Only allowed for Custom Actions transactions.
   """
   lineItems: [TransactionLineItemInput!]
@@ -10105,15 +10296,15 @@ input RefundInStoreCreditCardInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a refund being created (in any status), then the
   same refund in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -10122,7 +10313,7 @@ input RefundInStoreCreditCardInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
@@ -10235,15 +10426,15 @@ input RefundTransactionInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a refund being created (in any status), then the
   same refund in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -10252,7 +10443,7 @@ input RefundTransactionInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
@@ -10289,15 +10480,15 @@ input RefundUsBankAccountInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a refund being created (in any status), then the
   same refund in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -10306,7 +10497,7 @@ input RefundUsBankAccountInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
@@ -10359,7 +10550,14 @@ type RegisterApplePayDomainsPayload {
 
 """Top-level fields returned for a report query."""
 type Report {
-  """Top-level fields returned in the transaction-level fee report query."""
+  """
+  Top-level fields returned in the transaction-level fee report query.
+  
+  Deprecated (since 2020-02-10): This report has been renamed
+  `paymentLevelFees`, since it applies to all types in the Payment interface,
+  including transactions and refunds. Use the `paymentLevelFees` field instead,
+  which returns the same report.
+  """
   transactionLevelFees(
     """Report date (UTC)."""
     date: Date!
@@ -11089,15 +11287,15 @@ input ReverseEmvTransactionInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being created (in any status), then
   the same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -11106,7 +11304,7 @@ input ReverseEmvTransactionInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is created, then no duplication
@@ -11132,15 +11330,15 @@ input ReverseRefundInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a refund being created (in any status), then the
   same refund in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -11149,7 +11347,7 @@ input ReverseRefundInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no refund is created, then no duplication will
@@ -11170,15 +11368,15 @@ input ReverseTransactionInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction or refund being created (in any
   status), then the same transaction or refund in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -11187,7 +11385,7 @@ input ReverseTransactionInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction or refund is created, then no
@@ -11323,9 +11521,9 @@ input RoleSearchInput {
 }
 
 """
-Deprecated: Samsung pay is no longer supported.
-
 Details about a Samsung Pay card.
+
+Deprecated: Samsung pay is no longer supported.
 """
 type SamsungPayCardDetails {
   """The display name of the card brand, e.g. "Visa" or "American Express"."""
@@ -11352,9 +11550,9 @@ type SamsungPayCardDetails {
 }
 
 """
-Deprecated: Samsung pay is no longer supported.
-
 Input fields for a Samsung Pay card.
+
+Deprecated: Samsung pay is no longer supported.
 """
 input SamsungPayCardInput {
   """
@@ -11384,9 +11582,9 @@ input SamsungPayCardInput {
 }
 
 """
-Deprecated: Samsung Pay is no longer supported.
-
 Configuration for Samsung Pay on Android.
+
+Deprecated: Samsung Pay is no longer supported.
 """
 type SamsungPayConfiguration {
   """A string used to identify the merchant to the customer."""
@@ -11406,9 +11604,9 @@ type SamsungPayConfiguration {
 }
 
 """
-Deprecated: Samsung pay is no longer supported.
-
 The environment being used for Samsung Pay.
+
+Deprecated: Samsung pay is no longer supported.
 """
 enum SamsungPayEnvironment {
   PRODUCTION
@@ -11418,9 +11616,9 @@ enum SamsungPayEnvironment {
 }
 
 """
-Deprecated: Samsung pay is no longer supported.
-
 Additional information about the payment method specific to Samsung Pay.
+
+Deprecated: Samsung pay is no longer supported.
 """
 type SamsungPayOriginDetails {
   """
@@ -11468,50 +11666,78 @@ enum ScaExemptionType {
 type Search {
   """
   A paginated list of transactions that match the TransactionSearchInput.
+  
+  Deprecated (since 2026-07-01): Use the top-level `transactions` query instead.
   """
   transactions(input: TransactionSearchInput!, first: Int, after: String): TransactionConnection @deprecated(reason: "Use the top-level `transactions` query instead.")
 
-  """A paginated list of refunds that match the RefundSearchInput."""
+  """
+  A paginated list of refunds that match the RefundSearchInput.
+  
+  Deprecated (since 2026-07-01): Use the top-level `refunds` query instead.
+  """
   refunds(input: RefundSearchInput!, first: Int, after: String): RefundConnection @deprecated(reason: "Use the top-level `refunds` query instead.")
 
   """
   A paginated list of all types of Payment that match the PaymentSearchInput.
+  
+  Deprecated (since 2026-07-01): Use the top-level `payments` query instead.
   """
   payments(input: PaymentSearchInput!, first: Int, after: String): PaymentConnection @deprecated(reason: "Use the top-level `payments` query instead.")
 
-  """A paginated list of disputes that match the DisputeSearchInput."""
+  """
+  A paginated list of disputes that match the DisputeSearchInput.
+  
+  Deprecated (since 2026-07-01): Use the top-level `disputes` query instead.
+  """
   disputes(input: DisputeSearchInput!, first: Int, after: String): DisputeConnection @deprecated(reason: "Use the top-level `disputes` query instead.")
 
   """
   A paginated list of verifications that match the VerificationSearchInput.
+  
+  Deprecated (since 2026-07-01): Use the top-level `verifications` query instead.
   """
   verifications(input: VerificationSearchInput!, first: Int, after: String): VerificationConnection @deprecated(reason: "Use the top-level `verifications` query instead.")
 
-  """A paginated list of customers that match the CustomerSearchInput."""
+  """
+  A paginated list of customers that match the CustomerSearchInput.
+  
+  Deprecated (since 2026-07-01): Use the top-level `customers` query instead.
+  """
   customers(input: CustomerSearchInput!, first: Int, after: String): CustomerConnection @deprecated(reason: "Use the top-level `customers` query instead.")
 
   """
   A paginated list of business account creation requests that match the BusinessAccountCreationRequestSearchInput.
+  
+  Deprecated (since 2026-07-01): Use the top-level `businessAccountCreationRequests` query instead.
   """
   businessAccountCreationRequests(input: BusinessAccountCreationRequestSearchInput!, first: Int, after: String): BusinessAccountCreationRequestConnection @deprecated(reason: "Use the top-level `businessAccountCreationRequests` query instead.")
 
   """
   A paginated list of in-store readers that match the InStoreReaderSearchInput.
+  
+  Deprecated (since 2026-07-01): Use the top-level `inStoreReaders` query instead.
   """
   inStoreReaders(input: InStoreReaderSearchInput!, first: Int, after: String): InStoreReaderConnection @deprecated(reason: "Use the top-level `inStoreReaders` query instead.")
 
   """
   A paginated list of in-store locations that match any of the conditions in InStoreLocationSearchInput.
+  
+  Deprecated (since 2026-07-01): Use the top-level `searchInStoreLocations` query instead.
   """
   inStoreLocations(input: InStoreLocationSearchInput!, first: Int, after: String): InStoreLocationSearchConnection @deprecated(reason: "Use the top-level `searchInStoreLocations` query instead.")
 
   """
   A paginated list of roles that match any of the conditions in RoleSearchInput.
+  
+  Deprecated (since 2026-07-01): Use the top-level `roles` query instead.
   """
   roles(input: RoleSearchInput!, first: Int, after: String): RoleSearchConnection @deprecated(reason: "Use the top-level `roles` query instead.")
 
   """
   A paginated list of recurring billing subscriptions that match the RecurringBillingSubscriptionSearchInput.
+  
+  Deprecated (since 2026-07-01): Use the top-level `recurringBillingSubscriptions` query instead.
   """
   recurringBillingSubscriptions(input: RecurringBillingSubscriptionSearchInput!, first: Int, after: String): RecurringBillingSubscriptionConnection @deprecated(reason: "Use the top-level `recurringBillingSubscriptions` query instead.")
 }
@@ -11564,9 +11790,9 @@ input SearchAddressInput {
 }
 
 """
-Deprecated: Please use `SearchDisputeProtectionLevelInput` instead.
-
 Input fields for searching for a dispute with a given chargeback protection level.
+
+Deprecated: Please use `SearchDisputeProtectionLevelInput` instead.
 """
 input SearchChargebackProtectionLevelInput {
   """The dispute's chargeback protection level is exactly this value."""
@@ -12085,8 +12311,9 @@ type SelectedPayPalFinancingOptionDetails {
 }
 
 """
-Deprecated: SelectedPayPalFinancingOptionInput are no longer supported.
 Input fields indicating a selected financing option by a PayPal buyer.
+
+Deprecated: SelectedPayPalFinancingOptionInput are no longer supported.
 """
 input SelectedPayPalFinancingOptionInput {
   """Total number of payments over which to finance the transaction."""
@@ -12542,10 +12769,16 @@ enum ThreeDSecureAuthenticationStatus {
   AUTHENTICATE_FAILED_ACS_ERROR
   AUTHENTICATE_FRICTIONLESS_FAILED
   AUTHENTICATE_REJECTED
+
+  """Deprecated (since 2024-05-23): This was a 3DS1 status."""
   AUTHENTICATE_SIGNATURE_VERIFICATION_FAILED @deprecated(reason: "This was a 3DS1 status.")
   AUTHENTICATE_SUCCESSFUL
+
+  """Deprecated (since 2021-01-06): No longer applicable."""
   AUTHENTICATE_SUCCESSFUL_ISSUER_NOT_PARTICIPATING @deprecated(reason: "No longer applicable.")
   AUTHENTICATE_UNABLE_TO_AUTHENTICATE
+
+  """Deprecated (since 2024-06-07): No longer applicable."""
   AUTHENTICATION_BYPASSED @deprecated(reason: "No longer applicable.")
   AUTHENTICATION_UNAVAILABLE
   CHALLENGE_REQUIRED
@@ -12554,6 +12787,8 @@ enum ThreeDSecureAuthenticationStatus {
   EXEMPTION_TRA_SUCCESSFUL
   LOOKUP_BYPASSED
   LOOKUP_CARD_ERROR
+
+  """Deprecated (since 2025-11-25): This was a 3DS1 status."""
   LOOKUP_ENROLLED @deprecated(reason: "This was a 3DS1 status.")
   LOOKUP_ERROR
   LOOKUP_FAILED_ACS_ERROR
@@ -12662,57 +12897,99 @@ type ThreeDSecureDetails {
   according to the merchant's configuration with CardinalCommerce, with either
   Base64 or Hex encoding. The decoded value will be of different length and
   format per card scheme.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.cavv instead.
   """
   cavv: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.cavv instead.")
 
   """
   A unique identifier for the 3D Secure interaction with the card brand directory server.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.directoryServerTransactionId instead.
   """
   directoryServerTransactionId: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.directoryServerTransactionId instead.")
 
-  """The electronic commerce indicator."""
+  """
+  The electronic commerce indicator.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.eciFlag instead.
+  """
   eciFlag: ECommerceIndicator @deprecated(reason: "Use ThreeDSecureDetails.authentication.eciFlag instead.")
 
-  """A boolean indicating if the card has received liability shift."""
+  """
+  A boolean indicating if the card has received liability shift.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.liabilityShifted instead.
+  """
   liabilityShifted: Boolean @deprecated(reason: "Use ThreeDSecureDetails.authentication.liabilityShifted instead.")
 
-  """A boolean indicating if the card is eligible for liability shift."""
+  """
+  A boolean indicating if the card is eligible for liability shift.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.liabilityShiftPossible instead.
+  """
   liabilityShiftPossible: Boolean @deprecated(reason: "Use ThreeDSecureDetails.authentication.liabilityShiftPossible instead.")
 
-  """Indicates whether the card is enrolled in a 3D Secure program."""
+  """
+  Indicates whether the card is enrolled in a 3D Secure program.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.cardEnrolled instead.
+  """
   cardEnrolled: ThreeDSecureCardEnrolled @deprecated(reason: "Use ThreeDSecureDetails.authentication.cardEnrolled instead.")
 
-  """The 3D Secure authentication status of the card."""
+  """
+  The 3D Secure authentication status of the card.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.authenticationStatus instead.
+  """
   authenticationStatus: ThreeDSecureAuthenticationStatus @deprecated(reason: "Use ThreeDSecureDetails.authentication.authenticationStatus instead.")
 
-  """The version of the 3D Secure protocol used during authentication."""
+  """
+  The version of the 3D Secure protocol used during authentication.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.version instead.
+  """
   version: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.version instead.")
 
-  """A unique identifier for the 3D Secure interaction with the provider."""
+  """
+  A unique identifier for the 3D Secure interaction with the provider.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.xId instead.
+  """
   xId: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.xId instead.")
 
   """
   A unique identifier for the 3D Secure interaction with the 3D Secure server.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.threeDSecureServerTransactionId instead.
   """
   threeDSecureServerTransactionId: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.threeDSecureServerTransactionId instead.")
 
   """
   A unique identifier for the 3D Secure interaction with the access control server.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.acsTransactionId instead.
   """
   acsTransactionId: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.acsTransactionId instead.")
 
   """
   Indicates the current status of the 3D Secure authentication from the 3D Secure server for 3D Secure 1.0 authentications.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.paresStatus instead.
   """
   paresStatus: ThreeDSecureAuthenticationStatusIndicator @deprecated(reason: "Use ThreeDSecureDetails.authentication.paresStatus instead.")
 
   """
   Indicates the current status of the 3D Secure authentication from the 3D Secure server for 3D Secure 2.0 authentications.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.transactionStatus instead.
   """
   transactionStatus: ThreeDSecureAuthenticationStatusIndicator @deprecated(reason: "Use ThreeDSecureDetails.authentication.transactionStatus instead.")
 
   """
   Indicates the reason for the transaction status. This will be null if status is `SUCCESSFUL_AUTHENTICATION`.
+  
+  Deprecated (since 2020-10-05): Use ThreeDSecureDetails.authentication.transactionStatusReason instead.
   """
   transactionStatusReason: String @deprecated(reason: "Use ThreeDSecureDetails.authentication.transactionStatusReason instead.")
 }
@@ -13329,13 +13606,25 @@ type TokenizeCreditCardPayload {
   """
   clientMutationId: String
 
-  """A one-time-use reference to tokenized sensitive information."""
+  """
+  A one-time-use reference to tokenized sensitive information.
+  
+  Deprecated (since 2018-04-05): Use `paymentMethod.id` instead.
+  """
   token: String @deprecated(reason: "Use `paymentMethod.id` instead.")
 
-  """Details about the tokenized card."""
+  """
+  Details about the tokenized card.
+  
+  Deprecated (since 2018-04-05): Use `paymentMethod.details` instead.
+  """
   creditCard: CreditCardDetails @deprecated(reason: "Use `paymentMethod.details` instead.")
 
-  """A single-use payment method."""
+  """
+  A single-use payment method.
+  
+  Deprecated (since 2018-07-30): Use `paymentMethod` instead.
+  """
   singleUseToken: PaymentMethod @deprecated(reason: "Use `paymentMethod` instead.")
 
   """A single-use payment method."""
@@ -13346,6 +13635,8 @@ type TokenizeCreditCardPayload {
   that applies to the payment method when processed with the provided merchant
   account. This can be used to determine whether to perform 3D Secure
   authentication.
+  
+  Deprecated (since 2020-10-05): Use paymentMethod.details.threeDSecure.authenticationInsight instead.
   """
   authenticationInsight(input: AuthenticationInsightInput!): AuthenticationInsight @deprecated(reason: "Use paymentMethod.details.threeDSecure.authenticationInsight instead.")
 }
@@ -13400,7 +13691,11 @@ type TokenizeCvvPayload {
   """A single-use tokenized CVV."""
   tokenizedCvv: TokenizedCvv
 
-  """A single-use payment method representing just a CVV."""
+  """
+  A single-use payment method representing just a CVV.
+  
+  Deprecated (since 2020-08-24): This mutation does not create a full PaymentMethod. Use `tokenizedCvv` instead.
+  """
   singleUseToken: PaymentMethod @deprecated(reason: "This mutation does not create a full PaymentMethod. Use `tokenizedCvv` instead.")
 }
 
@@ -13547,9 +13842,9 @@ type TokenizePayPalOneTimePaymentPayload {
 }
 
 """
-Deprecated: Samsung pay is no longer supported.
-
 Top-level input field for tokenizing a Samsung Pay card.
+
+Deprecated: Samsung pay is no longer supported.
 """
 input TokenizeSamsungPayCardInput {
   """
@@ -13562,9 +13857,9 @@ input TokenizeSamsungPayCardInput {
 }
 
 """
-Deprecated: Samsung pay is no longer supported.
-
 Top-level fields returned from a tokenized Samsung Pay card.
+
+Deprecated: Samsung pay is no longer supported.
 """
 type TokenizeSamsungPayCardPayload {
   """
@@ -13572,7 +13867,11 @@ type TokenizeSamsungPayCardPayload {
   """
   clientMutationId: String
 
-  """A one-time-use reference to tokenized sensitive information."""
+  """
+  A one-time-use reference to tokenized sensitive information.
+  
+  Deprecated (since 2018-08-07): Use `paymentMethod` instead.
+  """
   singleUseToken: PaymentMethod @deprecated(reason: "Use `paymentMethod` instead.")
 
   """A single-use payment method."""
@@ -13602,9 +13901,9 @@ type TokenizeUsBankAccountPayload {
 }
 
 """
-Deprecated: US bank logins are no longer supported.
-
 Top-level input fields for tokenizing a US bank login.
+
+Deprecated: US bank logins are no longer supported.
 """
 input TokenizeUsBankLoginInput {
   """
@@ -13692,7 +13991,11 @@ type Transaction implements Node & Payment {
   """The current status of this transaction."""
   status: PaymentStatus
 
-  """Fields describing the payment processor response."""
+  """
+  Fields describing the payment processor response.
+  
+  Deprecated (since 2018-12-06): Use relevant events in `statusHistory` or `processorAuthorizationResponse` instead.
+  """
   processorResponse: TransactionAuthorizationProcessorResponse @deprecated(reason: "Use relevant events in `statusHistory` or `processorAuthorizationResponse` instead.")
 
   """Fields describing the payment authorization processor response."""
@@ -14018,8 +14321,8 @@ input TransactionInput {
   exchangeRateQuoteId: ID
 
   """
-    A purchase order identification value you associate with this transaction.
-    
+  A purchase order identification value you associate with this transaction.
+  
   *Required for Level 2 processing*.
   """
   purchaseOrderNumber: String
@@ -14062,39 +14365,39 @@ input TransactionInput {
   customerId: ID
 
   """
-    Shipping information.
-    
+  Shipping information.
+  
   *Required for Level 3 processing*.
   """
   shipping: TransactionShippingInput
 
   """
-    Tax information about the transaction.
-    
+  Tax information about the transaction.
+  
   *Required for Level 2 processing*.
   """
   tax: TransactionTaxInput
 
   """
-    Discount amount that was included in the total transaction amount. Does not
+  Discount amount that was included in the total transaction amount. Does not
   add to the total amount the payment method will be charged. This value can't
   be negative. Please note that this field is not used on PayPal transactions.
-    
+  
   *Required for Level 3 processing*.
   """
   discountAmount: String
 
   """
-    Surcharge amount that was included in the total transaction amount. Does not
+  Surcharge amount that was included in the total transaction amount. Does not
   add to the total amount the payment method will be charged. This value can't be negative.
-    
+  
   *Required for Visa Rent Discount Program*.
   """
   surchargeAmount: String
 
   """
-    Line items for this transaction. Up to 249 line items may be specified.
-    
+  Line items for this transaction. Up to 249 line items may be specified.
+  
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
@@ -14107,14 +14410,14 @@ input TransactionInput {
   vaultPaymentMethodAfterTransacting: VaultPaymentMethodAfterTransactingInput
 
   """
-    Customer information to be stored on the transaction and used for fraud
+  Customer information to be stored on the transaction and used for fraud
   protection. Use this if you wish to pass customer information on a transaction
   without creating an independent stored customer record in the vault.
-    
+  
   This parameter can only be used if you do not pass `customerId`, and if you
   are not using a vaulted/multi-use payment method. In other words, this field
   is only valid when the transaction will not be associated with an existing customer.
-    
+  
   If `vaultPaymentMethodAfterTransacting` is also passed, these values will be
   used when creating a new customer for the newly-vaulted payment method.
   """
@@ -14282,99 +14585,98 @@ type TransactionLineItem {
 """Data for individual line items on a transaction."""
 input TransactionLineItemInput {
   """
-    Item name. Maximum 35 characters, or 127 characters for PayPal transactions.
-    
+  Item name. Maximum 35 characters, or 127 characters for PayPal transactions.
+  
   *Required for Level 3 processing*.
   """
   name: String!
 
   """
-    Indicates whether the line item is a sale or refund.
-    
+  Indicates whether the line item is a sale or refund.
+  
   *Required for Level 3 processing*.
   """
   kind: TransactionLineItemType!
 
   """
-    Number of units of the item purchased. Can include up to 4 decimal places. This value can't be negative or zero.
-    
+  Number of units of the item purchased. Can include up to 4 decimal places. This value can't be negative or zero.
+  
   *Required for Level 3 processing*.
   """
   quantity: String!
 
   """
-    Per-unit price of the item. Maximum 4 decimal places, or 2 decimal places for
+  Per-unit price of the item. Maximum 4 decimal places, or 2 decimal places for
   PayPal transactions. This value can't be negative or zero.
-    
+  
   *Required for Level 3 processing*.
   """
   unitAmount: String!
 
   """
-    Total price amount for the line item: quantity multiplied by unitAmount. Can include up to 2 decimal places.
-    
+  Total price amount for the line item: quantity multiplied by unitAmount. Can include up to 2 decimal places.
+  
   *Required for Level 3 processing*.
   """
   totalAmount: String!
 
   """
-    Per-unit tax price of the item. Can include up to 2 decimal places. This value can't be negative or zero.
-    
+  Per-unit tax price of the item. Can include up to 2 decimal places. This value can't be negative or zero.
+  
   *Required for Level 3 processing*.
   """
   unitTaxAmount: String
 
   """
-    Tax amount for the line item. Can include up to 2 decimal places. This value can't be negative.
-    
+  Tax amount for the line item. Can include up to 2 decimal places. This value can't be negative.
+  
   *Required for Level 3 processing*.
   """
   taxAmount: String
 
   """
-    Amount of discount for the line item. Can include up to 2 decimal places.
-  This value can't be negative. Please note that this field is not used on
-  PayPal transactions.
-    
+  Amount of discount for the line item. Can include up to 2 decimal places. This
+  value can't be negative. Please note that this field is not used on PayPal transactions.
+  
   *Required for Level 3 processing*.
   """
   discountAmount: String
 
   """
-    The unit of measure or the unit of measure code. Maximum 12 characters.
-    
+  The unit of measure or the unit of measure code. Maximum 12 characters.
+  
   *Required for Level 3 processing*.
   """
   unitOfMeasure: String
 
   """
-    Product or UPC code for the item. Maximum 12 characters, or 127 characters for PayPal transactions.
-    
+  Product or UPC code for the item. Maximum 12 characters, or 127 characters for PayPal transactions.
+  
   *Required for Level 3 processing*.
   """
   productCode: String
 
   """
-    Code used to classify items purchased and track the total amount spent across
+  Code used to classify items purchased and track the total amount spent across
   various categories of products and services. Different corporate purchasing
   organizations may use different standards, but the [United Nations Standard
   Products and Services Code (UNSPSC)](https://www.unspsc.org/) is frequently
   used. Maximum 12 characters.
-    
+  
   *Required for Level 3 processing*.
   """
   commodityCode: String
 
   """
-    Item description. Maximum 127 characters.
-    
+  Item description. Maximum 127 characters.
+  
   *Required for Level 3 processing*.
   """
   description: String
 
   """
-    A URL to information about the product.
-    
+  A URL to information about the product.
+  
   *Required for Level 3 processing*.
   """
   url: String
@@ -14498,6 +14800,8 @@ type TransactionRiskContextPayload {
 
   """
   The identifier of the transaction risk context, to be used as the Client Metadata ID.
+  
+  Deprecated (since 2024-10-08): Use `paypalRiskCorrelationId` for clientMetadataId instead.
   """
   clientMetadataId: ID @deprecated(reason: "Use `paypalRiskCorrelationId` for clientMetadataId instead.")
 
@@ -14548,10 +14852,10 @@ input TransactionRiskEvaluateInput {
   customerId: ID
 
   """
-    Customer information to be stored on the transaction and used for fraud
+  Customer information to be stored on the transaction and used for fraud
   protection. Use this if you wish to pass customer information on a transaction
   without creating an independent stored customer record in the vault.
-    
+  
   This parameter can only be used if you do not pass `customerId`, and if you
   are not using a vaulted/multi-use payment method. In other words, this field
   is only valid when the transaction will not be associated with an existing customer.
@@ -14565,8 +14869,8 @@ input TransactionRiskEvaluateInput {
   billingAddress: AddressInput
 
   """
-    Line items for this transaction. Up to 249 line items may be specified.
-    
+  Line items for this transaction. Up to 249 line items may be specified.
+  
   *Required for Level 3 processing*.
   """
   lineItems: [TransactionLineItemInput!]
@@ -14688,15 +14992,31 @@ type TransactionSettlementProcessorResponse {
   """The text explanation of the processor response legacyCode."""
   message: String
 
-  """The processing bank's response to the provided CVV."""
+  """
+  The processing bank's response to the provided CVV.
+  
+  Deprecated (since 2019-11-15): AVS and CVV checks do not take place when
+  capturing a transaction, only when authorizing. Use the `processorResponse` on
+  an authorization-related `PaymentStatusEvent` instead.
+  """
   cvvResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `PaymentStatusEvent` instead.")
 
   """
   The processing bank's response to the provided billing postal or zip code.
+  
+  Deprecated (since 2019-11-15): AVS and CVV checks do not take place when
+  capturing a transaction, only when authorizing. Use the `processorResponse` on
+  an authorization-related `PaymentStatusEvent` instead.
   """
   avsPostalCodeResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `PaymentStatusEvent` instead.")
 
-  """The processing bank's response to the provided billing street address."""
+  """
+  The processing bank's response to the provided billing street address.
+  
+  Deprecated (since 2019-11-15): AVS and CVV checks do not take place when
+  capturing a transaction, only when authorizing. Use the `processorResponse` on
+  an authorization-related `PaymentStatusEvent` instead.
+  """
   avsStreetAddressResponse: AvsCvvResponseCode @deprecated(reason: "AVS and CVV checks do not take place when capturing a transaction, only when authorizing. Use the `processorResponse` on an authorization-related `PaymentStatusEvent` instead.")
 
   """The ACH return code, if applicable."""
@@ -14730,22 +15050,22 @@ type TransactionShipping {
 """Information related to shipping a physical product."""
 input TransactionShippingInput {
   """
-    Shipping destination address information.
-    
+  Shipping destination address information.
+  
   *Required for Level 3 processing*.
   """
   shippingAddress: AddressInput
 
   """
-    Shipping cost on the entire transaction.
-    
+  Shipping cost on the entire transaction.
+  
   *Required for Level 3 processing*.
   """
   shippingAmount: String
 
   """
-    The postal code of the source shipping location, in any country's format.
-    
+  The postal code of the source shipping location, in any country's format.
+  
   *Required for Level 3 processing*.
   """
   shipsFromPostalCode: String
@@ -14754,8 +15074,8 @@ input TransactionShippingInput {
   shippingMethod: TransactionShippingMethod
 
   """
-    Shipping tax amount on the entire transaction.
-    
+  Shipping tax amount on the entire transaction.
+  
   *Required for Level 3 processing*.
   """
   shippingTaxAmount: String
@@ -14786,16 +15106,16 @@ type TransactionTaxInformation {
 """Information related to taxes on the transaction."""
 input TransactionTaxInput {
   """
-    Amount of tax that was included in the total transaction amount. Does not add
+  Amount of tax that was included in the total transaction amount. Does not add
   to the total amount the payment method will be charged.
-    
+  
   *Required for Level 2 processing* unless `taxExempt` is `true`.
   """
   taxAmount: Amount
 
   """
-    Whether the transaction should be considered eligible for tax exemption.
-    
+  Whether the transaction should be considered eligible for tax exemption.
+  
   *Required for Level 2 processing*.
   """
   taxExempt: Boolean
@@ -14878,6 +15198,8 @@ type UpdateCreditCardBillingAddressPayload {
 
   """
   The new billing address. Will be `null` if a failed verification prevented the update.
+  
+  Deprecated (since 2023-10-04): Use `paymentMethod.details.billingAddress` instead.
   """
   billingAddress: Address @deprecated(reason: "Use `paymentMethod.details.billingAddress` instead.")
 
@@ -15421,10 +15743,10 @@ input UpdateTransactionAmountInput {
 }
 
 """
+Input for creating or updating custom fields on a transaction.
+
 Deprecated: `UpdateTransactionCustomFields` mutation is no longer supported,
 please use `UpdateCustomFields` mutation instead.
-
-Input for creating or updating custom fields on a transaction.
 """
 input UpdateTransactionCustomFieldsInput {
   """
@@ -15443,9 +15765,10 @@ input UpdateTransactionCustomFieldsInput {
 }
 
 """
+Top-level output field from updating custom fields for a specific transaction.
+
 Deprecated: `UpdateTransactionCustomFields` mutation is no longer supported,
 please use `UpdateCustomFields` mutation instead.
-Top-level output field from updating custom fields for a specific transaction.
 """
 type UpdateTransactionCustomFieldsPayload {
   """
@@ -15468,7 +15791,11 @@ scalar URL
 
 """Details about the customer's acceptance of ACH terms."""
 type UsBankAccountAchMandate {
-  """Deprecated, The text the customer agreed to when setting up ACH."""
+  """
+  The text the customer agreed to when setting up ACH.
+  
+  Deprecated (since 2025-07-09): Acceptance text no longer returned.
+  """
   acceptanceText: String @deprecated(reason: "Acceptance text no longer returned.")
 
   """Date and time when the text terms were accepted."""
@@ -15506,7 +15833,11 @@ type UsBankAccountConfiguration {
   """The route ID used to process a US bank account payment."""
   routeId: String
 
-  """The public key for Plaid to use to log in to a bank account."""
+  """
+  The public key for Plaid to use to log in to a bank account.
+  
+  Deprecated (since 2024-02-02): US bank logins are no longer supported.
+  """
   plaidPublicKey: String @deprecated(reason: "US bank logins are no longer supported.")
 }
 
@@ -15541,10 +15872,20 @@ type UsBankAccountDetails {
   """NACHA-mandated proof of acceptance of ACH terms."""
   achMandate: UsBankAccountAchMandate
 
-  """The ACH return code, if applicable."""
+  """
+  The ACH return code, if applicable.
+  
+  Deprecated (since 2025-11-25): Moved to Transaction level for semantic
+  correctness. Check for processorSettlementResponse field in Transaction instead.
+  """
   achReturnCode: String @deprecated(reason: "Moved to Transaction level for semantic correctness. Check for processorSettlementResponse field in Transaction instead.")
 
-  """The ACH reject reason, if applicable."""
+  """
+  The ACH reject reason, if applicable.
+  
+  Deprecated (since 2025-11-25): Moved to Transaction level for semantic
+  correctness. Check for processorSettlementResponse field in Transaction instead.
+  """
   achRejectReason: String @deprecated(reason: "Moved to Transaction level for semantic correctness. Check for processorSettlementResponse field in Transaction instead.")
 }
 
@@ -15679,9 +16020,9 @@ enum UsBankAccountVerificationMethod {
 }
 
 """
-Deprecated: US bank logins are no longer supported.
-
 Input fields for a US bank login object.
+
+Deprecated: US bank logins are no longer supported.
 """
 input UsBankLoginInput {
   """The public token returned from the bank login."""
@@ -16315,11 +16656,12 @@ type VenmoPaymentContext implements Node & PaymentContext {
   clientSDKMetadata: ClientSDKMetadata
 
   """
-    Deprecated: This field is included for supporting legacy clients. Please use `payerInfo.userName` instead.
-    
   The username associated with the payment.
+  
+  Deprecated (since 2021-09-07): This field is included for supporting legacy
+  clients. Please use `payerInfo.userName` instead.
   """
-  userName: String
+  userName: String @deprecated(reason: "This field is included for supporting legacy clients. Please use `payerInfo.userName` instead.")
 
   """
   Whether the `paymentMethodId` may be used to make a one time payment
@@ -16546,6 +16888,8 @@ type VenmoPaysheetTransactionDetails {
 
   """
   The list of line items belonging to the transaction. Can include up to 249 line items.
+  
+  Deprecated (since 2024-03-25): Use `venmoPaysheetLineItems` instead.
   """
   lineItems: [PaypalLineItem!] @deprecated(reason: "Use `venmoPaysheetLineItems` instead.")
 
@@ -16615,7 +16959,13 @@ type Verification implements Node {
   """
   paymentMethod: PaymentMethod
 
-  """For a credit card, the amount used when performing the verification."""
+  """
+  For a credit card, the amount used when performing the verification.
+  
+  Deprecated (since 2019-08-22): Depending on the type of payment method being
+  verified, some verifications do not have an amount. On a credit card
+  verification, use `paymentMethodVerificationDetails.amount` instead.
+  """
   amount: MonetaryAmount @deprecated(reason: "Depending on the type of payment method being verified, some verifications do not have an amount. On a credit card verification, use `paymentMethodVerificationDetails.amount` instead.")
 
   """The merchant account used for the verification."""
@@ -16832,19 +17182,39 @@ input VerifyUsBankAccountInput {
 
 """Details about the user and merchant authenticated in this request."""
 type Viewer {
-  """Unique identifier."""
+  """
+  Unique identifier.
+  
+  Deprecated (since 2019-05-29): Use `user` for id instead.
+  """
   id: ID @deprecated(reason: "Use `user` for id instead.")
 
-  """Email address."""
+  """
+  Email address.
+  
+  Deprecated (since 2019-05-29): Use `user` for email instead.
+  """
   email: String @deprecated(reason: "Use `user` for email instead.")
 
-  """Current status."""
+  """
+  Current status.
+  
+  Deprecated (since 2019-05-29): Use `user` for status instead.
+  """
   status: UserStatus @deprecated(reason: "Use `user` for status instead.")
 
-  """Full name."""
+  """
+  Full name.
+  
+  Deprecated (since 2019-05-29): Use `user` for name instead.
+  """
   name: String @deprecated(reason: "Use `user` for name instead.")
 
-  """Associated roles."""
+  """
+  Associated roles.
+  
+  Deprecated (since 2019-05-29): Use `user` for roles instead.
+  """
   roles: [Role!] @deprecated(reason: "Use `user` for roles instead.")
 
   """Details about the authenticated user."""
@@ -16858,9 +17228,9 @@ type Viewer {
 }
 
 """
-Deprecated: Visa Checkout is no longer supported.
-
 Configuration for Visa Checkout.
+
+Deprecated: Visa Checkout is no longer supported.
 """
 type VisaCheckoutConfiguration {
   """The Visa Checkout API key."""
@@ -16877,9 +17247,9 @@ type VisaCheckoutConfiguration {
 }
 
 """
-Deprecated: Visa Checkout is no longer supported.
-
 Additional information about the payment method specific to Visa Checkout.
+
+Deprecated: Visa Checkout is no longer supported.
 """
 type VisaCheckoutOriginDetails {
   """The Visa assigned identifier for the transaction."""
@@ -16925,15 +17295,15 @@ input VoidTransactionInput {
   clientMutationId: String
 
   """
-    An identifier to detect duplicate operations and prevent double-processing.
+  An identifier to detect duplicate operations and prevent double-processing.
   This can be used to protect from submitting a duplicate request; for instance,
   after receiving an INTERNAL error where the ultimate state of the request is uncertain.
-    
+  
   If a request is made with a new `apiRequestKey`, it will be processed as
   normal. If subsequent requests are made with the same `apiRequestKey`, and the
   first request resulted in a transaction being voided (in any status), then the
   same transaction in its current status will be returned.
-    
+  
   Subsequent requests with the same `apiRequestKey` must have the same input
   values as the original request. Subsequent requests with the same
   `apiRequestKey` must also be made after the initial request completes, and
@@ -16942,7 +17312,7 @@ input VoidTransactionInput {
   than the original request, it will result in a `VALIDATION` error on the
   subsequent request. If an `apiRequestKey` is reused after 30 days since its
   first use, it will be treated as if it has not been used before.
-    
+  
   If an initial request is made with an `apiRequestKey`, but the request
   receives a `AUTHENTICATION`, `AUTHORIZATION`, `NOT_FOUND`, `RESOURCE_LIMIT`,
   or `NOT_IMPLEMENTED` error, and no transaction is voided, then no duplication
