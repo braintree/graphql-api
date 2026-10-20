@@ -6394,6 +6394,8 @@ type Mutation {
 
   """
   Charge any payment method and return a payload that includes details of the resulting transaction.
+  When using an OAuth Access Token to call this mutation, it must include the
+  TRANSACTION_SALE and TRANSACTION_MANAGE_SETTLEMENT scopes.
   """
   chargePaymentMethod(input: ChargePaymentMethodInput!): TransactionPayload
 
@@ -6518,13 +6520,24 @@ type Mutation {
   """
   updateCustomFields(input: UpdateCustomFieldsInput!): UpdateCustomFieldsPayload
 
-  """Run a verification on a multi-use payment method."""
+  """
+  Run a verification on a multi-use payment method.
+  When using an OAuth Access Token to call this mutation, it must include the MULTI_USE_PAYMENT_METHOD_UPDATE scope.
+  """
   verifyPaymentMethod(input: VerifyPaymentMethodInput!): VerifyPaymentMethodPayload
 
-  """Run a verification on a multi-use credit card payment method."""
+  """
+  Run a verification on a credit card payment method.
+  When using an OAuth Access Token to call this mutation, it must include the
+  MULTI_USE_PAYMENT_METHOD_UPDATE scope for a multi-use payment method or the
+  STANDALONE_VERIFICATIONS scope for a single-use payment method.
+  """
   verifyCreditCard(input: VerifyCreditCardInput!): VerifyPaymentMethodPayload
 
-  """Run a verification on a multi-use US bank account payment method."""
+  """
+  Run a verification on a multi-use US bank account payment method.
+  When using an OAuth Access Token to call this mutation, it must include the MULTI_USE_PAYMENT_METHOD_UPDATE scope.
+  """
   verifyUsBankAccount(input: VerifyUsBankAccountInput!): VerifyPaymentMethodPayload
 
   """
@@ -12795,8 +12808,13 @@ enum ThreeDSecureAuthenticationStatus {
   LOOKUP_NOT_ENROLLED
   LOOKUP_SERVER_ERROR
   MPI_SERVER_ERROR
-  SKIPPED_DUE_TO_ADAPTIVE_AUTHENTICATION
+
+  """
+  Deprecated (since 2026-10-01): Replaced with SKIPPED_DUE_TO_SMART_AUTHENTICATION.
+  """
+  SKIPPED_DUE_TO_ADAPTIVE_AUTHENTICATION @deprecated(reason: "Replaced with SKIPPED_DUE_TO_SMART_AUTHENTICATION.")
   SKIPPED_DUE_TO_RULE
+  SKIPPED_DUE_TO_SMART_AUTHENTICATION
   UNSUPPORTED_ACCOUNT_TYPE
   UNSUPPORTED_CARD
   UNSUPPORTED_THREE_D_SECURE_VERSION

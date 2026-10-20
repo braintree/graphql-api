@@ -1,3 +1,9 @@
+# 10-20-2026
+* Add new enum values:
+    * `SKIPPED_DUE_TO_SMART_AUTHENTICATION` to `ThreeDSecureAuthenticationStatus`
+* Deprecate:
+    * `SKIPPED_DUE_TO_ADAPTIVE_AUTHENTICATION` on `ThreeDSecureAuthenticationStatus`
+
 # 10-06-2026
 * Add new fields:
     * `deviceId` to `PerformThreeDSecureLookupInput`
