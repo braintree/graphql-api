@@ -1,3 +1,8 @@
+# 10-27-2026
+* Add new fields:
+    * `mastercardTransactionLinkId` to `VaultCreditCardExternalVaultOptionsInput`
+    * `previousMastercardTransactionLinkId` to `TransactionExternalVaultOptionsInput`
+
 # 10-20-2026
 * Add new enum values:
     * `SKIPPED_DUE_TO_SMART_AUTHENTICATION` to `ThreeDSecureAuthenticationStatus`

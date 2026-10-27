@@ -14295,6 +14295,17 @@ input TransactionExternalVaultOptionsInput {
   `VAULTED`, but the customer is directly initiating the charge, do not pass this value.
   """
   verifyingNetworkTransactionId: String
+
+  """
+  The mastercard transaction link ID of the first _transaction_ after which this
+  payment method was stored in the external vault. If the `status` is
+  `WILL_VAULT`, do not pass this value; the mastercard transaction link ID of
+  the resulting transaction can be passed in this field for _subsequent_
+  transactions. If the `status` is `VAULTED`, but the customer is directly
+  initiating the charge, do not pass this value. If you pass this field, also
+  pass `verifyingNetworkTransactionId` for better authorization rates.
+  """
+  previousMastercardTransactionLinkId: String
 }
 
 """
@@ -16173,6 +16184,14 @@ input VaultCreditCardExternalVaultOptionsInput {
   stored in the external vault.
   """
   verifyingNetworkTransactionId: String
+
+  """
+  For use if this credit card is stored in an external vault. The mastercard
+  transaction link ID of the first _transaction_ after which this credit card
+  was stored in the external vault. It is recommended to pass
+  `verifyingNetworkTransactionId` along with this field.
+  """
+  mastercardTransactionLinkId: String
 }
 
 """
