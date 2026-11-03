@@ -9382,6 +9382,21 @@ enum ReaderStatus {
   ONLINE
 }
 
+"""Detailed breakdown for how a single reason contributes to the score."""
+type ReasonDetail {
+  """Code identifying one of the reasons for the decision."""
+  code: String
+
+  """
+  Relative contribution of this reason to the overall score, as a proportion
+  between 0 and 1. The sum of all weights for a given score should not be more than 1.
+  """
+  weight: Float
+
+  """The explicit rank of this reason, independent of array order."""
+  rank: Int
+}
+
 """
 Represents a user's subscription record, containing billing status, pricing
 details, and lifecycle timing within a specific merchant account.
@@ -11442,8 +11457,13 @@ type RiskData {
   """The risk decision on whether the transaction should be permitted."""
   decision: RiskDecision
 
-  """The reasons for the decision from the fraud service provider."""
+  """
+  The reasons for the approve/decline decision from the fraud service provider.
+  """
   decisionReasons: [String!]
+
+  """Detailed breakdown for each factor contributing to the risk score."""
+  reasonDetails: [ReasonDetail!]
 
   """
   Whether data associated with the customer's device was captured and used in the decision process.

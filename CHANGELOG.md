@@ -1,3 +1,10 @@
+# 11-03-2026
+* Add new types:
+    * `ReasonDetail`
+* Add new fields:
+    * `code`, `rank`, `weight` to `ReasonDetail`
+    * `reasonDetails` to `RiskData`
+
 # 10-27-2026
 * Add new fields:
     * `mastercardTransactionLinkId` to `VaultCreditCardExternalVaultOptionsInput`
