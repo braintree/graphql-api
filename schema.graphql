@@ -78,6 +78,30 @@ enum AccountInformationInquiry {
   SEND_DATA
 }
 
+"""The result of an account updater evaluation for a transaction."""
+type AccountUpdaterDetails {
+  """The account updater outcome reported for the transaction."""
+  status: AccountUpdaterStatus
+}
+
+"""The account updater outcome for a transaction."""
+enum AccountUpdaterStatus {
+  """The account updater response requires contacting the customer."""
+  CALL_CUSTOMER
+
+  """The account updater response requires contacting the card issuer."""
+  CALL_ISSUER
+
+  """The card account was closed."""
+  CLOSED
+
+  """The card expiration date was updated."""
+  UPDATED_EXPIRY
+
+  """The card number was updated."""
+  UPDATED_NUMBER
+}
+
 """
 A NACHA standard entry class (SEC) code, which designates how an ACH transaction was authorized.
 """
@@ -2812,6 +2836,9 @@ type CreditCardTransactionDetails {
   only returned for payment methods such as prepaid cards.
   """
   accountBalance: MonetaryAmount
+
+  """Details about an account updater outcome for this transaction."""
+  accountUpdaterDetails: AccountUpdaterDetails
 }
 
 """

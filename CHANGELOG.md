@@ -1,3 +1,14 @@
+# 11-10-2026
+* Add new types:
+    * `AccountUpdaterDetails`
+* Add new enums:
+    * `AccountUpdaterStatus`
+* Add new enum values:
+    * `CALL_CUSTOMER`, `CALL_ISSUER`, `CLOSED`, `UPDATED_EXPIRY`, `UPDATED_NUMBER` to `AccountUpdaterStatus`
+* Add new fields:
+    * `accountUpdaterDetails` to `CreditCardTransactionDetails`
+    * `status` to `AccountUpdaterDetails`
+
 # 11-03-2026
 * Add new types:
     * `ReasonDetail`
